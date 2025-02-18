@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		3D9884372D63BA4600AB988C /* GoodProperTabs in Frameworks */ = {isa = PBXBuildFile; productRef = 3D9884362D63BA4600AB988C /* GoodProperTabs */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		3D333ED32D639DF100D795BF /* yaControl.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = yaControl.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -23,6 +27,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3D9884372D63BA4600AB988C /* GoodProperTabs in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,6 +70,7 @@
 			);
 			name = yaControl;
 			packageProductDependencies = (
+				3D9884362D63BA4600AB988C /* GoodProperTabs */,
 			);
 			productName = yaControl;
 			productReference = 3D333ED32D639DF100D795BF /* yaControl.app */;
@@ -94,6 +100,9 @@
 			);
 			mainGroup = 3D333ECA2D639DF100D795BF;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				3D9884352D63BA4600AB988C /* XCLocalSwiftPackageReference "../GoodProperTabs" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 3D333ED42D639DF100D795BF /* Products */;
 			projectDirPath = "";
@@ -248,6 +257,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = yaControl/yaControl.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -255,6 +265,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"yaControl/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -273,6 +284,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = yaControl/yaControl.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -280,6 +292,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"yaControl/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -315,6 +328,20 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		3D9884352D63BA4600AB988C /* XCLocalSwiftPackageReference "../GoodProperTabs" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../GoodProperTabs;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		3D9884362D63BA4600AB988C /* GoodProperTabs */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = GoodProperTabs;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 3D333ECB2D639DF100D795BF /* Project object */;
 }
