@@ -21,5 +21,6 @@ struct MainWindow: View {
                     // Reset the "forecastChanged" so next time it shows normal icon
                     //propagationModel.forecastChanged = false
                 }
+                .frame(width: 800, height: 400)
     }
 }

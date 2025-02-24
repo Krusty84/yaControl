@@ -150,6 +150,7 @@ class YandexAPIService {
                                                 let memoryGB = String(Int(instance.resources.memory)! / 1024 / 1024 / 1024)
                                                 let addresses = instance.networkInterfaces.map { $0.primaryV4Address.address }
                                                 return VMTableData(
+                                                    id: instance.id,
                                                     name: instance.name,
                                                     status: instance.status,
                                                     createdAt: instance.createdAt,
@@ -157,7 +158,9 @@ class YandexAPIService {
                                                     memoryGB: memoryGB,
                                                     preemptible: instance.schedulingPolicy.preemptible,
                                                     addresses: addresses,
-                                                    folderName: folder.name
+                                                    folderName: folder.name,
+                                                    folderUrl: APIConfig.yaFoldersWebUrl+folder.id,
+                                                    vmUrl:APIConfig.yaCloudsWebUrl(folderID: folder.id, instanceID: instance.id)
                                                 )
                                             }
                                             allVMs.append(contentsOf: vmTableData)
@@ -257,44 +260,7 @@ class YandexAPIService {
             }.resume()
         }
         
-        // Helper function to get Instances
-//        private func getInstances(iamToken: String, folderId: String, completion: @escaping (Result<[VMInstance], Error>) -> Void) {
-//            guard let url = URL(string: "\(APIConfig.yaVMInstancesEndpoint)?folderId=\(folderId)") else {
-//                completion(.failure(NSError(domain: "Invalid URL", code: -1, userInfo: nil)))
-//                return
-//            }
-//            
-//            var request = URLRequest(url: url)
-//            request.httpMethod = "GET"
-//            request.setValue("Bearer \(iamToken)", forHTTPHeaderField: "Authorization")
-//            
-//            URLSession.shared.dataTask(with: request) { data, response, error in
-//                if let error = error {
-//                    completion(.failure(error))
-//                    return
-//                }
-//                
-//                guard let data = data else {
-//                    completion(.failure(NSError(domain: "No data received", code: -1, userInfo: nil)))
-//                    return
-//                }
-//                
-//                // Print raw JSON response for debugging
-//                        if let jsonString = String(data: data, encoding: .utf8) {
-//                            print("Raw JSON Response (VMs): \(jsonString)")
-//                        }
-//                        
-//                
-//                
-//                do {
-//                    let response = try JSONDecoder().decode([String: [VMInstance]].self, from: data)
-//                    completion(.success(response["instances"] ?? []))
-//                } catch {
-//                    completion(.failure(error))
-//                }
-//            }.resume()
-//        }
-    
+    // Helper function to get Instances
     private func getInstances(iamToken: String, folderId: String, completion: @escaping (Result<[VMInstance], Error>) -> Void) {
         guard let url = URL(string: "\(APIConfig.yaVMInstancesEndpoint)?folderId=\(folderId)") else {
             completion(.failure(NSError(domain: "Invalid URL", code: -1, userInfo: nil)))

@@ -63,6 +63,7 @@ struct VMInstance: Decodable {
 
 // Model for Final VM Table Data
 struct VMTableData:Decodable {
+    let id: String
     let name: String
     let status: String
     let createdAt: String
@@ -71,4 +72,8 @@ struct VMTableData:Decodable {
     let preemptible: Bool
     let addresses: [String]
     let folderName: String
+    let folderUrl: String
+    let vmUrl: String
 }
+
+//https://console.yandex.cloud/folders/b1gqcrohfu85p2fc6fkc/compute/instance/epddn33ae5rr4ep7to3i/overview
