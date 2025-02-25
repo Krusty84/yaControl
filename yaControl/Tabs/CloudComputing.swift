@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct CloudComputingTabContent: View {
+    @State private var iamToken: String = ""
     @State private var vmTableData: [VMTableData] = []
     @State private var errorMessage: String? = nil
     @State private var isLoading: Bool = false
@@ -41,7 +42,7 @@ struct CloudComputingTabContent: View {
              } else if filteredVMs.isEmpty {
                  EmptyView()
              } else {
-                 TableContent(filteredVMs: filteredVMs, selectedVM: $selectedVM)
+                 TableContent(iamToken: $iamToken,filteredVMs: filteredVMs, selectedVM: $selectedVM)
              }
          }
          .onAppear {
@@ -59,6 +60,7 @@ struct CloudComputingTabContent: View {
                 switch result {
                 case .success(let response):
                     // Step 2: Get VMs using the IAM Token
+                    iamToken=response.iamToken
                     YandexAPIService.shared.getVMs(iamToken: response.iamToken) { result in
                         DispatchQueue.main.async {
                             isLoading = false
@@ -122,8 +124,19 @@ struct TableHeader: View {
         //.background(Color(.systemGray))
     }
 }
+struct TableContent: View {
+    @Binding var iamToken: String
+    let filteredVMs: [VMTableData]
+    @Binding var selectedVM: VMTableData?
+    var body: some View {
+        List(filteredVMs, id: \.name) { vm in
+            TableRow(iamToken: $iamToken, vm: vm, selectedVM: $selectedVM)
+        }
+    }
+}
 
 struct TableRow: View {
+    @Binding var iamToken: String
     let vm: VMTableData
     @Binding var selectedVM: VMTableData?
     @Environment(\.openURL) private var openURL
@@ -142,7 +155,7 @@ struct TableRow: View {
                            }
             //Text(vm.status).foregroundColor(vm.status == "RUNNING" ? .green : .red).frame(width: 80, alignment: .leading)
             Button(action: {
-                            //handleStatusButtonTap(for: vm)
+                startStopVM(iamToken:iamToken,for: vm)
                         }) {
                             Image(systemName: vm.status == "RUNNING" ? "stop.fill" : "play.fill")
                                 .foregroundColor(vm.status == "RUNNING" ? .red : .green)
@@ -175,17 +188,6 @@ struct TableRow: View {
     }
 }
 
-struct TableContent: View {
-    let filteredVMs: [VMTableData]
-    @Binding var selectedVM: VMTableData?
-    
-    var body: some View {
-        List(filteredVMs, id: \.name) { vm in
-            TableRow(vm: vm, selectedVM: $selectedVM)
-        }
-    }
-}
-
 struct LoadingView: View {
     var body: some View {
         ProgressView("Loading...")
@@ -209,3 +211,4 @@ struct EmptyView: View {
             .padding()
     }
 }
+

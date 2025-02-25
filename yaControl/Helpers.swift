@@ -19,3 +19,35 @@ func numberStringBinding(for intValue: Binding<Int?>) -> Binding<String> {
         }
     )
 }
+
+func startStopVM(iamToken:String,for vm: VMTableData) {
+    if vm.status == "RUNNING" {
+        print("Stopping VM: \(vm.name)")
+        // Call API to stop the VM
+        YandexAPIService.shared.stopVM(iamToken:iamToken, vmId: vm.id) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success:
+                    print("VM stopped successfully")
+                    // Update the VM status in the UI
+                case .failure(let error):
+                    print("Failed to stop VM: \(error.localizedDescription)")
+                }
+            }
+        }
+    } else {
+        print("Starting VM: \(vm.name)")
+        // Call API to start the VM
+        YandexAPIService.shared.startVM(iamToken:iamToken,vmId: vm.id) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success:
+                    print("VM started successfully")
+                    // Update the VM status in the UI
+                case .failure(let error):
+                    print("Failed to start VM: \(error.localizedDescription)")
+                }
+            }
+        }
+    }
+}

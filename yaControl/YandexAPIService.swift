@@ -318,5 +318,54 @@ class YandexAPIService {
             }
         }.resume()
     }
-    
+
+    func startVM(iamToken: String,vmId: String, completion: @escaping (Result<Void, Error>) -> Void) {
+        guard let url = URL(string: "\(APIConfig.yaVMInstancesEndpoint)/\(vmId):start") else {
+            completion(.failure(NSError(domain: "Invalid URL", code: -1, userInfo: nil)))
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(iamToken)", forHTTPHeaderField: "Authorization")
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                completion(.failure(error))
+                return
+            }
+            
+            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+                completion(.failure(NSError(domain: "API Error", code: -1, userInfo: nil)))
+                return
+            }
+            
+            completion(.success(()))
+        }.resume()
     }
+
+    func stopVM(iamToken: String,vmId: String, completion: @escaping (Result<Void, Error>) -> Void) {
+        guard let url = URL(string: "\(APIConfig.yaVMInstancesEndpoint)/\(vmId):stop") else {
+            completion(.failure(NSError(domain: "Invalid URL", code: -1, userInfo: nil)))
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(iamToken)", forHTTPHeaderField: "Authorization")
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                completion(.failure(error))
+                return
+            }
+            
+            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+                completion(.failure(NSError(domain: "API Error", code: -1, userInfo: nil)))
+                return
+            }
+            
+            completion(.success(()))
+        }.resume()
+    }
+}
