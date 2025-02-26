@@ -20,6 +20,26 @@ func numberStringBinding(for intValue: Binding<Int?>) -> Binding<String> {
     )
 }
 
+func convertGMTToLocalTime(utcDateString: String) -> String? {
+    // Create a DateFormatter to parse the input string
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ" // ISO 8601 format
+        dateFormatter.timeZone = TimeZone(abbreviation: "UTC") // Set the input time zone to UTC
+
+        // Convert the string to a Date object
+        guard let date = dateFormatter.date(from: utcDateString) else {
+            print("Failed to parse the date string")
+            return nil
+        }
+
+        // Convert the Date to local time
+        dateFormatter.timeZone = TimeZone.current // Switch to the device's local time zone
+        dateFormatter.dateFormat = "dd.MM.yy (HH:mm)" // Your desired format
+
+        let localTimeString = dateFormatter.string(from: date)
+        return localTimeString
+}
+
 func startStopVM(iamToken:String,for vm: VMTableData) {
     if vm.status == "RUNNING" {
         print("Stopping VM: \(vm.name)")

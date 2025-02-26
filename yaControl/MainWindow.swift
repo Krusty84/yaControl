@@ -13,8 +13,9 @@ struct MainWindow: View {
     var body: some View {
         GoodProperTabsView(content: [
             (title: "Computing", icon: "ComputingIcon", view: AnyView(CloudComputingTabContent())),
-                (title: "Serverless Function", icon: "ServerLessIcon", view: AnyView(CloudComputingTabContent())),
+                (title: "Function", icon: "ServerLessIcon", view: AnyView(CloudComputingTabContent())),
                 (title: "Storage", icon: "StorageIcon", view: AnyView(CloudComputingTabContent())),
+                (title: "Billing", icon: "system:dollarsign", view: AnyView(CloudComputingTabContent())),
                 (title: "Settings", icon: "system:gear", view: AnyView(SettingsTabContent())),
                 (title: "About", icon: "system:info", view: AnyView(AboutTabContent()))
                 ]).onAppear {

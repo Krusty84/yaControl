@@ -148,12 +148,13 @@ class YandexAPIService {
                                             // Map instances to VMTableData
                                             let vmTableData = instances.map { instance in
                                                 let memoryGB = String(Int(instance.resources.memory)! / 1024 / 1024 / 1024)
+                                                let localTime = convertGMTToLocalTime(utcDateString: instance.createdAt)!
                                                 let addresses = instance.networkInterfaces.map { $0.primaryV4Address.address }
                                                 return VMTableData(
                                                     id: instance.id,
                                                     name: instance.name,
                                                     status: instance.status,
-                                                    createdAt: instance.createdAt,
+                                                    createdAt: localTime,
                                                     cores: instance.resources.cores,
                                                     memoryGB: memoryGB,
                                                     preemptible: instance.schedulingPolicy.preemptible,

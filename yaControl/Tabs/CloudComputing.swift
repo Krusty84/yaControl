@@ -113,15 +113,14 @@ struct TableHeader: View {
             Text("Name").frame(width: 100, alignment: .leading)
             Text("Status").frame(width: 50, alignment: .leading)
             Text("Created At").frame(width: 150, alignment: .leading)
-            Text("CPU").frame(width: 50, alignment: .leading)
+            Text("№ CPU").frame(width: 50, alignment: .leading)
             Text("RAM").frame(width: 50, alignment: .leading)
-            //Text("Preemptible").frame(width: 30, alignment: .leading)
             Text("Addresses").frame(width: 150, alignment: .leading)
             Text("Folder").frame(width: 100, alignment: .leading)
         }
         .font(.headline)
-        //.padding(.vertical, 8)
-        //.background(Color(.systemGray))
+        .padding(.vertical, 12)
+        .padding(.horizontal, 16)
     }
 }
 struct TableContent: View {
@@ -132,6 +131,7 @@ struct TableContent: View {
         List(filteredVMs, id: \.name) { vm in
             TableRow(iamToken: $iamToken, vm: vm, selectedVM: $selectedVM)
         }
+        //.listStyle(PlainListStyle())
     }
 }
 
@@ -140,6 +140,7 @@ struct TableRow: View {
     let vm: VMTableData
     @Binding var selectedVM: VMTableData?
     @Environment(\.openURL) private var openURL
+    @State private var isHovering = false
     
     var body: some View {
         HStack(spacing: 8) {
@@ -148,12 +149,19 @@ struct TableRow: View {
                            .frame(width: 100, alignment: .leading)
                            .foregroundColor(.blue)
                            .underline()
+                           .onHover { hovering in
+                                        isHovering = hovering
+                                        if hovering {
+                                            NSCursor.pointingHand.push()
+                                        } else {
+                                            NSCursor.pop()
+                                        }
+                                    }
                            .onTapGesture {
                                if let url = URL(string: vm.vmUrl) {
                                    openURL(url)
                                }
                            }
-            //Text(vm.status).foregroundColor(vm.status == "RUNNING" ? .green : .red).frame(width: 80, alignment: .leading)
             Button(action: {
                 startStopVM(iamToken:iamToken,for: vm)
                         }) {
@@ -164,13 +172,19 @@ struct TableRow: View {
             Text(vm.createdAt).frame(width: 150, alignment: .leading)
             Text(vm.cores).frame(width: 50, alignment: .leading)
             Text("\(vm.memoryGB) GB").frame(width: 50, alignment: .leading)
-            //Text(vm.preemptible ? "Yes" : "No").frame(width: 30, alignment: .leading)
             Text(vm.addresses.joined(separator: ", ")).frame(width: 150, alignment: .leading)
-            //Text(vm.folderName).frame(width: 100, alignment: .leading)
             Text(vm.folderName)
                            .frame(width: 100, alignment: .leading)
                            .foregroundColor(.blue)
                            .underline()
+                           .onHover { hovering in
+                                        isHovering = hovering
+                                        if hovering {
+                                            NSCursor.pointingHand.push()
+                                        } else {
+                                            NSCursor.pop()
+                                        }
+                                    }
                            .onTapGesture {
                                if let url = URL(string: vm.folderUrl) {
                                    openURL(url)
@@ -187,6 +201,7 @@ struct TableRow: View {
         }
     }
 }
+
 
 struct LoadingView: View {
     var body: some View {
