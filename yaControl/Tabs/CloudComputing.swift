@@ -56,12 +56,20 @@ struct CloudComputingTabContent: View {
                     .padding()
             } else {
                 HStack {
-                    Text("Total VMs: \(totalVMs)")
+                    (Text("Total VMs: ")
                         .font(.subheadline)
-                        .padding(.horizontal)
-                    Text("Running VMs: \(runningVMs)")
+                        .fontWeight(.bold) + Text("\(totalVMs)")
                         .font(.subheadline)
-                        .padding(.horizontal)
+                        .fontWeight(.regular))
+                    .padding(.horizontal)
+
+                    // Running VMs
+                    (Text("Running VMs: ")
+                        .font(.subheadline)
+                        .fontWeight(.bold) + Text("\(runningVMs)")
+                        .font(.subheadline)
+                        .fontWeight(.regular))
+                    .padding(.horizontal)
                     Spacer()
                     Button(action: {
                         fetchVMs()
