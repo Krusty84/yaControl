@@ -160,8 +160,8 @@ class YandexAPIService {
                                                     preemptible: instance.schedulingPolicy.preemptible,
                                                     addresses: addresses,
                                                     folderName: folder.name,
-                                                    folderUrl: APIConfig.yaFoldersWebUrl+folder.id,
-                                                    vmUrl:APIConfig.yaCloudsWebUrl(folderID: folder.id, instanceID: instance.id)
+                                                    folderUrl: URL(string:APIConfig.yaFoldersWebUrl+folder.id),
+                                                    vmUrl:URL(string:APIConfig.yaCloudsWebUrl(folderID: folder.id, instanceID: instance.id))
                                                 )
                                             }
                                             allVMs.append(contentsOf: vmTableData)

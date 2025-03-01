@@ -13,8 +13,12 @@ struct CloudComputingTabContent: View {
     @State private var errorMessage: String? = nil
     @State private var isLoading: Bool = false
     @State private var searchText: String = ""
-    @State private var selectedVM: VMTableData? = nil
-    
+    @State private var isHovering = false
+    @State private var selectedVM: VMTableData.ID? = nil
+    //
+    @State private var sortKey: KeyPath<VMTableData, String>? = nil
+    @State private var sortOrder: [KeyPathComparator<VMTableData>] = []
+    //
     var filteredVMs: [VMTableData] {
         if searchText.isEmpty {
             return vmTableData
@@ -22,33 +26,145 @@ struct CloudComputingTabContent: View {
             return vmTableData.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
         }
     }
+    var sortedVMs: [VMTableData] {
+        return filteredVMs.sorted(using: sortOrder)
+    }
+    var totalVMs: Int {
+        return vmTableData.count
+    }
     
-    
+    var runningVMs: Int {
+        return vmTableData.filter { $0.status == "RUNNING" }.count
+    }
     
     var body: some View {
-         VStack(spacing: 0) {
-             // Search Bar
-//             SearchBar(text: $searchText)
-//                 .padding(.horizontal)
-             
-             // Table Header
-             TableHeader()
-             
-             // Table Content
-             if isLoading {
-                 LoadingView()
-             } else if let errorMessage = errorMessage {
-                 ErrorView(errorMessage: errorMessage)
-             } else if filteredVMs.isEmpty {
-                 EmptyView()
-             } else {
-                 TableContent(iamToken: $iamToken,filteredVMs: filteredVMs, selectedVM: $selectedVM)
-             }
-         }
-         .onAppear {
-             fetchVMs()
-         }
-     }
+        VStack(spacing: 0) {
+            // Search Bar
+            //            SearchBar(text: $searchText)
+            //                .padding(.horizontal)
+            
+            // Table
+            if isLoading {
+                ProgressView("Loading...")
+                    .padding()
+            } else if let errorMessage = errorMessage {
+                Text("Error: \(errorMessage)")
+                    .foregroundColor(.red)
+                    .padding()
+            } else if filteredVMs.isEmpty {
+                Text("No VMs found")
+                    .padding()
+            } else {
+                HStack {
+                    Text("Total VMs: \(totalVMs)")
+                        .font(.subheadline)
+                        .padding(.horizontal)
+                    Text("Running VMs: \(runningVMs)")
+                        .font(.subheadline)
+                        .padding(.horizontal)
+                    Spacer()
+                    Button(action: {
+                        fetchVMs()
+                    }) {
+                        Image(systemName: "arrow.clockwise")
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                    .help("Refresh VMs")
+                    //
+                    Button(action: {
+                        stopAllRunningVMs(iamToken: iamToken, vms: vmTableData)
+                    }) {
+                        HStack {
+                            Image(systemName: "stop.fill")
+                                .foregroundColor(.red)
+                            Text("Stop All")
+                                .foregroundColor(.red)
+                        }
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
+                        .background(Color.red.opacity(0.2))
+                        .cornerRadius(5)
+                    }
+                    .disabled(runningVMs == 0)
+                    .help("Stop All Running VMs")
+                    .buttonStyle(PlainButtonStyle())
+                }
+                .padding(.vertical, 6)
+                //
+                Table(filteredVMs, selection: $selectedVM) {
+                    // Define columns
+                    TableColumn("Name") { vm in
+                        if let url = vm.vmUrl {
+                            Link(destination: url) {
+                                Text(vm.name)
+                                    .foregroundColor(.blue)
+                                    .underline()
+                                    .fixedSize(horizontal: false, vertical: true)
+                                    .lineLimit(nil)
+                                    .onHover { hovering in
+                                        isHovering = hovering
+                                        if hovering {
+                                            NSCursor.pointingHand.push()
+                                        } else {
+                                            NSCursor.pop()
+                                        }
+                                    }
+                            }
+                            .buttonStyle(PlainButtonStyle()) // Remove the button styling
+                        } else {
+                            Text(vm.name)
+                        }
+                    }.width(min: 150,max:200)
+                    TableColumn("Status") { vm in
+                        Button(action: {
+                            startStopVM(iamToken:iamToken,for: vm)
+                        }) {
+                            Image(systemName: vm.status == "RUNNING" ? "stop.fill" : "play.fill")
+                                .foregroundColor(vm.status == "RUNNING" ? .red : .green)
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                    }.width(min:40,max:40)
+                    TableColumn("Created At", value: \.createdAt).width(min: 120,max:120)
+                    TableColumn("Cores", value: \.cores).width(min:40,max:40)
+                    TableColumn("RAM", value: \.memoryGB).width(min:30,max:30)
+                    TableColumn("Addresses") { vm in
+                        Text(vm.addresses.joined(separator: ", "))
+                    }
+                    TableColumn("Folder") { vm in
+                        if let url = vm.folderUrl {
+                            Link(destination: url) {
+                                Text(vm.folderName)
+                                    .foregroundColor(.blue)
+                                    .underline()
+                                    .fixedSize(horizontal: false, vertical: true)
+                                    .lineLimit(nil)
+                                    .onHover { hovering in
+                                        isHovering = hovering
+                                        if hovering {
+                                            NSCursor.pointingHand.push()
+                                        } else {
+                                            NSCursor.pop()
+                                        }
+                                    }
+                            }
+                            .buttonStyle(PlainButtonStyle()) // Remove the button styling
+                        } else {
+                            Text(vm.name)
+                        }
+                    }.width(min: 150,max:150)
+                }
+                .padding(.vertical, 6)
+                .onChange(of: selectedVM) { oldSelection, newSelection in
+                    if let selectedVMId = newSelection, let selectedVM = filteredVMs.first(where: { $0.id == selectedVMId }) {
+                        print("Selected VM ID: \(selectedVM.id)")
+                    }
+                }
+            }
+        }
+        .onAppear {
+            fetchVMs()
+        }
+    }
     
     private func fetchVMs() {
         isLoading = true
@@ -58,172 +174,27 @@ struct CloudComputingTabContent: View {
         YandexAPIService.shared.checkOauthKey(yandexPassportOauthToken: SettingsManager.shared.oAuthKey) { result in
             DispatchQueue.main.async {
                 switch result {
-                case .success(let response):
-                    // Step 2: Get VMs using the IAM Token
-                    iamToken=response.iamToken
-                    YandexAPIService.shared.getVMs(iamToken: response.iamToken) { result in
-                        DispatchQueue.main.async {
-                            isLoading = false
-                            switch result {
-                            case .success(let allVMs):
-                                print("result: ", allVMs)
-                                vmTableData = allVMs
-                            case .failure(let error):
-                                errorMessage = error.localizedDescription
+                    case .success(let response):
+                        // Step 2: Get VMs using the IAM Token
+                        iamToken=response.iamToken
+                        YandexAPIService.shared.getVMs(iamToken: response.iamToken) { result in
+                            DispatchQueue.main.async {
+                                isLoading = false
+                                switch result {
+                                    case .success(let allVMs):
+                                        print("result: ", allVMs)
+                                        vmTableData = allVMs
+                                    case .failure(let error):
+                                        errorMessage = error.localizedDescription
+                                }
                             }
                         }
-                    }
-                case .failure(let error):
-                    isLoading = false
-                    print(error.localizedDescription)
-                    errorMessage = error.localizedDescription
+                    case .failure(let error):
+                        isLoading = false
+                        print(error.localizedDescription)
+                        errorMessage = error.localizedDescription
                 }
             }
         }
     }
 }
-
-struct SearchBar: View {
-    @Binding var text: String
-    
-    var body: some View {
-        HStack {
-            TextField("Search VMs", text: $text)
-                .padding(8)
-                .background(Color(.lightGray))
-                .cornerRadius(8)
-            
-            if !text.isEmpty {
-                Button(action: {
-                    text = ""
-                }) {
-                    Image(systemName: "xmark.circle.fill")
-                        .foregroundColor(.gray)
-                }
-            }
-        }
-        .padding(.horizontal)
-    }
-}
-
-
-struct TableHeader: View {
-    var body: some View {
-        HStack(spacing: 8) {
-            Text("Name").frame(width: 100, alignment: .leading)
-            Text("Status").frame(width: 50, alignment: .leading)
-            Text("Created At").frame(width: 150, alignment: .leading)
-            Text("№ CPU").frame(width: 50, alignment: .leading)
-            Text("RAM").frame(width: 50, alignment: .leading)
-            Text("Addresses").frame(width: 150, alignment: .leading)
-            Text("Folder").frame(width: 100, alignment: .leading)
-        }
-        .font(.headline)
-        .padding(.vertical, 12)
-        .padding(.horizontal, 16)
-    }
-}
-struct TableContent: View {
-    @Binding var iamToken: String
-    let filteredVMs: [VMTableData]
-    @Binding var selectedVM: VMTableData?
-    var body: some View {
-        List(filteredVMs, id: \.name) { vm in
-            TableRow(iamToken: $iamToken, vm: vm, selectedVM: $selectedVM)
-        }
-        //.listStyle(PlainListStyle())
-    }
-}
-
-struct TableRow: View {
-    @Binding var iamToken: String
-    let vm: VMTableData
-    @Binding var selectedVM: VMTableData?
-    @Environment(\.openURL) private var openURL
-    @State private var isHovering = false
-    
-    var body: some View {
-        HStack(spacing: 8) {
-            //Text(vm.name).frame(width: 100, alignment: .leading)
-            Text(vm.name)
-                           .frame(width: 100, alignment: .leading)
-                           .foregroundColor(.blue)
-                           .underline()
-                           .onHover { hovering in
-                                        isHovering = hovering
-                                        if hovering {
-                                            NSCursor.pointingHand.push()
-                                        } else {
-                                            NSCursor.pop()
-                                        }
-                                    }
-                           .onTapGesture {
-                               if let url = URL(string: vm.vmUrl) {
-                                   openURL(url)
-                               }
-                           }
-            Button(action: {
-                startStopVM(iamToken:iamToken,for: vm)
-                        }) {
-                            Image(systemName: vm.status == "RUNNING" ? "stop.fill" : "play.fill")
-                                .foregroundColor(vm.status == "RUNNING" ? .red : .green)
-                                .frame(width: 30, alignment: .leading)
-                        }
-            Text(vm.createdAt).frame(width: 150, alignment: .leading)
-            Text(vm.cores).frame(width: 50, alignment: .leading)
-            Text("\(vm.memoryGB) GB").frame(width: 50, alignment: .leading)
-            Text(vm.addresses.joined(separator: ", ")).frame(width: 150, alignment: .leading)
-            Text(vm.folderName)
-                           .frame(width: 100, alignment: .leading)
-                           .foregroundColor(.blue)
-                           .underline()
-                           .onHover { hovering in
-                                        isHovering = hovering
-                                        if hovering {
-                                            NSCursor.pointingHand.push()
-                                        } else {
-                                            NSCursor.pop()
-                                        }
-                                    }
-                           .onTapGesture {
-                               if let url = URL(string: vm.folderUrl) {
-                                   openURL(url)
-                               }
-                           }
-        }
-        .contentShape(Rectangle())
-        //.font(.subheadline)
-       // .padding(.vertical, 4)
-        .background(selectedVM?.id == vm.id ? Color.blue.opacity(0.2) : Color.clear)
-        .onTapGesture {
-            selectedVM = vm
-            print("Selected VM ID: \(vm.id)")
-        }
-    }
-}
-
-
-struct LoadingView: View {
-    var body: some View {
-        ProgressView("Loading...")
-            .padding()
-    }
-}
-
-struct ErrorView: View {
-    let errorMessage: String
-    
-    var body: some View {
-        Text("Error: \(errorMessage)")
-            .foregroundColor(.red)
-            .padding()
-    }
-}
-
-struct EmptyView: View {
-    var body: some View {
-        Text("No VMs found")
-            .padding()
-    }
-}
-

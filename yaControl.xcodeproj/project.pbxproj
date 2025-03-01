@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		3D9884372D63BA4600AB988C /* GoodProperTabs in Frameworks */ = {isa = PBXBuildFile; productRef = 3D9884362D63BA4600AB988C /* GoodProperTabs */; };
+		3DFE3C622D6FA9F80088FD3D /* GoodProperTabs in Frameworks */ = {isa = PBXBuildFile; productRef = 3DFE3C612D6FA9F80088FD3D /* GoodProperTabs */; };
+		3DFE3C842D6FB0830088FD3D /* GoodProperTabs in Frameworks */ = {isa = PBXBuildFile; productRef = 3DFE3C832D6FB0830088FD3D /* GoodProperTabs */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,7 +29,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3DFE3C842D6FB0830088FD3D /* GoodProperTabs in Frameworks */,
 				3D9884372D63BA4600AB988C /* GoodProperTabs in Frameworks */,
+				3DFE3C622D6FA9F80088FD3D /* GoodProperTabs in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -71,6 +75,8 @@
 			name = yaControl;
 			packageProductDependencies = (
 				3D9884362D63BA4600AB988C /* GoodProperTabs */,
+				3DFE3C612D6FA9F80088FD3D /* GoodProperTabs */,
+				3DFE3C832D6FB0830088FD3D /* GoodProperTabs */,
 			);
 			productName = yaControl;
 			productReference = 3D333ED32D639DF100D795BF /* yaControl.app */;
@@ -101,7 +107,7 @@
 			mainGroup = 3D333ECA2D639DF100D795BF;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				3D9884352D63BA4600AB988C /* XCLocalSwiftPackageReference "../GoodProperTabs" */,
+				3DFE3C822D6FB0830088FD3D /* XCRemoteSwiftPackageReference "GoodProperTabs" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 3D333ED42D639DF100D795BF /* Products */;
@@ -329,16 +335,29 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCLocalSwiftPackageReference section */
-		3D9884352D63BA4600AB988C /* XCLocalSwiftPackageReference "../GoodProperTabs" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = ../GoodProperTabs;
+/* Begin XCRemoteSwiftPackageReference section */
+		3DFE3C822D6FB0830088FD3D /* XCRemoteSwiftPackageReference "GoodProperTabs" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Krusty84/GoodProperTabs.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.1;
+			};
 		};
-/* End XCLocalSwiftPackageReference section */
+/* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
 		3D9884362D63BA4600AB988C /* GoodProperTabs */ = {
 			isa = XCSwiftPackageProductDependency;
+			productName = GoodProperTabs;
+		};
+		3DFE3C612D6FA9F80088FD3D /* GoodProperTabs */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = GoodProperTabs;
+		};
+		3DFE3C832D6FB0830088FD3D /* GoodProperTabs */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3DFE3C822D6FB0830088FD3D /* XCRemoteSwiftPackageReference "GoodProperTabs" */;
 			productName = GoodProperTabs;
 		};
 /* End XCSwiftPackageProductDependency section */

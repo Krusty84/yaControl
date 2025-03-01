@@ -71,3 +71,23 @@ func startStopVM(iamToken:String,for vm: VMTableData) {
         }
     }
 }
+
+func stopAllRunningVMs(iamToken: String, vms: [VMTableData]) {
+       let runningVMs = vms.filter { $0.status == "RUNNING" }
+       let group = DispatchGroup()
+       
+       for vm in runningVMs {
+           group.enter()
+           YandexAPIService.shared.stopVM(iamToken: iamToken, vmId: vm.id) { result in
+               DispatchQueue.main.async {
+                   switch result {
+                   case .success:
+                       print("VM stopped successfully: \(vm.name)")
+                   case .failure(let error):
+                       print("Failed to stop VM: \(error.localizedDescription)")
+                   }
+                   group.leave()
+               }
+           }
+       }
+   }
