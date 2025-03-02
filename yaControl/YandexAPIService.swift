@@ -149,7 +149,7 @@ class YandexAPIService {
                                             let vmTableData = instances.map { instance in
                                                 let memoryGB = String(Int(instance.resources.memory)! / 1024 / 1024 / 1024)
                                                 let localTime = convertGMTToLocalTime(utcDateString: instance.createdAt)!
-                                                let addresses = instance.networkInterfaces.map { $0.primaryV4Address.address }
+                                                let addresses = instance.networkInterfaces.compactMap { $0.primaryV4Address.oneToOneNat?.address }
                                                 return VMTableData(
                                                     id: instance.id,
                                                     name: instance.name,

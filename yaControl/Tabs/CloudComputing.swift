@@ -43,7 +43,49 @@ struct CloudComputingTabContent: View {
             //            SearchBar(text: $searchText)
             //                .padding(.horizontal)
             
-            // Table
+            HStack {
+                (Text("Total VMs: ")
+                    .font(.subheadline)
+                    .fontWeight(.bold) + Text("\(totalVMs)")
+                    .font(.subheadline)
+                    .fontWeight(.regular))
+                .padding(.horizontal)
+
+                // Running VMs
+                (Text("Running VMs: ")
+                    .font(.subheadline)
+                    .fontWeight(.bold) + Text("\(runningVMs)")
+                    .font(.subheadline)
+                    .fontWeight(.regular))
+                .padding(.horizontal)
+                Spacer()
+                Button(action: {
+                    fetchVMs()
+                }) {
+                    Image(systemName: "arrow.clockwise")
+                }
+                .buttonStyle(PlainButtonStyle())
+                .help("Refresh VMs")
+                //
+                Button(action: {
+                    stopAllRunningVMs(iamToken: iamToken, vms: vmTableData)
+                }) {
+                    HStack {
+                        Image(systemName: "stop.fill")
+                            .foregroundColor(.red)
+                        Text("Stop All")
+                            .foregroundColor(.red)
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 5)
+                    .background(Color.red.opacity(0.2))
+                    .cornerRadius(5)
+                }
+                .disabled(runningVMs == 0)
+                .help("Stop All Running VMs")
+                .buttonStyle(PlainButtonStyle())
+            }
+            .padding(.vertical, 6)
             if isLoading {
                 ProgressView("Loading...")
                     .padding()
@@ -55,50 +97,6 @@ struct CloudComputingTabContent: View {
                 Text("No VMs found")
                     .padding()
             } else {
-                HStack {
-                    (Text("Total VMs: ")
-                        .font(.subheadline)
-                        .fontWeight(.bold) + Text("\(totalVMs)")
-                        .font(.subheadline)
-                        .fontWeight(.regular))
-                    .padding(.horizontal)
-
-                    // Running VMs
-                    (Text("Running VMs: ")
-                        .font(.subheadline)
-                        .fontWeight(.bold) + Text("\(runningVMs)")
-                        .font(.subheadline)
-                        .fontWeight(.regular))
-                    .padding(.horizontal)
-                    Spacer()
-                    Button(action: {
-                        fetchVMs()
-                    }) {
-                        Image(systemName: "arrow.clockwise")
-                    }
-                    .buttonStyle(PlainButtonStyle())
-                    .help("Refresh VMs")
-                    //
-                    Button(action: {
-                        stopAllRunningVMs(iamToken: iamToken, vms: vmTableData)
-                    }) {
-                        HStack {
-                            Image(systemName: "stop.fill")
-                                .foregroundColor(.red)
-                            Text("Stop All")
-                                .foregroundColor(.red)
-                        }
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 5)
-                        .background(Color.red.opacity(0.2))
-                        .cornerRadius(5)
-                    }
-                    .disabled(runningVMs == 0)
-                    .help("Stop All Running VMs")
-                    .buttonStyle(PlainButtonStyle())
-                }
-                .padding(.vertical, 6)
-                //
                 Table(filteredVMs, selection: $selectedVM) {
                     // Define columns
                     TableColumn("Name") { vm in
@@ -117,6 +115,14 @@ struct CloudComputingTabContent: View {
                                             NSCursor.pop()
                                         }
                                     }
+                                    .contextMenu {
+                                           Button("Copy") {
+                                               let combinedText = "\(vm.name) (\(vm.id))"
+                                               let pasteboard = NSPasteboard.general
+                                               pasteboard.clearContents()
+                                               pasteboard.setString(combinedText, forType: .string)
+                                           }
+                                       }
                             }
                             .buttonStyle(PlainButtonStyle()) // Remove the button styling
                         } else {
@@ -135,9 +141,18 @@ struct CloudComputingTabContent: View {
                     TableColumn("Created At", value: \.createdAt).width(min: 120,max:120)
                     TableColumn("Cores", value: \.cores).width(min:40,max:40)
                     TableColumn("RAM", value: \.memoryGB).width(min:30,max:30)
-                    TableColumn("Addresses") { vm in
+                    TableColumn("Public Ip") { vm in
                         Text(vm.addresses.joined(separator: ", "))
-                    }
+                            .fixedSize(horizontal: false, vertical: true)
+                            .lineLimit(nil)
+                            .contextMenu {
+                                   Button("Copy") {
+                                       let pasteboard = NSPasteboard.general
+                                       pasteboard.clearContents()
+                                       pasteboard.setString(vm.addresses.joined(separator: ", "), forType: .string)
+                                   }
+                               }
+                    }.width(min: 150,max:200)
                     TableColumn("Folder") { vm in
                         if let url = vm.folderUrl {
                             Link(destination: url) {
