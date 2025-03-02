@@ -7,9 +7,9 @@
 
 import Foundation
 
-class YandexAPIService {
+class YandexAPIService:ObservableObject {
     static let shared = YandexAPIService() // Singleton for reusability
-    
+    @Published var lastUpdateTime: String = ""
     private init() {}
     
     func checkOauthKey(yandexPassportOauthToken: String, completion: @escaping (Result<(code: Int, iamToken: String, expiresAt: String), Error>) -> Void) {
@@ -150,6 +150,9 @@ class YandexAPIService {
                                                 let memoryGB = String(Int(instance.resources.memory)! / 1024 / 1024 / 1024)
                                                 let localTime = convertGMTToLocalTime(utcDateString: instance.createdAt)!
                                                 let addresses = instance.networkInterfaces.compactMap { $0.primaryV4Address.oneToOneNat?.address }
+                                                let dateFormatter = DateFormatter()
+                                                dateFormatter.dateFormat = "HH:mm:ss"
+                                                self.lastUpdateTime = dateFormatter.string(from: Date())
                                                 return VMTableData(
                                                     id: instance.id,
                                                     name: instance.name,

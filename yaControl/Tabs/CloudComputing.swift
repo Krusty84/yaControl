@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct CloudComputingTabContent: View {
+    @ObservedObject var apiService = YandexAPIService.shared
     @State private var iamToken: String = ""
     @State private var vmTableData: [VMTableData] = []
     @State private var errorMessage: String? = nil
@@ -18,6 +19,8 @@ struct CloudComputingTabContent: View {
     //
     @State private var sortKey: KeyPath<VMTableData, String>? = nil
     @State private var sortOrder: [KeyPathComparator<VMTableData>] = []
+    //
+    @State private var processingVMName: String? = nil
     //
     var filteredVMs: [VMTableData] {
         if searchText.isEmpty {
@@ -130,7 +133,7 @@ struct CloudComputingTabContent: View {
                         }
                     }.width(min: 150,max:200)
                     TableColumn("Status") { vm in
-                        Button(action: {
+                        Button(action:{
                             startStopVM(iamToken:iamToken,for: vm)
                         }) {
                             Image(systemName: vm.status == "RUNNING" ? "stop.fill" : "play.fill")
@@ -152,7 +155,7 @@ struct CloudComputingTabContent: View {
                                        pasteboard.setString(vm.addresses.joined(separator: ", "), forType: .string)
                                    }
                                }
-                    }.width(min: 150,max:200)
+                    }.width(min: 120,max:120)
                     TableColumn("Folder") { vm in
                         if let url = vm.folderUrl {
                             Link(destination: url) {
@@ -183,6 +186,21 @@ struct CloudComputingTabContent: View {
                     }
                 }
             }
+            HStack {
+                Text("Last updated: \(apiService.lastUpdateTime)")
+                    .font(.subheadline)
+                    .foregroundColor(.gray)
+                
+                Spacer()
+                
+                if let processingVMName = processingVMName {
+                    Text("Processing: \(processingVMName)")
+                        .font(.subheadline)
+                        .foregroundColor(.blue)
+                }
+            }
+            .padding(.horizontal)
+            .padding(.vertical, 8)
         }
         .onAppear {
             fetchVMs()
