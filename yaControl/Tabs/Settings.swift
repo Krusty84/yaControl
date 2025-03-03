@@ -48,11 +48,9 @@ struct SettingsTabContent: View {
                     })
                     .buttonStyle(.automatic)
                     //
-                    
-                    
                 }
             }
-            TextField("Result", text: numberStringBinding(for: $responseCode))
+            TextField("Result", text: Helpers.shared.numberStringBinding(for: $responseCode))
         }
         .onAppear {
             // Sync SettingsManager to ensure consistency

@@ -9,6 +9,7 @@ import SwiftUI
 
 struct CloudComputingTabContent: View {
     @ObservedObject var apiService = YandexAPIService.shared
+    @ObservedObject var helpers = Helpers.shared
     @State private var iamToken: String = ""
     @State private var vmTableData: [VMTableData] = []
     @State private var errorMessage: String? = nil
@@ -19,8 +20,6 @@ struct CloudComputingTabContent: View {
     //
     @State private var sortKey: KeyPath<VMTableData, String>? = nil
     @State private var sortOrder: [KeyPathComparator<VMTableData>] = []
-    //
-    @State private var processingVMName: String? = nil
     //
     var filteredVMs: [VMTableData] {
         if searchText.isEmpty {
@@ -63,6 +62,8 @@ struct CloudComputingTabContent: View {
                 .padding(.horizontal)
                 Spacer()
                 Button(action: {
+                  
+                    helpers.processingVMName.removeAll()
                     fetchVMs()
                 }) {
                     Image(systemName: "arrow.clockwise")
@@ -71,7 +72,7 @@ struct CloudComputingTabContent: View {
                 .help("Refresh VMs")
                 //
                 Button(action: {
-                    stopAllRunningVMs(iamToken: iamToken, vms: vmTableData)
+                    helpers.stopAllRunningVMs(iamToken: iamToken, vms: vmTableData)
                 }) {
                     HStack {
                         Image(systemName: "stop.fill")
@@ -134,7 +135,7 @@ struct CloudComputingTabContent: View {
                     }.width(min: 150,max:200)
                     TableColumn("Status") { vm in
                         Button(action:{
-                            startStopVM(iamToken:iamToken,for: vm)
+                            helpers.startStopVM(iamToken:iamToken,for: vm)
                         }) {
                             Image(systemName: vm.status == "RUNNING" ? "stop.fill" : "play.fill")
                                 .foregroundColor(vm.status == "RUNNING" ? .red : .green)
@@ -190,14 +191,11 @@ struct CloudComputingTabContent: View {
                 Text("Last updated: \(apiService.lastUpdateTime)")
                     .font(.subheadline)
                     .foregroundColor(.gray)
-                
                 Spacer()
-                
-                if let processingVMName = processingVMName {
-                    Text("Processing: \(processingVMName)")
+                Text(helpers.processingVMName)
                         .font(.subheadline)
-                        .foregroundColor(.blue)
-                }
+                        .foregroundColor(.red)
+                
             }
             .padding(.horizontal)
             .padding(.vertical, 8)

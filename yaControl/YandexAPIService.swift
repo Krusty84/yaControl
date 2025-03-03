@@ -148,7 +148,7 @@ class YandexAPIService:ObservableObject {
                                             // Map instances to VMTableData
                                             let vmTableData = instances.map { instance in
                                                 let memoryGB = String(Int(instance.resources.memory)! / 1024 / 1024 / 1024)
-                                                let localTime = convertGMTToLocalTime(utcDateString: instance.createdAt)!
+                                                let localTime = Helpers.shared.convertGMTToLocalTime(utcDateString: instance.createdAt)!
                                                 let addresses = instance.networkInterfaces.compactMap { $0.primaryV4Address.oneToOneNat?.address }
                                                 let dateFormatter = DateFormatter()
                                                 dateFormatter.dateFormat = "HH:mm:ss"
