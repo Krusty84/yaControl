@@ -38,6 +38,9 @@ struct CloudComputingTabContent: View {
     var runningVMs: Int {
         return vmTableData.filter { $0.status == "RUNNING" }.count
     }
+    @State private var previousRunningVMs: Int = 0
+    // 0 - stopping, 1 - running
+    @State private var proccessingVMType: Int = 0
     
     var body: some View {
         VStack(spacing: 0) {
@@ -62,9 +65,17 @@ struct CloudComputingTabContent: View {
                 .padding(.horizontal)
                 Spacer()
                 Button(action: {
-                  
-                    helpers.processingVMName.removeAll()
-                    fetchVMs()
+                    if(proccessingVMType == 0 && runningVMs == previousRunningVMs){
+                        fetchVMs()
+                    } else if(proccessingVMType == 0 && runningVMs < previousRunningVMs){
+                        fetchVMs()
+                        helpers.processingVMName.removeAll()
+                    } else if (proccessingVMType == 1 && runningVMs == previousRunningVMs){
+                        fetchVMs()
+                    } else if (proccessingVMType == 1 && runningVMs > previousRunningVMs){
+                        fetchVMs()
+                        helpers.processingVMName.removeAll()
+                    }
                 }) {
                     Image(systemName: "arrow.clockwise")
                 }
@@ -135,6 +146,13 @@ struct CloudComputingTabContent: View {
                     }.width(min: 150,max:200)
                     TableColumn("Status") { vm in
                         Button(action:{
+                            if (vm.status == "RUNNING") {
+                                previousRunningVMs=runningVMs;
+                                proccessingVMType = 0;
+                            } else {
+                                previousRunningVMs=runningVMs;
+                                proccessingVMType = 1;
+                            }
                             helpers.startStopVM(iamToken:iamToken,for: vm)
                         }) {
                             Image(systemName: vm.status == "RUNNING" ? "stop.fill" : "play.fill")
