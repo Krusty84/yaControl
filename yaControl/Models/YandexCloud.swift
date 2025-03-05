@@ -78,4 +78,34 @@ struct VMTableData:Decodable,Identifiable,Equatable {
     let vmUrl: URL?
 }
 
+// Model for Functions
+struct CloudFunction: Decodable {
+    let id: String
+    let folderId: String
+    let createdAt: String
+    let name: String
+    let httpInvokeUrl: String
+    let status: String
+}
+
+// Model for Final VM Table Data
+struct CloudFunctionTableData:Decodable,Identifiable,Equatable {
+    let id: String
+    let name: String
+    let status: String
+    let createdAt: String
+    let folderName: String
+    let folderUrl: URL?
+    let httpInvokeUrl: URL?
+}
+
+/*
+ "id": "d4e38851c0ofsnkki9f7",
+ "folderId": "b1gqcrohfu85p2fc6fkc",
+ "createdAt": "2022-04-21T19:56:18.176Z",
+ "name": "teamcenter-alice",
+ "httpInvokeUrl": "https://functions.yandexcloud.net/d4e38851c0ofsnkki9f7",
+ "status": "ACTIVE"
+ */
+
 //https://console.yandex.cloud/folders/b1gqcrohfu85p2fc6fkc/compute/instance/epddn33ae5rr4ep7to3i/overview

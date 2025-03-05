@@ -190,6 +190,64 @@ class YandexAPIService:ObservableObject {
             }
         }
         
+    func getFunctions(iamToken: String, completion: @escaping (Result<[CloudFunctionTableData], Error>) -> Void) {
+            // Step 1: Get Clouds
+            getClouds(iamToken: iamToken) { result in
+                switch result {
+                case .success(let clouds):
+                    var allFuncs: [CloudFunctionTableData] = []
+                    let group = DispatchGroup()
+                    
+                    for cloud in clouds {
+                        group.enter()
+                        // Step 2: Get Folders for each Cloud
+                        self.getFolders(iamToken: iamToken, cloudId: cloud.id) { result in
+                            switch result {
+                            case .success(let folders):
+                                for folder in folders {
+                                    group.enter()
+                                    // Step 3: Get Instances for each Folder
+                                    self.getFunctions(iamToken: iamToken, folderId: folder.id) { result in
+                                        switch result {
+                                        case .success(let functions):
+                                            // Map functions to CloudFunctionTableData
+                                            let functionTableData = functions.map { function in
+                                                let localTime = Helpers.shared.convertGMTToLocalTime(utcDateString: function.createdAt)!
+                                                let dateFormatter = DateFormatter()
+                                                dateFormatter.dateFormat = "HH:mm:ss"
+                                                self.lastUpdateTime = dateFormatter.string(from: Date())
+                                                return CloudFunctionTableData(
+                                                    id: function.id,
+                                                    name: function.name,
+                                                    status: function.status,
+                                                    createdAt: localTime,
+                                                    folderName: folder.name,
+                                                    folderUrl: URL(string:APIConfig.yaFoldersWebUrl+folder.id),
+                                                    httpInvokeUrl:URL(string:function.httpInvokeUrl)
+                                                )
+                                            }
+                                                allFuncs.append(contentsOf: functionTableData)
+                                        case .failure(let error):
+                                            completion(.failure(error))
+                                        }
+                                        group.leave()
+                                    }
+                                }
+                            case .failure(let error):
+                                completion(.failure(error))
+                            }
+                            group.leave()
+                        }
+                    }
+                    
+                    group.notify(queue: .main) {
+                        completion(.success(allFuncs))
+                    }
+                case .failure(let error):
+                    completion(.failure(error))
+                }
+            }
+        }
         // Helper function to get Clouds
         private func getClouds(iamToken: String, completion: @escaping (Result<[Cloud], Error>) -> Void) {
             guard let url = URL(string: APIConfig.yaCloudsEndpoint) else {
@@ -323,6 +381,64 @@ class YandexAPIService:ObservableObject {
         }.resume()
     }
 
+    //Helper function to get Cloud Functions
+    private func getFunctions(iamToken: String, folderId: String, completion: @escaping (Result<[CloudFunction], Error>) -> Void) {
+        guard let url = URL(string: "\(APIConfig.yaFunctionsEndpoint)?folderId=\(folderId)") else {
+            completion(.failure(NSError(domain: "Invalid URL", code: -1, userInfo: nil)))
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(iamToken)", forHTTPHeaderField: "Authorization")
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                completion(.failure(error))
+                return
+            }
+            
+            guard let data = data else {
+                completion(.failure(NSError(domain: "No data received", code: -1, userInfo: nil)))
+                return
+            }
+            
+            // Print raw JSON response for debugging
+            if let jsonString = String(data: data, encoding: .utf8) {
+                print("Raw JSON Response (Instances): \(jsonString)")
+            }
+            
+            do {
+                // Try to decode the response as a dictionary
+                if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+                    // Check if the response contains an error
+                    if let errorDict = json["error"] as? [String: Any],
+                       let errorCode = errorDict["code"] as? Int,
+                       let errorMessage = errorDict["message"] as? String {
+                        let error = NSError(domain: "API Error", code: errorCode, userInfo: [NSLocalizedDescriptionKey: errorMessage])
+                        completion(.failure(error))
+                        return
+                    }
+                    
+                    // Check if the "instances" key exists
+                    if let functionsArray = json["functions"] as? [[String: Any]] {
+                        let functions = try JSONDecoder().decode([CloudFunction].self, from: JSONSerialization.data(withJSONObject: functionsArray, options: []))
+                        completion(.success(functions))
+                    } else {
+                        // If "functions" key is missing, return an empty array
+                        print("No functions found for folderId: \(folderId)")
+                        completion(.success([]))
+                    }
+                } else {
+                    print("Error: Invalid JSON format")
+                    completion(.failure(NSError(domain: "Invalid JSON format", code: -1, userInfo: nil)))
+                }
+            } catch {
+                print("Decoding Error (Instances): \(error)")
+                completion(.failure(error))
+            }
+        }.resume()
+    }
     func startVM(iamToken: String,vmId: String, completion: @escaping (Result<Void, Error>) -> Void) {
         guard let url = URL(string: "\(APIConfig.yaVMInstancesEndpoint)/\(vmId):start") else {
             completion(.failure(NSError(domain: "Invalid URL", code: -1, userInfo: nil)))

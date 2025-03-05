@@ -12,6 +12,8 @@ struct APIConfig {
     static let yaCloudsEndpoint = "https://resource-manager.api.cloud.yandex.net/resource-manager/v1/clouds"
     static let yaFoldersEndpoint = "https://resource-manager.api.cloud.yandex.net/resource-manager/v1/folders"
     static let yaVMInstancesEndpoint = "https://compute.api.cloud.yandex.net/compute/v1/instances"
+    static let yaFunctionsEndpoint = "https://serverless-functions.api.cloud.yandex.net/functions/v1/functions"
+
     //
     static let yaFoldersWebUrl = "https://console.yandex.cloud/folders/"
     //static let yaCloudsWebUrl = "https://console.yandex.cloud/folders/"
