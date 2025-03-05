@@ -79,7 +79,7 @@ struct VMTableData:Decodable,Identifiable,Equatable {
 }
 
 // Model for Functions
-struct CloudFunction: Decodable {
+struct ServerLessFunction: Decodable {
     let id: String
     let folderId: String
     let createdAt: String
@@ -89,7 +89,7 @@ struct CloudFunction: Decodable {
 }
 
 // Model for Final VM Table Data
-struct CloudFunctionTableData:Decodable,Identifiable,Equatable {
+struct ServerLessFunctionTableData:Decodable,Identifiable,Equatable {
     let id: String
     let name: String
     let status: String

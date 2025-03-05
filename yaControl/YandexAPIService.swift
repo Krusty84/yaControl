@@ -190,12 +190,12 @@ class YandexAPIService:ObservableObject {
             }
         }
         
-    func getFunctions(iamToken: String, completion: @escaping (Result<[CloudFunctionTableData], Error>) -> Void) {
+    func getFunctions(iamToken: String, completion: @escaping (Result<[ServerLessFunctionTableData], Error>) -> Void) {
             // Step 1: Get Clouds
             getClouds(iamToken: iamToken) { result in
                 switch result {
                 case .success(let clouds):
-                    var allFuncs: [CloudFunctionTableData] = []
+                    var allFuncs: [ServerLessFunctionTableData] = []
                     let group = DispatchGroup()
                     
                     for cloud in clouds {
@@ -216,7 +216,7 @@ class YandexAPIService:ObservableObject {
                                                 let dateFormatter = DateFormatter()
                                                 dateFormatter.dateFormat = "HH:mm:ss"
                                                 self.lastUpdateTime = dateFormatter.string(from: Date())
-                                                return CloudFunctionTableData(
+                                                return ServerLessFunctionTableData(
                                                     id: function.id,
                                                     name: function.name,
                                                     status: function.status,
@@ -382,7 +382,7 @@ class YandexAPIService:ObservableObject {
     }
 
     //Helper function to get Cloud Functions
-    private func getFunctions(iamToken: String, folderId: String, completion: @escaping (Result<[CloudFunction], Error>) -> Void) {
+    private func getFunctions(iamToken: String, folderId: String, completion: @escaping (Result<[ServerLessFunction], Error>) -> Void) {
         guard let url = URL(string: "\(APIConfig.yaFunctionsEndpoint)?folderId=\(folderId)") else {
             completion(.failure(NSError(domain: "Invalid URL", code: -1, userInfo: nil)))
             return
@@ -422,7 +422,7 @@ class YandexAPIService:ObservableObject {
                     
                     // Check if the "instances" key exists
                     if let functionsArray = json["functions"] as? [[String: Any]] {
-                        let functions = try JSONDecoder().decode([CloudFunction].self, from: JSONSerialization.data(withJSONObject: functionsArray, options: []))
+                        let functions = try JSONDecoder().decode([ServerLessFunction].self, from: JSONSerialization.data(withJSONObject: functionsArray, options: []))
                         completion(.success(functions))
                     } else {
                         // If "functions" key is missing, return an empty array
