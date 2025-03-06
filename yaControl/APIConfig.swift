@@ -17,7 +17,10 @@ struct APIConfig {
     //
     static let yaFoldersWebUrl = "https://console.yandex.cloud/folders/"
     //static let yaCloudsWebUrl = "https://console.yandex.cloud/folders/"
-    static func yaCloudsWebUrl(folderID: String, instanceID: String) -> String {
+    static func yaVMsWebUrl(folderID: String, instanceID: String) -> String {
+          return "\(yaFoldersWebUrl)\(folderID)/compute/instance/\(instanceID)/overview"
+    }
+    static func yaSLFsWebUrl(folderID: String, instanceID: String) -> String {
           return "\(yaFoldersWebUrl)\(folderID)/compute/instance/\(instanceID)/overview"
       }
 }

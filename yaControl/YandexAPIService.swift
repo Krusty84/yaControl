@@ -164,7 +164,7 @@ class YandexAPIService:ObservableObject {
                                                     addresses: addresses,
                                                     folderName: folder.name,
                                                     folderUrl: URL(string:APIConfig.yaFoldersWebUrl+folder.id),
-                                                    vmUrl:URL(string:APIConfig.yaCloudsWebUrl(folderID: folder.id, instanceID: instance.id))
+                                                    vmUrl:URL(string:APIConfig.yaVMsWebUrl(folderID: folder.id, instanceID: instance.id))
                                                 )
                                             }
                                             allVMs.append(contentsOf: vmTableData)
@@ -190,7 +190,7 @@ class YandexAPIService:ObservableObject {
             }
         }
         
-    func getFunctions(iamToken: String, completion: @escaping (Result<[ServerLessFunctionTableData], Error>) -> Void) {
+    func getServerLessFunctions(iamToken: String, completion: @escaping (Result<[ServerLessFunctionTableData], Error>) -> Void) {
             // Step 1: Get Clouds
             getClouds(iamToken: iamToken) { result in
                 switch result {
@@ -223,7 +223,8 @@ class YandexAPIService:ObservableObject {
                                                     createdAt: localTime,
                                                     folderName: folder.name,
                                                     folderUrl: URL(string:APIConfig.yaFoldersWebUrl+folder.id),
-                                                    httpInvokeUrl:URL(string:function.httpInvokeUrl)
+                                                    httpInvokeUrl:URL(string:function.httpInvokeUrl),
+                                                    slfUrl:URL(string:APIConfig.yaCloudsWebUrl(folderID: folder.id, instanceID: function.id))
                                                 )
                                             }
                                                 allFuncs.append(contentsOf: functionTableData)

@@ -11,32 +11,32 @@ struct ServerLessFunctionTabContent: View {
     @ObservedObject var apiService = YandexAPIService.shared
     @ObservedObject var helpers = Helpers.shared
     @State private var iamToken: String = ""
-    @State private var vmTableData: [VMTableData] = []
+    @State private var serverLessFunctionTableData: [ServerLessFunctionTableData] = []
     @State private var errorMessage: String? = nil
     @State private var isLoading: Bool = false
     @State private var searchText: String = ""
     @State private var isHovering = false
-    @State private var selectedVM: VMTableData.ID? = nil
+    @State private var selectedSLF: ServerLessFunctionTableData.ID? = nil
     //
-    @State private var sortKey: KeyPath<VMTableData, String>? = nil
-    @State private var sortOrder: [KeyPathComparator<VMTableData>] = []
+    @State private var sortKey: KeyPath<ServerLessFunctionTableData, String>? = nil
+    @State private var sortOrder: [KeyPathComparator<ServerLessFunctionTableData>] = []
     //
-    var filteredVMs: [VMTableData] {
+    var filteredSLFs: [ServerLessFunctionTableData] {
         if searchText.isEmpty {
-            return vmTableData
+            return serverLessFunctionTableData
         } else {
-            return vmTableData.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
+            return serverLessFunctionTableData.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
         }
     }
-    var sortedVMs: [VMTableData] {
-        return filteredVMs.sorted(using: sortOrder)
+    var sortedVMs: [ServerLessFunctionTableData] {
+        return filteredSLFs.sorted(using: sortOrder)
     }
-    var totalVMs: Int {
-        return vmTableData.count
+    var totalSLFs: Int {
+        return serverLessFunctionTableData.count
     }
     
     var runningVMs: Int {
-        return vmTableData.filter { $0.status == "RUNNING" }.count
+        return serverLessFunctionTableData.filter { $0.status == "RUNNING" }.count
     }
     @State private var previousRunningVMs: Int = 0
     // 0 - stopping, 1 - running
@@ -51,7 +51,7 @@ struct ServerLessFunctionTabContent: View {
             HStack {
                 (Text("Total VMs: ")
                     .font(.subheadline)
-                    .fontWeight(.bold) + Text("\(totalVMs)")
+                    .fontWeight(.bold) + Text("\(totalSLFs)")
                     .font(.subheadline)
                     .fontWeight(.regular))
                 .padding(.horizontal)
@@ -65,25 +65,15 @@ struct ServerLessFunctionTabContent: View {
                 .padding(.horizontal)
                 Spacer()
                 Button(action: {
-                    if(proccessingVMType == 0 && runningVMs == previousRunningVMs){
-                        fetchVMs()
-                    } else if(proccessingVMType == 0 && runningVMs < previousRunningVMs){
-                        fetchVMs()
-                        helpers.processingVMName.removeAll()
-                    } else if (proccessingVMType == 1 && runningVMs == previousRunningVMs){
-                        fetchVMs()
-                    } else if (proccessingVMType == 1 && runningVMs > previousRunningVMs){
-                        fetchVMs()
-                        helpers.processingVMName.removeAll()
-                    }
-                }) {
+                    fetchServerLessFunctions()
+                 }) {
                     Image(systemName: "arrow.clockwise")
                 }
                 .buttonStyle(PlainButtonStyle())
                 .help("Refresh VMs")
                 //
                 Button(action: {
-                    helpers.stopAllRunningVMs(iamToken: iamToken, vms: vmTableData)
+                   // helpers.stopAllRunningVMs(iamToken: iamToken, vms: serverLessFunctionTableData)
                 }) {
                     HStack {
                         Image(systemName: "stop.fill")
@@ -108,16 +98,16 @@ struct ServerLessFunctionTabContent: View {
                 Text("Error: \(errorMessage)")
                     .foregroundColor(.red)
                     .padding()
-            } else if filteredVMs.isEmpty {
+            } else if filteredSLFs.isEmpty {
                 Text("No VMs found")
                     .padding()
             } else {
-                Table(filteredVMs, selection: $selectedVM) {
+                Table(filteredSLFs, selection: $selectedSLF) {
                     // Define columns
-                    TableColumn("Name") { vm in
-                        if let url = vm.vmUrl {
+                    TableColumn("Name") { slf in
+                        if let url = slf.slfUrl {
                             Link(destination: url) {
-                                Text(vm.name)
+                                Text(slf.name)
                                     .foregroundColor(.blue)
                                     .underline()
                                     .fixedSize(horizontal: false, vertical: true)
@@ -132,7 +122,7 @@ struct ServerLessFunctionTabContent: View {
                                     }
                                     .contextMenu {
                                            Button("Copy") {
-                                               let combinedText = "\(vm.name) (\(vm.id))"
+                                               let combinedText = "\(slf.name) (\(slf.id))"
                                                let pasteboard = NSPasteboard.general
                                                pasteboard.clearContents()
                                                pasteboard.setString(combinedText, forType: .string)
@@ -141,44 +131,29 @@ struct ServerLessFunctionTabContent: View {
                             }
                             .buttonStyle(PlainButtonStyle()) // Remove the button styling
                         } else {
-                            Text(vm.name)
+                            Text(slf.name)
                         }
                     }.width(min: 150,max:200)
-                    TableColumn("Status") { vm in
-                        Button(action:{
-                            if (vm.status == "RUNNING") {
-                                previousRunningVMs=runningVMs;
-                                proccessingVMType = 0;
-                            } else {
-                                previousRunningVMs=runningVMs;
-                                proccessingVMType = 1;
-                            }
-                            helpers.startStopVM(iamToken:iamToken,for: vm)
-                        }) {
-                            Image(systemName: vm.status == "RUNNING" ? "stop.fill" : "play.fill")
-                                .foregroundColor(vm.status == "RUNNING" ? .red : .green)
-                        }
-                        .buttonStyle(PlainButtonStyle())
-                    }.width(min:40,max:40)
+                    TableColumn("Status", value: \.status).width(min: 120,max:120)
                     TableColumn("Created At", value: \.createdAt).width(min: 120,max:120)
-                    TableColumn("Cores", value: \.cores).width(min:40,max:40)
-                    TableColumn("RAM", value: \.memoryGB).width(min:30,max:30)
-                    TableColumn("Public Ip") { vm in
-                        Text(vm.addresses.joined(separator: ", "))
-                            .fixedSize(horizontal: false, vertical: true)
-                            .lineLimit(nil)
-                            .contextMenu {
-                                   Button("Copy") {
-                                       let pasteboard = NSPasteboard.general
-                                       pasteboard.clearContents()
-                                       pasteboard.setString(vm.addresses.joined(separator: ", "), forType: .string)
-                                   }
-                               }
-                    }.width(min: 120,max:120)
-                    TableColumn("Folder") { vm in
-                        if let url = vm.folderUrl {
+//                    TableColumn("Cores", value: \.cores).width(min:40,max:40)
+//                    TableColumn("RAM", value: \.memoryGB).width(min:30,max:30)
+//                    TableColumn("Public Ip") { vm in
+//                        Text(vm.addresses.joined(separator: ", "))
+//                            .fixedSize(horizontal: false, vertical: true)
+//                            .lineLimit(nil)
+//                            .contextMenu {
+//                                   Button("Copy") {
+//                                       let pasteboard = NSPasteboard.general
+//                                       pasteboard.clearContents()
+//                                       pasteboard.setString(slf.addresses.joined(separator: ", "), forType: .string)
+//                                   }
+//                               }
+//                    }.width(min: 120,max:120)
+                    TableColumn("Folder") { slf in
+                        if let url = slf.folderUrl {
                             Link(destination: url) {
-                                Text(vm.folderName)
+                                Text(slf.folderName)
                                     .foregroundColor(.blue)
                                     .underline()
                                     .fixedSize(horizontal: false, vertical: true)
@@ -194,14 +169,14 @@ struct ServerLessFunctionTabContent: View {
                             }
                             .buttonStyle(PlainButtonStyle()) // Remove the button styling
                         } else {
-                            Text(vm.name)
+                            Text(slf.name)
                         }
                     }.width(min: 150,max:150)
                 }
                 .padding(.vertical, 6)
-                .onChange(of: selectedVM) { oldSelection, newSelection in
-                    if let selectedVMId = newSelection, let selectedVM = filteredVMs.first(where: { $0.id == selectedVMId }) {
-                        print("Selected VM ID: \(selectedVM.id)")
+                .onChange(of: selectedSLF) { oldSelection, newSelection in
+                    if let selectedSLFId = newSelection, let selectedSLF = filteredSLFs.first(where: { $0.id == selectedSLFId }) {
+                        print("Selected VM ID: \(selectedSLF.id)")
                     }
                 }
             }
@@ -219,14 +194,13 @@ struct ServerLessFunctionTabContent: View {
             .padding(.vertical, 8)
         }
         .onAppear {
-            fetchVMs()
+            fetchServerLessFunctions()
         }
     }
     
-    private func fetchVMs() {
+    private func fetchServerLessFunctions() {
         isLoading = true
         errorMessage = nil
-        
         // Step 1: Get IAM Token
         YandexAPIService.shared.checkOauthKey(yandexPassportOauthToken: SettingsManager.shared.oAuthKey) { result in
             DispatchQueue.main.async {
@@ -234,13 +208,13 @@ struct ServerLessFunctionTabContent: View {
                     case .success(let response):
                         // Step 2: Get VMs using the IAM Token
                         iamToken=response.iamToken
-                        YandexAPIService.shared.getVMs(iamToken: response.iamToken) { result in
+                        YandexAPIService.shared.getServerLessFunctions(iamToken: response.iamToken) { result in
                             DispatchQueue.main.async {
                                 isLoading = false
                                 switch result {
-                                    case .success(let allVMs):
-                                        print("result: ", allVMs)
-                                        vmTableData = allVMs
+                                    case .success(let allSLFs):
+                                        print("result: ", allSLFs)
+                                        selected = allSLFs
                                     case .failure(let error):
                                         errorMessage = error.localizedDescription
                                 }
