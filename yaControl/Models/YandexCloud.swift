@@ -83,6 +83,7 @@ struct ServerLessFunction: Decodable {
     let id: String
     let folderId: String
     let createdAt: String
+    let description: String
     let name: String
     let httpInvokeUrl: String
     let status: String
@@ -94,9 +95,11 @@ struct ServerLessFunctionTableData:Decodable,Identifiable,Equatable {
     let name: String
     let status: String
     let createdAt: String
+    let description: String
     let folderName: String
     let folderUrl: URL?
     let httpInvokeUrl: URL?
+    let slfUrl: URL?
 }
 
 /*

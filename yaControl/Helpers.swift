@@ -25,25 +25,37 @@ class Helpers:ObservableObject {
             }
         )
     }
-    
-    func convertGMTToLocalTime(utcDateString: String) -> String? {
-        // Create a DateFormatter to parse the input string
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ" // ISO 8601 format
-        dateFormatter.timeZone = TimeZone(abbreviation: "UTC") // Set the input time zone to UTC
         
-        // Convert the string to a Date object
-        guard let date = dateFormatter.date(from: utcDateString) else {
-            print("Failed to parse the date string")
-            return nil
+    func convertGMTToLocalTime(utcDateString: String) -> String {
+        print("Input Date: " + utcDateString)
+        
+        // Define possible date formats
+        let dateFormats = [
+            "yyyy-MM-dd'T'HH:mm:ss.SSSZ", // With milliseconds
+            "yyyy-MM-dd'T'HH:mm:ssZ",     // Without milliseconds
+            "yyyy-MM-dd'T'HH:mmZ",        // Without seconds
+            "yyyy-MM-dd HH:mm:ss Z",      // Alternative format
+            "yyyy-MM-dd HH:mm Z"          // Another alternative format
+        ]
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.timeZone = TimeZone(abbreviation: "UTC") // Set input time zone to UTC
+        
+        // Try each format until one succeeds
+        for format in dateFormats {
+            dateFormatter.dateFormat = format
+            if let date = dateFormatter.date(from: utcDateString) {
+                // Convert the Date to local time
+                dateFormatter.timeZone = TimeZone.current // Switch to local time zone
+                dateFormatter.dateFormat = "dd.MM.yy (HH:mm)" // Your desired output format
+                let localTimeString = dateFormatter.string(from: date)
+                return localTimeString
+            }
         }
         
-        // Convert the Date to local time
-        dateFormatter.timeZone = TimeZone.current // Switch to the device's local time zone
-        dateFormatter.dateFormat = "dd.MM.yy (HH:mm)" // Your desired format
-        
-        let localTimeString = dateFormatter.string(from: date)
-        return localTimeString
+        // If none of the formats worked
+        print("Failed to parse the date string")
+        return ""
     }
     
     func startStopVM(iamToken:String,for vm: VMTableData) {
@@ -100,5 +112,4 @@ class Helpers:ObservableObject {
             }
         }
     }
-    
 }

@@ -141,14 +141,13 @@ class YandexAPIService:ObservableObject {
                             case .success(let folders):
                                 for folder in folders {
                                     group.enter()
-                                    // Step 3: Get Instances for each Folder
+                                    // Step 3: Get VMs for each Folder
                                     self.getInstances(iamToken: iamToken, folderId: folder.id) { result in
                                         switch result {
                                         case .success(let instances):
                                             // Map instances to VMTableData
                                             let vmTableData = instances.map { instance in
                                                 let memoryGB = String(Int(instance.resources.memory)! / 1024 / 1024 / 1024)
-                                                let localTime = Helpers.shared.convertGMTToLocalTime(utcDateString: instance.createdAt)!
                                                 let addresses = instance.networkInterfaces.compactMap { $0.primaryV4Address.oneToOneNat?.address }
                                                 let dateFormatter = DateFormatter()
                                                 dateFormatter.dateFormat = "HH:mm:ss"
@@ -157,7 +156,7 @@ class YandexAPIService:ObservableObject {
                                                     id: instance.id,
                                                     name: instance.name,
                                                     status: instance.status,
-                                                    createdAt: localTime,
+                                                    createdAt: Helpers.shared.convertGMTToLocalTime(utcDateString: instance.createdAt),
                                                     cores: instance.resources.cores,
                                                     memoryGB: memoryGB,
                                                     preemptible: instance.schedulingPolicy.preemptible,
@@ -195,7 +194,7 @@ class YandexAPIService:ObservableObject {
             getClouds(iamToken: iamToken) { result in
                 switch result {
                 case .success(let clouds):
-                    var allFuncs: [ServerLessFunctionTableData] = []
+                    var allSLFs: [ServerLessFunctionTableData] = []
                     let group = DispatchGroup()
                     
                     for cloud in clouds {
@@ -206,13 +205,12 @@ class YandexAPIService:ObservableObject {
                             case .success(let folders):
                                 for folder in folders {
                                     group.enter()
-                                    // Step 3: Get Instances for each Folder
+                                    // Step 3: Get ServerLess Functions for each Folder
                                     self.getFunctions(iamToken: iamToken, folderId: folder.id) { result in
                                         switch result {
                                         case .success(let functions):
-                                            // Map functions to CloudFunctionTableData
+                                            // Map functions to ServerLessFunctionTableData
                                             let functionTableData = functions.map { function in
-                                                let localTime = Helpers.shared.convertGMTToLocalTime(utcDateString: function.createdAt)!
                                                 let dateFormatter = DateFormatter()
                                                 dateFormatter.dateFormat = "HH:mm:ss"
                                                 self.lastUpdateTime = dateFormatter.string(from: Date())
@@ -220,14 +218,15 @@ class YandexAPIService:ObservableObject {
                                                     id: function.id,
                                                     name: function.name,
                                                     status: function.status,
-                                                    createdAt: localTime,
+                                                    createdAt: Helpers.shared.convertGMTToLocalTime(utcDateString: function.createdAt),
+                                                    description: function.description,
                                                     folderName: folder.name,
                                                     folderUrl: URL(string:APIConfig.yaFoldersWebUrl+folder.id),
                                                     httpInvokeUrl:URL(string:function.httpInvokeUrl),
-                                                    slfUrl:URL(string:APIConfig.yaCloudsWebUrl(folderID: folder.id, instanceID: function.id))
+                                                    slfUrl:URL(string:APIConfig.yaSLFsWebUrl(folderID: folder.id, slfID: function.id))
                                                 )
                                             }
-                                                allFuncs.append(contentsOf: functionTableData)
+                                                allSLFs.append(contentsOf: functionTableData)
                                         case .failure(let error):
                                             completion(.failure(error))
                                         }
@@ -242,7 +241,7 @@ class YandexAPIService:ObservableObject {
                     }
                     
                     group.notify(queue: .main) {
-                        completion(.success(allFuncs))
+                        completion(.success(allSLFs))
                     }
                 case .failure(let error):
                     completion(.failure(error))
@@ -346,9 +345,9 @@ class YandexAPIService:ObservableObject {
             }
             
             // Print raw JSON response for debugging
-            if let jsonString = String(data: data, encoding: .utf8) {
-                print("Raw JSON Response (Instances): \(jsonString)")
-            }
+//            if let jsonString = String(data: data, encoding: .utf8) {
+//                print("Raw JSON Response (Instances): \(jsonString)")
+//            }
             
             do {
                 // Try to decode the response as a dictionary
@@ -382,7 +381,7 @@ class YandexAPIService:ObservableObject {
         }.resume()
     }
 
-    //Helper function to get Cloud Functions
+    //Helper function to get Cloud Serverless Functions
     private func getFunctions(iamToken: String, folderId: String, completion: @escaping (Result<[ServerLessFunction], Error>) -> Void) {
         guard let url = URL(string: "\(APIConfig.yaFunctionsEndpoint)?folderId=\(folderId)") else {
             completion(.failure(NSError(domain: "Invalid URL", code: -1, userInfo: nil)))
@@ -405,9 +404,9 @@ class YandexAPIService:ObservableObject {
             }
             
             // Print raw JSON response for debugging
-            if let jsonString = String(data: data, encoding: .utf8) {
-                print("Raw JSON Response (Instances): \(jsonString)")
-            }
+//            if let jsonString = String(data: data, encoding: .utf8) {
+//                print("Raw JSON Response (Functions): \(jsonString)")
+//            }
             
             do {
                 // Try to decode the response as a dictionary
@@ -421,7 +420,7 @@ class YandexAPIService:ObservableObject {
                         return
                     }
                     
-                    // Check if the "instances" key exists
+                    // Check if the "functions" key exists
                     if let functionsArray = json["functions"] as? [[String: Any]] {
                         let functions = try JSONDecoder().decode([ServerLessFunction].self, from: JSONSerialization.data(withJSONObject: functionsArray, options: []))
                         completion(.success(functions))
@@ -435,7 +434,7 @@ class YandexAPIService:ObservableObject {
                     completion(.failure(NSError(domain: "Invalid JSON format", code: -1, userInfo: nil)))
                 }
             } catch {
-                print("Decoding Error (Instances): \(error)")
+                print("Decoding Error (Functions): \(error)")
                 completion(.failure(error))
             }
         }.resume()

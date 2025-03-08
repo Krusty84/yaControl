@@ -16,12 +16,12 @@ struct APIConfig {
 
     //
     static let yaFoldersWebUrl = "https://console.yandex.cloud/folders/"
-    //static let yaCloudsWebUrl = "https://console.yandex.cloud/folders/"
     static func yaVMsWebUrl(folderID: String, instanceID: String) -> String {
           return "\(yaFoldersWebUrl)\(folderID)/compute/instance/\(instanceID)/overview"
     }
-    static func yaSLFsWebUrl(folderID: String, instanceID: String) -> String {
-          return "\(yaFoldersWebUrl)\(folderID)/compute/instance/\(instanceID)/overview"
+    static func yaSLFsWebUrl(folderID: String, slfID: String) -> String {
+          return "\(yaFoldersWebUrl)\(folderID)/functions/functions/\(slfID)/overview"
       }
 }
 //https://console.yandex.cloud/folders/b1gqcrohfu85p2fc6fkc
+//https://console.yandex.cloud/folders/b1gqcrohfu85p2fc6fkc/functions/functions/d4e38851c0ofsnkki9f7/overview
