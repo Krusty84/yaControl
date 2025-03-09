@@ -99,8 +99,10 @@ struct CloudComputingTabContent: View {
                 .disabled(runningVMs == 0)
                 .help("Stop All Running VMs")
                 .buttonStyle(PlainButtonStyle())
+                .padding(.trailing, 10) // Add padding to the right of the button
             }
             .padding(.vertical, 6)
+            .padding(.leading, 10)
             if isLoading {
                 ProgressView("Loading...")
                     .padding()

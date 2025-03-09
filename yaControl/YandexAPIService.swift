@@ -219,10 +219,9 @@ class YandexAPIService:ObservableObject {
                                                     name: function.name,
                                                     status: function.status,
                                                     createdAt: Helpers.shared.convertGMTToLocalTime(utcDateString: function.createdAt),
-                                                    description: function.description,
                                                     folderName: folder.name,
                                                     folderUrl: URL(string:APIConfig.yaFoldersWebUrl+folder.id),
-                                                    httpInvokeUrl:URL(string:function.httpInvokeUrl),
+                                                    httpInvokeUrl:function.httpInvokeUrl,
                                                     slfUrl:URL(string:APIConfig.yaSLFsWebUrl(folderID: folder.id, slfID: function.id))
                                                 )
                                             }

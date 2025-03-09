@@ -47,7 +47,6 @@ struct ServerLessFunctionTabContent: View {
             // Search Bar
             //            SearchBar(text: $searchText)
             //                .padding(.horizontal)
-            
             HStack {
                 (Text("Total SLFs: ")
                     .font(.subheadline)
@@ -56,14 +55,17 @@ struct ServerLessFunctionTabContent: View {
                     .fontWeight(.regular))
                 .padding(.horizontal)
                 
-                // Running VMs
+                // Active SLFs
                 (Text("Active SLFs: ")
                     .font(.subheadline)
                     .fontWeight(.bold) + Text("\(activeSLFs)")
                     .font(.subheadline)
                     .fontWeight(.regular))
                 .padding(.horizontal)
+                
                 Spacer()
+                
+                // Refresh Button
                 Button(action: {
                     fetchServerLessFunctions()
                 }) {
@@ -71,8 +73,10 @@ struct ServerLessFunctionTabContent: View {
                 }
                 .buttonStyle(PlainButtonStyle())
                 .help("Refresh SLFs")
+                .padding(.trailing, 10) // Add padding to the right of the button
             }
             .padding(.vertical, 6)
+            .padding(.leading, 10)
             if isLoading {
                 ProgressView("Loading...")
                     .padding()
@@ -121,15 +125,17 @@ struct ServerLessFunctionTabContent: View {
                                 .foregroundColor(slf.status == "ACTIVE" ? .green : .red)
                     }.width(min:40,max:40)
                     TableColumn("Created At", value: \.createdAt).width(min: 120,max:120)
-                   // TableColumn("Invoke Url", value: \.httpInvokeUrl).width(min: 120,max:120)
-                    TableColumn("Invoke Url") { item in
-                                    if let url = item.httpInvokeUrl {
-                                        Text(url.absoluteString) // Convert URL to String
-                                    } else {
-                                        Text("No URL") // Handle nil case
-                                    }
-                                }
-                                .width(min: 120,max:120)
+                    TableColumn("Invoke") { (slf: ServerLessFunctionTableData) in
+                        Text(slf.id)
+                            .contextMenu {
+                                   Button("Copy invoke url") {
+                                       let pasteboard = NSPasteboard.general
+                                       pasteboard.clearContents()
+                                       pasteboard.setString(slf.httpInvokeUrl, forType: .string)
+                                   }
+                               }
+                    }.width(min: 200,max:200)
+                    
                     TableColumn("Folder") { slf in
                         if let url = slf.folderUrl {
                             Link(destination: url) {
