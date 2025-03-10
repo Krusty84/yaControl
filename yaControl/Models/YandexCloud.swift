@@ -88,7 +88,7 @@ struct ServerLessFunction: Decodable {
     let status: String
 }
 
-// Model for Final VM Table Data
+// Model for Final Functions Table Data
 struct ServerLessFunctionTableData:Decodable,Identifiable,Equatable {
     let id: String
     let name: String
@@ -98,6 +98,26 @@ struct ServerLessFunctionTableData:Decodable,Identifiable,Equatable {
     let folderUrl: URL?
     let httpInvokeUrl: String
     let slfUrl: URL?
+}
+
+// Model for Buckets
+struct Bucket: Decodable {
+   // let id: Int
+    let folderId: String
+    let createdAt: String
+    let name: String
+    let maxSize: String
+}
+
+// Model for Final Buckets Table Data
+struct BucketTableData:Decodable,Identifiable,Equatable {
+    let id: UUID
+    let name: String
+    let maxSize: String
+    let createdAt: String
+    let folderName: String
+    let folderUrl: URL?
+    let bucketUrl: URL?
 }
 
 /*

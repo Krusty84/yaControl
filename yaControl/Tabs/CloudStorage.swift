@@ -1,43 +1,43 @@
 //
-//  CloudComputing.swift
+//  CloudStorage.swift
 //  yaControl
 //
-//  Created by Sedoykin Alexey on 17/02/2025.
+//  Created by Sedoykin Alexey on 09/03/2025.
 //
 
 import SwiftUI
 
-struct ServerLessFunctionTabContent: View {
+struct BucketTabContent: View {
     @ObservedObject var apiService = YandexAPIService.shared
     @ObservedObject var helpers = Helpers.shared
     @State private var iamToken: String = ""
-    @State private var slfTableData: [ServerLessFunctionTableData] = []
+    @State private var bucketTableData: [BucketTableData] = []
     @State private var errorMessage: String? = nil
     @State private var isLoading: Bool = false
     @State private var searchText: String = ""
     @State private var isHovering = false
-    @State private var selectedSlf: ServerLessFunctionTableData.ID? = nil
+    @State private var selectedBucket: BucketTableData.ID? = nil
     //
-    @State private var sortKey: KeyPath<ServerLessFunctionTableData, String>? = nil
-    @State private var sortOrder: [KeyPathComparator<ServerLessFunctionTableData>] = []
+    @State private var sortKey: KeyPath<BucketTableData, String>? = nil
+    @State private var sortOrder: [KeyPathComparator<BucketTableData>] = []
     //
-    var filteredSLFs: [ServerLessFunctionTableData] {
+    var filteredBuckets: [BucketTableData] {
         if searchText.isEmpty {
-            return slfTableData
+            return bucketTableData
         } else {
-            return slfTableData.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
+            return bucketTableData.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
         }
     }
-    var sortedSLFs: [ServerLessFunctionTableData] {
-        return filteredSLFs.sorted(using: sortOrder)
+    var sortedBuckets: [BucketTableData] {
+        return filteredBuckets.sorted(using: sortOrder)
     }
-    var totalSLFs: Int {
-        return slfTableData.count
+    var totalBuckets: Int {
+        return bucketTableData.count
     }
     
-    var activeSLFs: Int {
-        return slfTableData.filter { $0.status == "ACTIVE" }.count
-    }
+//    var activeBuckets: Int {
+//        return bucketTableData.filter { $0.status == "ACTIVE" }.count
+//    }
     
     var body: some View {
         VStack(spacing: 0) {
@@ -45,17 +45,9 @@ struct ServerLessFunctionTabContent: View {
             //            SearchBar(text: $searchText)
             //                .padding(.horizontal)
             HStack {
-                (Text("Total SLFs: ")
+                (Text("Total Buckets: ")
                     .font(.subheadline)
-                    .fontWeight(.bold) + Text("\(totalSLFs)")
-                    .font(.subheadline)
-                    .fontWeight(.regular))
-                .padding(.horizontal)
-                
-                // Active SLFs
-                (Text("Active SLFs: ")
-                    .font(.subheadline)
-                    .fontWeight(.bold) + Text("\(activeSLFs)")
+                    .fontWeight(.bold) + Text("\(totalBuckets)")
                     .font(.subheadline)
                     .fontWeight(.regular))
                 .padding(.horizontal)
@@ -64,7 +56,7 @@ struct ServerLessFunctionTabContent: View {
                 
                 // Refresh Button
                 Button(action: {
-                    fetchServerLessFunctions()
+                    fetchBuckets()
                 }) {
                     Image(systemName: "arrow.clockwise")
                 }
@@ -81,16 +73,16 @@ struct ServerLessFunctionTabContent: View {
                 Text("Error: \(errorMessage)")
                     .foregroundColor(.red)
                     .padding()
-            } else if filteredSLFs.isEmpty {
-                Text("No SLFs found")
+            } else if filteredBuckets.isEmpty {
+                Text("No Buckets found")
                     .padding()
             } else {
-                Table(filteredSLFs, selection: $selectedSlf) {
+                Table(filteredBuckets, selection: $selectedBucket) {
                     // Define columns
-                    TableColumn("Name") { slf in
-                        if let url = slf.slfUrl {
+                    TableColumn("Name") { item in
+                        if let url = item.bucketUrl {
                             Link(destination: url) {
-                                Text(slf.name)
+                                Text(item.name)
                                     .foregroundColor(.blue)
                                     .underline()
                                     .fixedSize(horizontal: false, vertical: true)
@@ -105,7 +97,7 @@ struct ServerLessFunctionTabContent: View {
                                     }
                                     .contextMenu {
                                            Button("Copy") {
-                                               let combinedText = "\(slf.name) (\(slf.id))"
+                                               let combinedText = "\(item.name) (\(item.id))"
                                                let pasteboard = NSPasteboard.general
                                                pasteboard.clearContents()
                                                pasteboard.setString(combinedText, forType: .string)
@@ -114,29 +106,16 @@ struct ServerLessFunctionTabContent: View {
                             }
                             .buttonStyle(PlainButtonStyle()) // Remove the button styling
                         } else {
-                            Text(slf.name)
+                            Text(item.name)
                         }
                     }.width(min: 150,max:200)
-                    TableColumn("Status") { slf in
-                        Image(systemName: slf.status == "ACTIVE" ? "arrow.up.square.fill" : "arrow.down.square.fill")
-                                .foregroundColor(slf.status == "ACTIVE" ? .green : .red)
-                    }.width(min:40,max:40)
+                    TableColumn("Max Size", value: \.maxSize).width(min: 120,max:120)
                     TableColumn("Created At", value: \.createdAt).width(min: 120,max:120)
-                    TableColumn("Invoke") { (slf: ServerLessFunctionTableData) in
-                        Text(slf.id)
-                            .contextMenu {
-                                   Button("Copy invoke url") {
-                                       let pasteboard = NSPasteboard.general
-                                       pasteboard.clearContents()
-                                       pasteboard.setString(slf.httpInvokeUrl, forType: .string)
-                                   }
-                               }
-                    }.width(min: 200,max:200)
-                    
-                    TableColumn("Folder") { slf in
-                        if let url = slf.folderUrl {
+
+                    TableColumn("Folder") { item in
+                        if let url = item.folderUrl {
                             Link(destination: url) {
-                                Text(slf.folderName)
+                                Text(item.folderName)
                                     .foregroundColor(.blue)
                                     .underline()
                                     .fixedSize(horizontal: false, vertical: true)
@@ -152,14 +131,14 @@ struct ServerLessFunctionTabContent: View {
                             }
                             .buttonStyle(PlainButtonStyle()) // Remove the button styling
                         } else {
-                            Text(slf.name)
+                            Text(item.name)
                         }
                     }.width(min: 150,max:150)
                 }
                 .padding(.vertical, 6)
-                .onChange(of: selectedSlf) { oldSelection, newSelection in
-                    if let selectedSLFId = newSelection, let selectedSLF = filteredSLFs.first(where: { $0.id == selectedSLFId }) {
-                        print("Selected SLF ID: \(selectedSLF.id)")
+                .onChange(of: selectedBucket) { oldSelection, newSelection in
+                    if let selectedBucketId = newSelection, let selectedBucket = filteredBuckets.first(where: { $0.id == selectedBucketId }) {
+                        print("Selected Bucket ID: \(selectedBucket.id)")
                     }
                 }
             }
@@ -177,11 +156,11 @@ struct ServerLessFunctionTabContent: View {
             .padding(.vertical, 8)
         }
         .onAppear {
-            fetchServerLessFunctions()
+            fetchBuckets()
         }
     }
     
-    private func fetchServerLessFunctions() {
+    private func fetchBuckets() {
         isLoading = true
         errorMessage = nil
         // Step 1: Get IAM Token
@@ -191,13 +170,13 @@ struct ServerLessFunctionTabContent: View {
                     case .success(let response):
                         // Step 2: Get VMs using the IAM Token
                         iamToken=response.iamToken
-                        YandexAPIService.shared.getServerLessFunctions(iamToken: response.iamToken) { result in
+                        YandexAPIService.shared.getBuckets(iamToken: response.iamToken) { result in
                             DispatchQueue.main.async {
                                 isLoading = false
                                 switch result {
-                                    case .success(let allSLFs):
-                                        print("result: ", allSLFs)
-                                        slfTableData = allSLFs
+                                    case .success(let allBuckets):
+                                        print("result: ", allBuckets)
+                                        bucketTableData = allBuckets
                                     case .failure(let error):
                                         errorMessage = error.localizedDescription
                                 }

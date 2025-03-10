@@ -247,6 +247,67 @@ class YandexAPIService:ObservableObject {
                 }
             }
         }
+    
+    func getBuckets(iamToken: String, completion: @escaping (Result<[BucketTableData], Error>) -> Void) {
+            // Step 1: Get Clouds
+            getClouds(iamToken: iamToken) { result in
+                switch result {
+                case .success(let cloudResult):
+                    var allBuckets: [BucketTableData] = []
+                    let group = DispatchGroup()
+                    let clouds = cloudResult.clouds
+                    for cloud in clouds {
+                        group.enter()
+                        // Step 2: Get Folders for each Cloud
+                        self.getFolders(iamToken: iamToken, cloudId: cloud.id) { result in
+                            switch result {
+                            case .success(let folders):
+                                for folder in folders {
+                                    group.enter()
+                                    // Step 3: Get Buckets for each Folder
+                                    self.getBuckets(iamToken: iamToken, folderId: folder.id) { result in
+                                        switch result {
+                                        case .success(let buckets):
+                                            // Map functions to ServerLessFunctionTableData
+                                            let bucketTableData = buckets.map { bucket in
+                                                let dateFormatter = DateFormatter()
+                                                dateFormatter.dateFormat = "HH:mm:ss"
+                                                self.lastUpdateTime = dateFormatter.string(from: Date())
+                                                return BucketTableData(
+                                                    id: UUID(),
+                                                    name: bucket.name,
+                                                    maxSize: bucket.maxSize,
+                                                    createdAt: Helpers.shared.convertGMTToLocalTime(utcDateString: bucket.createdAt),
+                                                    folderName: folder.name,
+                                                    folderUrl: URL(string:APIConfig.yaFoldersWebUrl+folder.id),
+                                                    //httpInvokeUrl:function.httpInvokeUrl,
+                                                    //bucketUrl:URL(string:APIConfig.yaBucketsWebUrl(folderID: folder.id, bucketName: bucket.id))
+                                                    bucketUrl:URL(string:APIConfig.yaFoldersWebUrl+folder.id)
+                                                )
+                                            }
+                                                allBuckets.append(contentsOf: bucketTableData)
+                                        case .failure(let error):
+                                            completion(.failure(error))
+                                        }
+                                        group.leave()
+                                    }
+                                }
+                            case .failure(let error):
+                                completion(.failure(error))
+                            }
+                            group.leave()
+                        }
+                    }
+                    
+                    group.notify(queue: .main) {
+                        completion(.success(allBuckets))
+                    }
+                case .failure(let error):
+                    completion(.failure(error))
+                }
+            }
+        }
+        // MARK: - local Helpers
         // Helper function to get Clouds
         private func getClouds(iamToken: String, completion: @escaping (Result<[Cloud], Error>) -> Void) {
             guard let url = URL(string: APIConfig.yaCloudsEndpoint) else {
@@ -438,6 +499,65 @@ class YandexAPIService:ObservableObject {
             }
         }.resume()
     }
+    
+    private func getBuckets(iamToken: String, folderId: String, completion: @escaping (Result<[Bucket], Error>) -> Void) {
+        guard let url = URL(string: "\(APIConfig.yaBucketsEndpoint)?folderId=\(folderId)") else {
+            completion(.failure(NSError(domain: "Invalid URL", code: -1, userInfo: nil)))
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(iamToken)", forHTTPHeaderField: "Authorization")
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                completion(.failure(error))
+                return
+            }
+            
+            guard let data = data else {
+                completion(.failure(NSError(domain: "No data received", code: -1, userInfo: nil)))
+                return
+            }
+            
+            // Print raw JSON response for debugging
+//            if let jsonString = String(data: data, encoding: .utf8) {
+//                print("Raw JSON Response (Functions): \(jsonString)")
+//            }
+            
+            do {
+                // Try to decode the response as a dictionary
+                if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+                    // Check if the response contains an error
+                    if let errorDict = json["error"] as? [String: Any],
+                       let errorCode = errorDict["code"] as? Int,
+                       let errorMessage = errorDict["message"] as? String {
+                        let error = NSError(domain: "API Error", code: errorCode, userInfo: [NSLocalizedDescriptionKey: errorMessage])
+                        completion(.failure(error))
+                        return
+                    }
+                    
+                    // Check if the "functions" key exists
+                    if let bucketsArray = json["buckets"] as? [[String: Any]] {
+                        let buckets = try JSONDecoder().decode([Bucket].self, from: JSONSerialization.data(withJSONObject: bucketsArray, options: []))
+                        completion(.success(buckets))
+                    } else {
+                        // If "functions" key is missing, return an empty array
+                        print("No buckets found for folderId: \(folderId)")
+                        completion(.success([]))
+                    }
+                } else {
+                    print("Error: Invalid JSON format")
+                    completion(.failure(NSError(domain: "Invalid JSON format", code: -1, userInfo: nil)))
+                }
+            } catch {
+                print("Decoding Error (Functions): \(error)")
+                completion(.failure(error))
+            }
+        }.resume()
+    }
+    
     func startVM(iamToken: String,vmId: String, completion: @escaping (Result<Void, Error>) -> Void) {
         guard let url = URL(string: "\(APIConfig.yaVMInstancesEndpoint)/\(vmId):start") else {
             completion(.failure(NSError(domain: "Invalid URL", code: -1, userInfo: nil)))
