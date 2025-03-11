@@ -30,3 +30,5 @@ struct APIConfig {
 //https://console.yandex.cloud/folders/b1gqcrohfu85p2fc6fkc
 //https://console.yandex.cloud/folders/b1gqcrohfu85p2fc6fkc/functions/functions/d4e38851c0ofsnkki9f7/overview
 //https://console.yandex.cloud/folders/b1gqcrohfu85p2fc6fkc/storage/buckets/archive1
+//https://storage.api.cloud.yandex.net/storage/v1/buckets/mynotes888:getStats
+//https://console.yandex.cloud/folders/b1gqcrohfu85p2fc6fkc/storage/buckets/archive1

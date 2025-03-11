@@ -109,15 +109,66 @@ struct Bucket: Decodable {
     let maxSize: String
 }
 
+struct BucketInfo: Decodable {
+    let storageClassUsedSizes: [StorageClassUsedSize]
+    let storageClassCounters: [StorageClassCounter]
+    let anonymousAccessFlags: AnonymousAccessFlags
+    let name: String
+    let maxSize: String
+    let usedSize: String
+    let defaultStorageClass: String
+    let createdAt: String
+    let updatedAt: String
+    
+    // Computed property to get the total object count
+    var totalObjectCount: Int {
+        storageClassCounters.reduce(0) { result, counter in
+            let simpleCount = Int(counter.counters.simpleObjectCount) ?? 0
+            let multipartCount = Int(counter.counters.multipartObjectsCount) ?? 0
+            return result + simpleCount + multipartCount
+        }
+    }
+}
+
+struct StorageClassUsedSize: Decodable {
+    let storageClass: String
+    let classSize: String
+}
+
+struct StorageClassCounter: Decodable {
+    let counters: Counters
+    let storageClass: String
+}
+
+struct Counters: Decodable {
+    let simpleObjectSize: String
+    let simpleObjectCount: String
+    let multipartObjectsSize: String
+    let multipartObjectsCount: String
+}
+
+struct AnonymousAccessFlags: Decodable {
+    let read: Bool
+    let list: Bool
+    let configRead: Bool
+}
+
 // Model for Final Buckets Table Data
 struct BucketTableData:Decodable,Identifiable,Equatable {
     let id: UUID
     let name: String
     let maxSize: String
+    let usedSize: String
+    let totalObjectCount: Int
     let createdAt: String
+    let updatedAt: String
     let folderName: String
     let folderUrl: URL?
     let bucketUrl: URL?
+    // Computed property to convert totalObjectCount to String
+    var totalObjectCountString: String {
+            String(totalObjectCount)
+    }
 }
 
 /*

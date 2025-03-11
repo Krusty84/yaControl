@@ -109,8 +109,11 @@ struct BucketTabContent: View {
                             Text(item.name)
                         }
                     }.width(min: 150,max:200)
-                    TableColumn("Max Size", value: \.maxSize).width(min: 120,max:120)
+                    TableColumn("Max Size (Gb)", value: \.maxSize).width(min: 80,max:80)
+                    TableColumn("Used Size (Gb)", value: \.usedSize).width(min: 90,max:90)
+                    TableColumn("Files", value: \.totalObjectCountString).width(min: 90, max: 90)
                     TableColumn("Created At", value: \.createdAt).width(min: 120,max:120)
+                    TableColumn("Updated At", value: \.updatedAt).width(min: 120,max:120)
 
                     TableColumn("Folder") { item in
                         if let url = item.folderUrl {

@@ -112,4 +112,20 @@ class Helpers:ObservableObject {
             }
         }
     }
+    
+    func convertBytesToGB(bytes: String) -> String {
+        // Convert the input string (bytes) to a Double
+        guard let bytesValue = Double(bytes) else {
+            return "0" // Return a default value if conversion fails
+        }
+        
+        // Constants for conversion
+        let bytesInGB: Double = 1024 * 1024 * 1024 // 1 GB = 1024 MB = 1024 * 1024 KB = 1024 * 1024 * 1024 bytes
+        
+        // Convert bytes to GB
+        let sizeInGB = bytesValue / bytesInGB
+        
+        // Format the result to 2 decimal places
+        return String(format: "%.2f", sizeInGB)
+    }
 }

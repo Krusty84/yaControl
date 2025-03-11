@@ -247,66 +247,80 @@ class YandexAPIService:ObservableObject {
                 }
             }
         }
-    
+        
     func getBuckets(iamToken: String, completion: @escaping (Result<[BucketTableData], Error>) -> Void) {
-            // Step 1: Get Clouds
-            getClouds(iamToken: iamToken) { result in
-                switch result {
-                case .success(let cloudResult):
-                    var allBuckets: [BucketTableData] = []
-                    let group = DispatchGroup()
-                    let clouds = cloudResult.clouds
-                    for cloud in clouds {
-                        group.enter()
-                        // Step 2: Get Folders for each Cloud
-                        self.getFolders(iamToken: iamToken, cloudId: cloud.id) { result in
-                            switch result {
-                            case .success(let folders):
-                                for folder in folders {
-                                    group.enter()
-                                    // Step 3: Get Buckets for each Folder
-                                    self.getBuckets(iamToken: iamToken, folderId: folder.id) { result in
-                                        switch result {
-                                        case .success(let buckets):
-                                            // Map functions to ServerLessFunctionTableData
-                                            let bucketTableData = buckets.map { bucket in
-                                                let dateFormatter = DateFormatter()
-                                                dateFormatter.dateFormat = "HH:mm:ss"
-                                                self.lastUpdateTime = dateFormatter.string(from: Date())
-                                                return BucketTableData(
-                                                    id: UUID(),
-                                                    name: bucket.name,
-                                                    maxSize: bucket.maxSize,
-                                                    createdAt: Helpers.shared.convertGMTToLocalTime(utcDateString: bucket.createdAt),
-                                                    folderName: folder.name,
-                                                    folderUrl: URL(string:APIConfig.yaFoldersWebUrl+folder.id),
-                                                    //httpInvokeUrl:function.httpInvokeUrl,
-                                                    //bucketUrl:URL(string:APIConfig.yaBucketsWebUrl(folderID: folder.id, bucketName: bucket.id))
-                                                    bucketUrl:URL(string:APIConfig.yaFoldersWebUrl+folder.id)
-                                                )
+        // Step 1: Get Clouds
+        getClouds(iamToken: iamToken) { result in
+            switch result {
+            case .success(let cloudResult):
+                var allBuckets: [BucketTableData] = []
+                let group = DispatchGroup()
+                let clouds = cloudResult.clouds
+                
+                for cloud in clouds {
+                    group.enter()
+                    // Step 2: Get Folders for each Cloud
+                    self.getFolders(iamToken: iamToken, cloudId: cloud.id) { result in
+                        switch result {
+                        case .success(let folders):
+                            for folder in folders {
+                                group.enter()
+                                // Step 3: Get Buckets for each Folder
+                                self.getBuckets(iamToken: iamToken, folderId: folder.id) { result in
+                                    switch result {
+                                    case .success(let buckets):
+                                        for bucket in buckets {
+                                            group.enter()
+                                            // Step 4: Get Bucket Info (getStats) for each Bucket
+                                            self.getBucketInfo(iamToken: iamToken, bucketName: bucket.name) { result in
+                                                switch result {
+                                                case .success(let bucketInfo):
+                                                    // Map bucket and bucketInfo to BucketTableData
+                                                    let dateFormatter = DateFormatter()
+                                                    dateFormatter.dateFormat = "HH:mm:ss"
+                                                    self.lastUpdateTime = dateFormatter.string(from: Date())
+                                                    
+                                                    let bucketTableData = BucketTableData(
+                                                        id: UUID(),
+                                                        name: bucketInfo.name,
+                                                        maxSize: Helpers.shared.convertBytesToGB(bytes: bucketInfo.maxSize),
+                                                        usedSize: Helpers.shared.convertBytesToGB(bytes: bucketInfo.usedSize),
+                                                        totalObjectCount: bucketInfo.totalObjectCount,
+                                                        createdAt: Helpers.shared.convertGMTToLocalTime(utcDateString: bucketInfo.createdAt),
+                                                        updatedAt: Helpers.shared.convertGMTToLocalTime(utcDateString: bucketInfo.updatedAt),
+                                                        folderName: folder.name,
+                                                        folderUrl: URL(string: APIConfig.yaFoldersWebUrl + folder.id),
+                                                        bucketUrl: URL(string: APIConfig.yaBucketsWebUrl(folderID: folder.id,bucketName: bucket.name))
+                                                    )
+                                                    allBuckets.append(bucketTableData)
+                                                case .failure(let error):
+                                                    completion(.failure(error))
+                                                }
+                                                group.leave()
                                             }
-                                                allBuckets.append(contentsOf: bucketTableData)
-                                        case .failure(let error):
-                                            completion(.failure(error))
                                         }
-                                        group.leave()
+                                    case .failure(let error):
+                                        completion(.failure(error))
                                     }
+                                    group.leave()
                                 }
-                            case .failure(let error):
-                                completion(.failure(error))
                             }
-                            group.leave()
+                        case .failure(let error):
+                            completion(.failure(error))
                         }
+                        group.leave()
                     }
-                    
-                    group.notify(queue: .main) {
-                        completion(.success(allBuckets))
-                    }
-                case .failure(let error):
-                    completion(.failure(error))
                 }
+                
+                group.notify(queue: .main) {
+                    completion(.success(allBuckets))
+                }
+            case .failure(let error):
+                completion(.failure(error))
             }
         }
+    }
+    
         // MARK: - local Helpers
         // Helper function to get Clouds
         private func getClouds(iamToken: String, completion: @escaping (Result<[Cloud], Error>) -> Void) {
@@ -557,6 +571,50 @@ class YandexAPIService:ObservableObject {
             }
         }.resume()
     }
+    
+    private func getBucketInfo(iamToken: String, bucketName: String, completion: @escaping (Result<BucketInfo, Error>) -> Void) {
+        // Construct the URL
+        guard let url = URL(string: "\(APIConfig.yaBucketsEndpoint)/\(bucketName):getStats") else {
+            completion(.failure(NSError(domain: "Invalid URL", code: -1, userInfo: nil)))
+            return
+        }
+        
+        // Set up the request
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(iamToken)", forHTTPHeaderField: "Authorization")
+        
+        // Perform the data task
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            // Handle errors
+            if let error = error {
+                completion(.failure(error))
+                return
+            }
+            
+            // Ensure data is received
+            guard let data = data else {
+                completion(.failure(NSError(domain: "No data received", code: -1, userInfo: nil)))
+                return
+            }
+            
+            // Print raw JSON response for debugging (optional)
+//            if let jsonString = String(data: data, encoding: .utf8) {
+//                print("Raw JSON Response: \(jsonString)")
+//            }
+            
+            do {
+                // Decode the JSON response into the BucketInfo struct
+                let bucketInfo = try JSONDecoder().decode(BucketInfo.self, from: data)
+                completion(.success(bucketInfo))
+            } catch {
+                // Handle decoding errors
+                print("Decoding Error: \(error)")
+                completion(.failure(error))
+            }
+        }.resume()
+    }
+    
     
     func startVM(iamToken: String,vmId: String, completion: @escaping (Result<Void, Error>) -> Void) {
         guard let url = URL(string: "\(APIConfig.yaVMInstancesEndpoint)/\(vmId):start") else {
