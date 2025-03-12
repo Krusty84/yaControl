@@ -124,7 +124,7 @@ struct BucketInfo: Decodable {
     var totalObjectCount: Int {
         storageClassCounters.reduce(0) { result, counter in
             let simpleCount = Int(counter.counters.simpleObjectCount) ?? 0
-            let multipartCount = Int(counter.counters.multipartObjectsCount) ?? 0
+            let multipartCount = Int(counter.counters.multipartObjectsCount ?? "0") ?? 0 // Handle optional multipartObjectsCount
             return result + simpleCount + multipartCount
         }
     }
@@ -132,7 +132,19 @@ struct BucketInfo: Decodable {
 
 struct StorageClassUsedSize: Decodable {
     let storageClass: String
-    let classSize: String
+    let classSize: String? // Make classSize optional
+    
+    // Provide a default value if classSize is missing
+    enum CodingKeys: String, CodingKey {
+        case storageClass
+        case classSize
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.storageClass = try container.decode(String.self, forKey: .storageClass)
+        self.classSize = try container.decodeIfPresent(String.self, forKey: .classSize) ?? "0" // Default to "0" if missing
+    }
 }
 
 struct StorageClassCounter: Decodable {
@@ -141,10 +153,26 @@ struct StorageClassCounter: Decodable {
 }
 
 struct Counters: Decodable {
-    let simpleObjectSize: String
+    let simpleObjectSize: String?
     let simpleObjectCount: String
-    let multipartObjectsSize: String
-    let multipartObjectsCount: String
+    let multipartObjectsSize: String?
+    let multipartObjectsCount: String? // Make multipartObjectsCount optional
+    
+    // Provide default values if fields are missing
+    enum CodingKeys: String, CodingKey {
+        case simpleObjectSize
+        case simpleObjectCount
+        case multipartObjectsSize
+        case multipartObjectsCount
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.simpleObjectSize = try container.decodeIfPresent(String.self, forKey: .simpleObjectSize) ?? "0" // Default to "0"
+        self.simpleObjectCount = try container.decode(String.self, forKey: .simpleObjectCount)
+        self.multipartObjectsSize = try container.decodeIfPresent(String.self, forKey: .multipartObjectsSize) ?? "0" // Default to "0"
+        self.multipartObjectsCount = try container.decodeIfPresent(String.self, forKey: .multipartObjectsCount) ?? "0" // Default to "0"
+    }
 }
 
 struct AnonymousAccessFlags: Decodable {

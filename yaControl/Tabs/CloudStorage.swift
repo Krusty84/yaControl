@@ -34,11 +34,7 @@ struct BucketTabContent: View {
     var totalBuckets: Int {
         return bucketTableData.count
     }
-    
-//    var activeBuckets: Int {
-//        return bucketTableData.filter { $0.status == "ACTIVE" }.count
-//    }
-    
+        
     var body: some View {
         VStack(spacing: 0) {
             // Search Bar
@@ -96,13 +92,13 @@ struct BucketTabContent: View {
                                         }
                                     }
                                     .contextMenu {
-                                           Button("Copy") {
-                                               let combinedText = "\(item.name) (\(item.id))"
-                                               let pasteboard = NSPasteboard.general
-                                               pasteboard.clearContents()
-                                               pasteboard.setString(combinedText, forType: .string)
-                                           }
-                                       }
+                                        Button("Copy") {
+                                            let combinedText = "\(item.name) (\(item.id))"
+                                            let pasteboard = NSPasteboard.general
+                                            pasteboard.clearContents()
+                                            pasteboard.setString(combinedText, forType: .string)
+                                        }
+                                    }
                             }
                             .buttonStyle(PlainButtonStyle()) // Remove the button styling
                         } else {
@@ -111,10 +107,10 @@ struct BucketTabContent: View {
                     }.width(min: 150,max:200)
                     TableColumn("Max Size (Gb)", value: \.maxSize).width(min: 80,max:80)
                     TableColumn("Used Size (Gb)", value: \.usedSize).width(min: 90,max:90)
-                    TableColumn("Files", value: \.totalObjectCountString).width(min: 90, max: 90)
-                    TableColumn("Created At", value: \.createdAt).width(min: 120,max:120)
-                    TableColumn("Updated At", value: \.updatedAt).width(min: 120,max:120)
-
+                    TableColumn("Files", value: \.totalObjectCountString).width(min: 40, ideal: 40, max: 120)
+                    TableColumn("Created At", value: \.createdAt).width(min: 110, ideal: 110,max:120)
+                    TableColumn("Updated At", value: \.updatedAt).width(min: 110, ideal: 110,max:120)
+                    
                     TableColumn("Folder") { item in
                         if let url = item.folderUrl {
                             Link(destination: url) {
@@ -136,7 +132,7 @@ struct BucketTabContent: View {
                         } else {
                             Text(item.name)
                         }
-                    }.width(min: 150,max:150)
+                    }.width(min: 80, ideal: 80,max:150)
                 }
                 .padding(.vertical, 6)
                 .onChange(of: selectedBucket) { oldSelection, newSelection in
@@ -151,8 +147,8 @@ struct BucketTabContent: View {
                     .foregroundColor(.gray)
                 Spacer()
                 Text(helpers.processingVMName)
-                        .font(.subheadline)
-                        .foregroundColor(.red)
+                    .font(.subheadline)
+                    .foregroundColor(.red)
                 
             }
             .padding(.horizontal)
@@ -171,7 +167,7 @@ struct BucketTabContent: View {
             DispatchQueue.main.async {
                 switch result {
                     case .success(let response):
-                        // Step 2: Get VMs using the IAM Token
+                        // Step 2: Get Buckets using the IAM Token
                         iamToken=response.iamToken
                         YandexAPIService.shared.getBuckets(iamToken: response.iamToken) { result in
                             DispatchQueue.main.async {
