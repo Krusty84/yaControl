@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import LaunchAtLogin
 
 struct SettingsTabContent: View {
     @AppStorage("oAuthKey") private var oAuthKey: String = SettingsManager.shared.oAuthKey
@@ -19,6 +20,7 @@ struct SettingsTabContent: View {
                     TextField("OAuth Key", text: $oAuthKey)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                     //isabled(!isEditingEnabled)
+                    LaunchAtLogin.Toggle()
                 }
                 VStack {
                     Button(action: {

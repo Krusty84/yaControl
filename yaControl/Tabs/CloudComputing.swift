@@ -41,7 +41,7 @@ struct CloudComputingTabContent: View {
     @State private var previousRunningVMs: Int = 0
     // 0 - stopping, 1 - running
     @State private var proccessingVMType: Int = 0
-    
+
     var body: some View {
         VStack(spacing: 0) {
             // Search Bar
@@ -116,6 +116,22 @@ struct CloudComputingTabContent: View {
             } else {
                 Table(filteredVMs, selection: $selectedVM) {
                     // Define columns
+                    TableColumn("Select") { vm in
+                        Toggle("", isOn: Binding(
+                            get: { vm.isAutoStarted },
+                            set: { newValue in
+                                // Update the checkbox state in your data model
+                                if let index = vmTableData.firstIndex(where: { $0.id == vm.id }) {
+                                    vmTableData[index].isAutoStarted = newValue
+                                    // Save the state in UserDefaults
+                                    SettingsManager.shared.saveCheckboxState(for: vm.id, isAutoStarted: newValue)
+                                }
+                            }
+                        ))
+                        //.toggleStyle(CheckboxToggleStyle())
+                    }
+                    .width(min: 50, max: 50)
+        
                     TableColumn("Name") { vm in
                         if let url = vm.vmUrl {
                             Link(destination: url) {

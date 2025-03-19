@@ -20,4 +20,14 @@ class SettingsManager {
         set { defaults.set(newValue, forKey: "oAuthKey") }
     }
     
+    // Save checkbox state
+     func saveCheckboxState(for vmId: String, isAutoStarted: Bool) {
+         defaults.set(isAutoStarted, forKey: "vm_\(vmId)_isSelected")
+     }
+     
+     // Retrieve checkbox state
+     func getCheckboxState(for vmId: String) -> Bool {
+         return defaults.bool(forKey: "vm_\(vmId)_isSelected")
+     }
+    
 }

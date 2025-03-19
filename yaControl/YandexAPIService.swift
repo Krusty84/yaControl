@@ -152,6 +152,7 @@ class YandexAPIService:ObservableObject {
                                                 let dateFormatter = DateFormatter()
                                                 dateFormatter.dateFormat = "HH:mm:ss"
                                                 self.lastUpdateTime = dateFormatter.string(from: Date())
+                                                let isAutoStarted = SettingsManager.shared.getCheckboxState(for: instance.id)
                                                 return VMTableData(
                                                     id: instance.id,
                                                     name: instance.name,
@@ -163,7 +164,8 @@ class YandexAPIService:ObservableObject {
                                                     addresses: addresses,
                                                     folderName: folder.name,
                                                     folderUrl: URL(string:APIConfig.yaFoldersWebUrl+folder.id),
-                                                    vmUrl:URL(string:APIConfig.yaVMsWebUrl(folderID: folder.id, instanceID: instance.id))
+                                                    vmUrl:URL(string:APIConfig.yaVMsWebUrl(folderID: folder.id, instanceID: instance.id)),
+                                                    isAutoStarted:isAutoStarted
                                                 )
                                             }
                                             allVMs.append(contentsOf: vmTableData)

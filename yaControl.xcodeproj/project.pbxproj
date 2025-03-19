@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3D023EB72D8B3BFA003FA336 /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 3D023EB62D8B3BFA003FA336 /* LaunchAtLogin */; };
 		3D9884372D63BA4600AB988C /* GoodProperTabs in Frameworks */ = {isa = PBXBuildFile; productRef = 3D9884362D63BA4600AB988C /* GoodProperTabs */; };
 		3DFE3C622D6FA9F80088FD3D /* GoodProperTabs in Frameworks */ = {isa = PBXBuildFile; productRef = 3DFE3C612D6FA9F80088FD3D /* GoodProperTabs */; };
 		3DFE3C842D6FB0830088FD3D /* GoodProperTabs in Frameworks */ = {isa = PBXBuildFile; productRef = 3DFE3C832D6FB0830088FD3D /* GoodProperTabs */; };
@@ -31,6 +32,7 @@
 			files = (
 				3DFE3C842D6FB0830088FD3D /* GoodProperTabs in Frameworks */,
 				3D9884372D63BA4600AB988C /* GoodProperTabs in Frameworks */,
+				3D023EB72D8B3BFA003FA336 /* LaunchAtLogin in Frameworks */,
 				3DFE3C622D6FA9F80088FD3D /* GoodProperTabs in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -77,6 +79,7 @@
 				3D9884362D63BA4600AB988C /* GoodProperTabs */,
 				3DFE3C612D6FA9F80088FD3D /* GoodProperTabs */,
 				3DFE3C832D6FB0830088FD3D /* GoodProperTabs */,
+				3D023EB62D8B3BFA003FA336 /* LaunchAtLogin */,
 			);
 			productName = yaControl;
 			productReference = 3D333ED32D639DF100D795BF /* yaControl.app */;
@@ -108,6 +111,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				3DFE3C822D6FB0830088FD3D /* XCRemoteSwiftPackageReference "GoodProperTabs" */,
+				3D023EB52D8B3BFA003FA336 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 3D333ED42D639DF100D795BF /* Products */;
@@ -336,6 +340,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		3D023EB52D8B3BFA003FA336 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sindresorhus/LaunchAtLogin-Modern";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
 		3DFE3C822D6FB0830088FD3D /* XCRemoteSwiftPackageReference "GoodProperTabs" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Krusty84/GoodProperTabs.git";
@@ -347,6 +359,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		3D023EB62D8B3BFA003FA336 /* LaunchAtLogin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3D023EB52D8B3BFA003FA336 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */;
+			productName = LaunchAtLogin;
+		};
 		3D9884362D63BA4600AB988C /* GoodProperTabs */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = GoodProperTabs;

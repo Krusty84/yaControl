@@ -76,6 +76,7 @@ struct VMTableData:Decodable,Identifiable,Equatable {
     let folderName: String
     let folderUrl: URL?
     let vmUrl: URL?
+    var isAutoStarted: Bool
 }
 
 // Model for Functions

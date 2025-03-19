@@ -9,6 +9,9 @@ import SwiftUI
 
 @main
 struct yaControlApp: App {
+    init(){
+        
+    }
       @Environment(\.openWindow) var openWindow
       var body: some Scene {
           MenuBarExtra {
