@@ -10,7 +10,7 @@ import SwiftUI
 @main
 struct yaControlApp: App {
     init(){
-        
+        LoggerHelper.info("!@ yaControlApp initialized, Yeah!")
     }
       @Environment(\.openWindow) var openWindow
       var body: some Scene {
