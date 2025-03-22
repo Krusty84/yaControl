@@ -6,24 +6,19 @@
 //
 
 import SwiftUI
+import AppKit
 import Foundation
 import Network
 
 class Helpers:ObservableObject {
     static let shared = Helpers() // Singleton for reusability
+    @StateObject private var appState = AppState.shared
     @Published var processingVMName: String = ""
-    @Published var isConnectedToWAN: Bool = false
-    private var onConnectedToWAN: (() -> Void)?
-    private var monitor: NWPathMonitor?
-    private let queue = DispatchQueue(label: "InternetConnectionMonitor")
     
-    init(onConnectedToWAN: (() -> Void)? = nil) {
-        self.onConnectedToWAN = onConnectedToWAN
-        checkInternetConnection()
+    init (){
     }
     
     deinit {
-        monitor?.cancel()
     }
     
     func numberStringBinding(for intValue: Binding<Int?>) -> Binding<String> {
@@ -96,6 +91,7 @@ class Helpers:ObservableObject {
                     switch result {
                         case .success:
                             print("VM started successfully")
+                            self.appState.isVirtualMachineRunning = true
                             // Update the VM status in the UI
                         case .failure(let error):
                             print("Failed to start VM: \(error.localizedDescription)")
@@ -142,49 +138,17 @@ class Helpers:ObservableObject {
         return String(format: "%.2f", sizeInGB)
     }
     
-    private func checkInternetConnection() {
-        monitor = NWPathMonitor()
-            monitor?.pathUpdateHandler = { [weak self] path in
-                DispatchQueue.main.async {
-                    let isConnected = path.status == .satisfied
-                    self?.isConnectedToWAN = isConnected
-                    if isConnected {
-                        LoggerHelper.info("!@ Internet connection detected, Yeah!")
-                        self?.onConnectedToWAN?() // Call the callback
-                    }
-                }
-            }
-            monitor?.start(queue: queue)
-    }
-    
-    static func tintedIcon(named iconName: String, color: NSColor) -> NSImage {
-        guard let icon = NSImage(named: iconName) else { return NSImage() } // Use your icon name here
-        
-        // Resize the icon to 18x18 points
-        let newSize = NSSize(width: 18, height: 18)
-        let resizedIcon = NSImage(size: newSize)
-        
-        resizedIcon.lockFocus()
-        icon.draw(in: NSRect(origin: .zero, size: newSize))
-        resizedIcon.unlockFocus()
-        
-        // Apply the tint color
-        let tintedIcon = resizedIcon.copy() as! NSImage
-        tintedIcon.lockFocus()
-        
-        color.set()
-        let imageRect = NSRect(origin: .zero, size: newSize)
-        imageRect.fill(using: .sourceAtop)
-        
-        tintedIcon.unlockFocus()
-        return tintedIcon
-    }
-}
+    static func checkInternetConnection(isConnected: Binding<Bool>) {
+           let monitor = NWPathMonitor()
+           let queue = DispatchQueue(label: "InternetConnectionMonitor")
 
-struct MenuBarIcon: View {
-    var isConnectedToInternet: Bool
-    var body: some View {
-        let iconColor: NSColor = isConnectedToInternet ? .systemGreen : .systemGray // Change color based on connection status
-        return Image(nsImage: Helpers.tintedIcon(named: "AppIcon", color: iconColor))
-    }
+           monitor.pathUpdateHandler = { path in
+               DispatchQueue.main.async {
+                   isConnected.wrappedValue = path.status == .satisfied
+               }
+           }
+
+           // Start monitoring
+           monitor.start(queue: queue)
+       }
 }
