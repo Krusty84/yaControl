@@ -12,7 +12,7 @@ import Network
 
 class Helpers:ObservableObject {
     static let shared = Helpers() // Singleton for reusability
-    @StateObject private var appState = AppState.shared
+    let appState = AppState.shared
     @Published var processingVMName: String = ""
     
     init (){
@@ -68,7 +68,7 @@ class Helpers:ObservableObject {
     
     func startStopVM(iamToken:String,for vm: VMTableData) {
         if vm.status == "RUNNING" {
-            print("Stopping VM: \(vm.name)")
+            //print("Stopping VM: \(vm.name)")
             self.processingVMName="Stopping VM: \(vm.name)"
             // Call API to stop the VM
             YandexAPIService.shared.stopVM(iamToken:iamToken, vmId: vm.id) { result in
@@ -83,7 +83,7 @@ class Helpers:ObservableObject {
                 }
             }
         } else {
-            print("Starting VM: \(vm.name)")
+            //print("Starting VM: \(vm.name)")
             self.processingVMName="Starting VM: \(vm.name)"
             // Call API to start the VM
             YandexAPIService.shared.startVM(iamToken:iamToken,vmId: vm.id) { result in
@@ -92,7 +92,6 @@ class Helpers:ObservableObject {
                         case .success:
                             print("VM started successfully")
                             self.appState.isVirtualMachineRunning = true
-                            // Update the VM status in the UI
                         case .failure(let error):
                             print("Failed to start VM: \(error.localizedDescription)")
                     }
@@ -138,17 +137,21 @@ class Helpers:ObservableObject {
         return String(format: "%.2f", sizeInGB)
     }
     
-    static func checkInternetConnection(isConnected: Binding<Bool>) {
-           let monitor = NWPathMonitor()
-           let queue = DispatchQueue(label: "InternetConnectionMonitor")
+    static func checkInternetConnection(completion: @escaping () -> Void) {
+        let monitor = NWPathMonitor()
+        let queue = DispatchQueue(label: "InternetConnectionMonitor")
 
-           monitor.pathUpdateHandler = { path in
-               DispatchQueue.main.async {
-                   isConnected.wrappedValue = path.status == .satisfied
-               }
-           }
+        monitor.pathUpdateHandler = { path in
+            if path.status == .satisfied {
+                // Internet connection is available
+                DispatchQueue.main.async {
+                    completion() // Call the completion handler
+                }
+                monitor.cancel() // Stop monitoring once the connection is available
+            }
+        }
 
-           // Start monitoring
-           monitor.start(queue: queue)
-       }
+        // Start monitoring
+        monitor.start(queue: queue)
+    }
 }

@@ -8,48 +8,6 @@
 import SwiftUI
 import AppKit
 
-// MARK: - Icon Color Rules
-
-struct IconColorRule {
-    let condition: (AppState) -> Bool // A closure that takes AppState and returns a Bool
-    let color: NSColor // The color to use if the condition is true
-}
-
-let iconColorRules: [IconColorRule] = [
-    IconColorRule(
-        condition: { $0.isConnectedToInternet }, // Connected to the internet (highest priority)
-        color: .systemBlue
-    ),
-    IconColorRule(
-        condition: { $0.accountBalance < 0 }, // Account is in credit (negative balance)
-        color: .systemRed
-    ),
-    IconColorRule(
-        condition: { $0.accountBalance < 100 }, // Account balance is low
-        color: .systemYellow
-    ),
-    IconColorRule(
-        condition: { $0.isVirtualMachineRunning }, // At least one virtual machine is running
-        color: .systemGreen
-    ),
-    IconColorRule(
-        condition: { _ in true }, // Default rule (always matches)
-        color: .systemGray
-    )
-]
-
-// MARK: - Icon Color Determination
-
-func determineIconColor(for appState: AppState) -> NSColor {
-    for rule in iconColorRules {
-        if rule.condition(appState) {
-            print("Rule matched: \(rule.color)") // Debug log
-            return rule.color
-        }
-    }
-    return .systemGray // Fallback color (should never be reached)
-}
-
 // MARK: - Icon Tinting
 
 func tintedIcon(named iconName: String, color: NSColor) -> NSImage {
@@ -76,10 +34,10 @@ func tintedIcon(named iconName: String, color: NSColor) -> NSImage {
 }
 
 struct MenuBarIcon: View {
-    @ObservedObject var appState: AppState // Observe the AppState
+    @ObservedObject var appState: AppState
 
     var body: some View {
-        let iconColor = determineIconColor(for: appState) // Determine the icon color
-        return Image(nsImage: tintedIcon(named: "AppIcon", color: iconColor)) // Tint the icon
+        let iconColor = appState.latestConditionColor
+        return Image(nsImage: tintedIcon(named: "AppIcon", color: iconColor))
     }
 }

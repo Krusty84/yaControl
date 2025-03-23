@@ -11,7 +11,9 @@ import SwiftUI
 struct yaControlApp: App {
     @StateObject private var appState = AppState.shared
     init() {
-        LoggerHelper.info("!@ yaControlApp initialized, Yeah!")
+        Helpers.checkInternetConnection {
+            AppState.shared.checkNumRunningVMs()
+        }
     }
     @Environment(\.openWindow) var openWindow
 
@@ -20,7 +22,6 @@ struct yaControlApp: App {
               MainWindow()
           } label: {
               MenuBarIcon(appState: appState)
-              
           }
           .menuBarExtraStyle(.window)
       }

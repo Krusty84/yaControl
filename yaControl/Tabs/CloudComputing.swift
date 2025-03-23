@@ -36,6 +36,9 @@ struct CloudComputingTabContent: View {
     }
     
     var runningVMs: Int {
+        if (vmTableData.filter { $0.status == "RUNNING" }.count == 0){
+            AppState.isVirtualMachineRunning = false
+        }
         return vmTableData.filter { $0.status == "RUNNING" }.count
     }
     @State private var previousRunningVMs: Int = 0
