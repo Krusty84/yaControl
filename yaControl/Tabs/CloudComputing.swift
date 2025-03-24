@@ -10,6 +10,7 @@ import SwiftUI
 struct CloudComputingTabContent: View {
     @ObservedObject var apiService = YandexAPIService.shared
     @ObservedObject var helpers = Helpers.shared
+    @StateObject var appState = AppState.shared
     @State private var iamToken: String = ""
     @State private var vmTableData: [VMTableData] = []
     @State private var errorMessage: String? = nil
@@ -36,9 +37,6 @@ struct CloudComputingTabContent: View {
     }
     
     var runningVMs: Int {
-        if (vmTableData.filter { $0.status == "RUNNING" }.count == 0){
-            AppState.isVirtualMachineRunning = false
-        }
         return vmTableData.filter { $0.status == "RUNNING" }.count
     }
     @State private var previousRunningVMs: Int = 0
@@ -78,6 +76,11 @@ struct CloudComputingTabContent: View {
                     } else if (proccessingVMType == 1 && runningVMs > previousRunningVMs){
                         fetchVMs()
                         helpers.processingVMName.removeAll()
+                    }
+                    if (vmTableData.filter { $0.status == "RUNNING" }.count == 0){
+                        appState.isVirtualMachineRunning = false
+                    } else {
+                        appState.isVirtualMachineRunning = true
                     }
                 }) {
                     Image(systemName: "arrow.clockwise")

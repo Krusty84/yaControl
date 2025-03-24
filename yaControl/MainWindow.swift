@@ -12,9 +12,12 @@ struct MainWindow: View {
    // @EnvironmentObject var propagationModel: PropagationModel
     var body: some View {
         GoodProperTabsView(content: [
-                (title: "Computing", icon: "ComputingIcon", view: AnyView(CloudComputingTabContent())),
-                (title: "Function", icon: "ServerLessIcon", view: AnyView(ServerLessFunctionTabContent())),
-                (title: "Storage", icon: "StorageIcon", view: AnyView(BucketTabContent())),
+                //(title: "Computing", icon: "ComputingIcon", view: AnyView(CloudComputingTabContent())),
+                (title: "Computing", icon: "system:desktopcomputer", view: AnyView(CloudComputingTabContent())),
+                //(title: "Function", icon: "ServerLessIcon", view: AnyView(ServerLessFunctionTabContent())),
+                (title: "Function", icon: "system:function", view: AnyView(ServerLessFunctionTabContent())),
+                //(title: "Storage", icon: "StorageIcon", view: AnyView(BucketTabContent())),
+                (title: "Storage", icon: "system:archivebox", view: AnyView(BucketTabContent())),
                 (title: "Billing", icon: "system:dollarsign", view: AnyView(BillingTabContent())),
                 (title: "Settings", icon: "system:gear", view: AnyView(SettingsTabContent())),
                 (title: "About", icon: "system:info", view: AnyView(AboutTabContent()))
