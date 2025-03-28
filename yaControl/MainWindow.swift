@@ -18,7 +18,8 @@ struct MainWindow: View {
                 (title: "Function", icon: "system:function", view: AnyView(ServerLessFunctionTabContent())),
                 //(title: "Storage", icon: "StorageIcon", view: AnyView(BucketTabContent())),
                 (title: "Storage", icon: "system:archivebox", view: AnyView(BucketTabContent())),
-                (title: "Billing", icon: "system:dollarsign", view: AnyView(BillingTabContent())),
+                //(title: "Billing", icon: "system:dollarsign", view: AnyView(BillingTabContent())),
+                (title: "Billing", icon: "system:creditcard", view: AnyView(BillingTabContent())),
                 (title: "Settings", icon: "system:gear", view: AnyView(SettingsTabContent())),
                 (title: "About", icon: "system:info", view: AnyView(AboutTabContent()))
                 ]).onAppear {

@@ -200,6 +200,21 @@ struct BucketTableData:Decodable,Identifiable,Equatable {
     }
 }
 
+
+// Model for VM Instance
+struct Billing: Decodable {
+    let id: String
+    let currency: String
+    let balance: String
+}
+
+struct BillingTableData: Decodable,Identifiable,Equatable {
+    let id: UUID
+    let currency: String
+    let balance: String
+    let billingUrl: URL?
+}
+
 /*
  "id": "d4e38851c0ofsnkki9f7",
  "folderId": "b1gqcrohfu85p2fc6fkc",

@@ -22,14 +22,21 @@ struct InfoWindow: View {
     @State private var bucketTableData: [BucketTableData] = []
     @State private var totalBucketsCount = 0
     
+    // Billing States
+    @State private var billingData: [BillingTableData] = []
+    @State private var currentBalance: String = "Loading..."
+    @State private var currency: String = ""
+    @State private var billingUrl: URL? = nil
+    
     // Common States
     @State private var isLoading = false
     @State private var errorMessage: String?
     @State private var lastUpdated = Date()
+    @State private var iamToken: String = ""
     
     var body: some View {
         VStack(spacing: 16) {
-            Text("Cloud Resource Dashboard")
+            Text("Yandex Cloud Statistics")
                 .font(.headline)
                 .padding(.top, 8)
             
@@ -48,6 +55,20 @@ struct InfoWindow: View {
             } else {
                 ScrollView {
                     VStack(spacing: 20) {
+                        // Billing Section (added at top)
+                        StatsSection(
+                            title: "Billing Information",
+                            icon: "creditcard",
+                            stats: [
+                                ("Current Balance", Helpers.formattedBalance(amount: currentBalance, currency: currency)),
+                                ("Details", "View Billing")
+                            ],
+                            url: billingUrl
+                        )
+
+                        
+                        Divider()
+                        
                         // VM Statistics Section
                         StatsSection(
                             title: "Virtual Machines",
@@ -55,7 +76,7 @@ struct InfoWindow: View {
                             stats: [
                                 ("Total VMs", "\(totalVMsCount)"),
                                 ("Running", "\(runningVMsCount)"),
-                                //("Stopped", "\(totalVMsCount - runningVMsCount)")
+                                ("Stopped", "\(totalVMsCount - runningVMsCount)")
                             ]
                         )
                         
@@ -68,7 +89,7 @@ struct InfoWindow: View {
                             stats: [
                                 ("Total Functions", "\(totalSLFsCount)"),
                                 ("Active", "\(activeSLFsCount)"),
-                                //("Inactive", "\(totalSLFsCount - activeSLFsCount)")
+                                ("Inactive", "\(totalSLFsCount - activeSLFsCount)")
                             ]
                         )
                         
@@ -92,7 +113,7 @@ struct InfoWindow: View {
                 .foregroundColor(.secondary)
                 .padding(.bottom, 8)
         }
-        .frame(width: 320, height: 320)  // Adjusted size to accommodate all sections
+        .frame(width: 340, height: 460)  // Adjusted size to accommodate billing section
         .onAppear {
             loadAllData()
         }
@@ -102,7 +123,22 @@ struct InfoWindow: View {
         isLoading = true
         errorMessage = nil
         
-        // Create a dispatch group to track all async operations
+        // First get IAM token once and reuse it
+        YandexAPIService.shared.checkOauthKey(yandexPassportOauthToken: SettingsManager.shared.oAuthKey) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let response):
+                    self.iamToken = response.iamToken
+                    self.loadResourcesWithToken()
+                case .failure(let error):
+                    self.isLoading = false
+                    self.errorMessage = error.localizedDescription
+                }
+            }
+        }
+    }
+    
+    private func loadResourcesWithToken() {
         let group = DispatchGroup()
         
         group.enter()
@@ -120,6 +156,11 @@ struct InfoWindow: View {
             group.leave()
         }
         
+        group.enter()
+        getCosts {
+            group.leave()
+        }
+        
         group.notify(queue: .main) {
             self.isLoading = false
             self.lastUpdated = Date()
@@ -128,26 +169,16 @@ struct InfoWindow: View {
     
     // MARK: - VM Functions
     private func getVMsStat(completion: @escaping () -> Void) {
-        YandexAPIService.shared.checkOauthKey(yandexPassportOauthToken: SettingsManager.shared.oAuthKey) { result in
+        YandexAPIService.shared.getVMs(iamToken: iamToken) { result in
             DispatchQueue.main.async {
                 switch result {
-                case .success(let response):
-                    YandexAPIService.shared.getVMs(iamToken: response.iamToken) { result in
-                        DispatchQueue.main.async {
-                            switch result {
-                            case .success(let allVMs):
-                                self.vmTableData = allVMs
-                                self.getStatData(with: allVMs)
-                            case .failure(let error):
-                                self.errorMessage = error.localizedDescription
-                            }
-                            completion()
-                        }
-                    }
+                case .success(let allVMs):
+                    self.vmTableData = allVMs
+                    self.getStatData(with: allVMs)
                 case .failure(let error):
                     self.errorMessage = error.localizedDescription
-                    completion()
                 }
+                completion()
             }
         }
     }
@@ -159,26 +190,16 @@ struct InfoWindow: View {
     
     // MARK: - Serverless Functions
     private func getServerLessFunctionsStat(completion: @escaping () -> Void) {
-        YandexAPIService.shared.checkOauthKey(yandexPassportOauthToken: SettingsManager.shared.oAuthKey) { result in
+        YandexAPIService.shared.getServerLessFunctions(iamToken: iamToken) { result in
             DispatchQueue.main.async {
                 switch result {
-                case .success(let response):
-                    YandexAPIService.shared.getServerLessFunctions(iamToken: response.iamToken) { result in
-                        DispatchQueue.main.async {
-                            switch result {
-                            case .success(let allSLFs):
-                                self.slfTableData = allSLFs
-                                self.getSLFsStatData(with: allSLFs)
-                            case .failure(let error):
-                                self.errorMessage = error.localizedDescription
-                            }
-                            completion()
-                        }
-                    }
+                case .success(let allSLFs):
+                    self.slfTableData = allSLFs
+                    self.getSLFsStatData(with: allSLFs)
                 case .failure(let error):
                     self.errorMessage = error.localizedDescription
-                    completion()
                 }
+                completion()
             }
         }
     }
@@ -190,32 +211,42 @@ struct InfoWindow: View {
     
     // MARK: - Bucket Functions
     private func getBucketsStat(completion: @escaping () -> Void) {
-        YandexAPIService.shared.checkOauthKey(yandexPassportOauthToken: SettingsManager.shared.oAuthKey) { result in
+        YandexAPIService.shared.getBuckets(iamToken: iamToken) { result in
             DispatchQueue.main.async {
                 switch result {
-                case .success(let response):
-                    YandexAPIService.shared.getBuckets(iamToken: response.iamToken) { result in
-                        DispatchQueue.main.async {
-                            switch result {
-                            case .success(let allBuckets):
-                                self.bucketTableData = allBuckets
-                                self.getBucketsStatData(with: allBuckets)
-                            case .failure(let error):
-                                self.errorMessage = error.localizedDescription
-                            }
-                            completion()
-                        }
-                    }
+                case .success(let allBuckets):
+                    self.bucketTableData = allBuckets
+                    self.getBucketsStatData(with: allBuckets)
                 case .failure(let error):
                     self.errorMessage = error.localizedDescription
-                    completion()
                 }
+                completion()
             }
         }
     }
     
     private func getBucketsStatData(with bucketTableData: [BucketTableData]) {
         totalBucketsCount = bucketTableData.count
+    }
+    
+    // MARK: - Billing Functions
+    private func getCosts(completion: @escaping () -> Void) {
+        YandexAPIService.shared.getCosts(iamToken: iamToken) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let billings):
+                    self.billingData = billings
+                    if let firstBilling = billings.first {
+                        self.currentBalance = firstBilling.balance
+                        self.currency = firstBilling.currency
+                        self.billingUrl = firstBilling.billingUrl
+                    }
+                case .failure(let error):
+                    self.errorMessage = error.localizedDescription
+                }
+                completion() // Make sure to call completion in all cases
+            }
+        }
     }
 }
 
@@ -224,6 +255,7 @@ private struct StatsSection: View {
     let title: String
     let icon: String
     let stats: [(String, String)]
+    var url: URL?
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -235,7 +267,13 @@ private struct StatsSection: View {
             }
             
             ForEach(stats, id: \.0) { stat in
-                StatRow(label: stat.0, value: stat.1)
+                if stat.0 == "Details", let url = url {
+                    Link(destination: url) {
+                        StatRow(label: stat.0, value: stat.1)
+                    }
+                } else {
+                    StatRow(label: stat.0, value: stat.1)
+                }
             }
         }
     }
@@ -256,3 +294,4 @@ private struct StatRow: View {
         }
     }
 }
+

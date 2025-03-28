@@ -154,4 +154,28 @@ class Helpers:ObservableObject {
         // Start monitoring
         monitor.start(queue: queue)
     }
+    
+    static func formattedBalance(amount: String, currency: String) -> String {
+            guard !amount.isEmpty, !currency.isEmpty else { return "N/A" }
+            
+            // Clean the input string (remove any non-numeric characters except decimal point)
+            let cleanedAmount = amount
+                .replacingOccurrences(of: "[^0-9.]", with: "", options: .regularExpression)
+            
+            // Convert to Double and format
+            if let balanceValue = Double(cleanedAmount) {
+                let formatter = NumberFormatter()
+                formatter.numberStyle = .decimal
+                formatter.minimumFractionDigits = 2
+                formatter.maximumFractionDigits = 2
+                formatter.roundingMode = .halfUp
+                
+                if let formattedString = formatter.string(from: NSNumber(value: balanceValue)) {
+                    return "\(formattedString) \(currency)"
+                }
+            }
+            
+            // Fallback to original if formatting fails
+            return "\(amount) \(currency)"
+        }
 }

@@ -14,6 +14,8 @@ struct APIConfig {
     static let yaVMInstancesEndpoint = "https://compute.api.cloud.yandex.net/compute/v1/instances"
     static let yaFunctionsEndpoint = "https://serverless-functions.api.cloud.yandex.net/functions/v1/functions"
     static let yaBucketsEndpoint = "https://storage.api.cloud.yandex.net/storage/v1/buckets"
+    static let yaBillingEndpoint = "https://billing.api.cloud.yandex.net/billing/v1/billingAccounts"
+    static let yaBillingConsoleUrl = "https://center.yandex.cloud/billing/accounts"
 
     //
     static let yaFoldersWebUrl = "https://console.yandex.cloud/folders/"
@@ -26,9 +28,8 @@ struct APIConfig {
     static func yaBucketsWebUrl(folderID: String, bucketName: String) -> String {
           return "\(yaFoldersWebUrl)\(folderID)/storage/buckets/\(bucketName)"
     }
+    static func yaBillingWebUrl(billingID: String) -> String {
+        return "\(yaBillingConsoleUrl)/\(billingID)/overview"
+    }
 }
-//https://console.yandex.cloud/folders/b1gqcrohfu85p2fc6fkc
-//https://console.yandex.cloud/folders/b1gqcrohfu85p2fc6fkc/functions/functions/d4e38851c0ofsnkki9f7/overview
-//https://console.yandex.cloud/folders/b1gqcrohfu85p2fc6fkc/storage/buckets/archive1
-//https://storage.api.cloud.yandex.net/storage/v1/buckets/mynotes888:getStats
-//https://console.yandex.cloud/folders/b1gqcrohfu85p2fc6fkc/storage/buckets/archive1
+

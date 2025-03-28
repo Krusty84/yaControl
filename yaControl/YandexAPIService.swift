@@ -227,7 +227,7 @@ class YandexAPIService:ObservableObject {
                                                     slfUrl:URL(string:APIConfig.yaSLFsWebUrl(folderID: folder.id, slfID: function.id))
                                                 )
                                             }
-                                                allSLFs.append(contentsOf: functionTableData)
+                                            allSLFs.append(contentsOf: functionTableData)
                                         case .failure(let error):
                                             completion(.failure(error))
                                         }
@@ -323,6 +323,27 @@ class YandexAPIService:ObservableObject {
         }
     }
     
+    func getCosts(iamToken: String, completion: @escaping (Result<[BillingTableData], Error>) -> Void) {
+        self.getBillings(iamToken: iamToken) { result in
+            switch result {
+            case .success(let billings):
+                let billingTableData = billings.map { billing in
+                    BillingTableData(
+                        id: UUID(),
+                        currency: billing.currency,
+                        balance: billing.balance,
+                        billingUrl: URL(string: APIConfig.yaBillingWebUrl(billingID: billing.id))
+                    )
+                }
+                completion(.success(billingTableData)) // This was missing
+                
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+    }
+
+        
         // MARK: - local Helpers
         // Helper function to get Clouds
         private func getClouds(iamToken: String, completion: @escaping (Result<[Cloud], Error>) -> Void) {
@@ -612,6 +633,65 @@ class YandexAPIService:ObservableObject {
             } catch {
                 // Handle decoding errors
                 print("Decoding Error: \(error)")
+                completion(.failure(error))
+            }
+        }.resume()
+    }
+    
+    
+    private func getBillings(iamToken: String, completion: @escaping (Result<[Billing], Error>) -> Void) {
+        guard let url = URL(string: "\(APIConfig.yaBillingEndpoint)") else {
+            completion(.failure(NSError(domain: "Invalid URL", code: -1, userInfo: nil)))
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(iamToken)", forHTTPHeaderField: "Authorization")
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                completion(.failure(error))
+                return
+            }
+            
+            guard let data = data else {
+                completion(.failure(NSError(domain: "No data received", code: -1, userInfo: nil)))
+                return
+            }
+            
+            // Print raw JSON response for debugging
+//            if let jsonString = String(data: data, encoding: .utf8) {
+//                print("Raw JSON Response (Billing): \(jsonString)")
+//            }
+            
+            do {
+                // Try to decode the response as a dictionary
+                if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+                    // Check if the response contains an error
+                    if let errorDict = json["error"] as? [String: Any],
+                       let errorCode = errorDict["code"] as? Int,
+                       let errorMessage = errorDict["message"] as? String {
+                        let error = NSError(domain: "API Error", code: errorCode, userInfo: [NSLocalizedDescriptionKey: errorMessage])
+                        completion(.failure(error))
+                        return
+                    }
+                    
+                    // Check if the "billingAccounts" key exists
+                    if let billingsArray = json["billingAccounts"] as? [[String: Any]] {
+                        let billings = try JSONDecoder().decode([Billing].self, from: JSONSerialization.data(withJSONObject: billingsArray, options: []))
+                        completion(.success(billings))
+                    } else {
+                        // If "billingAccounts" key is missing, return an empty array
+                        print("No billings found")
+                        completion(.success([]))
+                    }
+                } else {
+                    print("Error: Invalid JSON format")
+                    completion(.failure(NSError(domain: "Invalid JSON format", code: -1, userInfo: nil)))
+                }
+            } catch {
+                print("Decoding Error (Functions): \(error)")
                 completion(.failure(error))
             }
         }.resume()
