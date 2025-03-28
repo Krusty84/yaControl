@@ -169,21 +169,39 @@ struct CloudComputingTabContent: View {
                         }
                     }.width(min: 150,max:200)
                     TableColumn("Status") { vm in
-                        Button(action:{
+                        // Determine if this VM is currently being processed
+                        let isProcessing = helpers.processingVMName.contains(vm.name)
+                        
+                        Button(action: {
                             if (vm.status == "RUNNING") {
-                                previousRunningVMs=runningVMs;
-                                proccessingVMType = 0;
+                                previousRunningVMs = runningVMs
+                                proccessingVMType = 0
                             } else {
-                                previousRunningVMs=runningVMs;
-                                proccessingVMType = 1;
+                                previousRunningVMs = runningVMs
+                                proccessingVMType = 1
                             }
-                            helpers.startStopVM(iamToken:iamToken,for: vm)
+                            helpers.startStopVM(iamToken: iamToken, for: vm)
                         }) {
-                            Image(systemName: vm.status == "RUNNING" ? "stop.fill" : "play.fill")
-                                .foregroundColor(vm.status == "RUNNING" ? .red : .green)
+                            if isProcessing {
+                                // Show loading indicator when processing
+                                Image(systemName: "arrow.triangle.2.circlepath")
+                                    .foregroundColor(.gray)
+                                    .rotationEffect(.degrees(isProcessing ? 360 : 0))
+                                    .animation(
+                                        Animation.linear(duration: 1.0)
+                                            .repeatForever(autoreverses: false),
+                                        value: isProcessing
+                                    )
+                            } else {
+                                // Show normal play/stop icon when not processing
+                                Image(systemName: vm.status == "RUNNING" ? "stop.fill" : "play.fill")
+                                    .foregroundColor(vm.status == "RUNNING" ? .red : .green)
+                            }
                         }
                         .buttonStyle(PlainButtonStyle())
-                    }.width(min:40,max:40)
+                        .disabled(isProcessing) // Disable button while processing
+                    }
+                    .width(min:40,max:40)
                     TableColumn("Created At", value: \.createdAt).width(min: 120,max:120)
                     TableColumn("Cores", value: \.cores).width(min:40,max:40)
                     TableColumn("RAM", value: \.memoryGB).width(min:30,max:30)
@@ -247,6 +265,21 @@ struct CloudComputingTabContent: View {
         }
     }
     
+    private func sortTableDataByStatus() {
+        let statusPriority = ["RUNNING", "STARTING", "STOPPED", "STOPPING"]
+            
+            vmTableData.sort { a, b in
+                let aPriority = statusPriority.firstIndex(of: a.status) ?? Int.max
+                let bPriority = statusPriority.firstIndex(of: b.status) ?? Int.max
+                
+                // If same status, sort by name (optional)
+                if aPriority == bPriority {
+                    return a.name < b.name
+                }
+                return aPriority < bPriority
+            }
+    }
+    
     private func fetchVMs() {
         isLoading = true
         errorMessage = nil
@@ -265,6 +298,7 @@ struct CloudComputingTabContent: View {
                                     case .success(let allVMs):
                                         print("result: ", allVMs)
                                         vmTableData = allVMs
+                                        self.sortTableDataByStatus()
                                     case .failure(let error):
                                         errorMessage = error.localizedDescription
                                 }
@@ -278,4 +312,5 @@ struct CloudComputingTabContent: View {
             }
         }
     }
+    
 }
