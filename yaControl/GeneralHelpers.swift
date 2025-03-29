@@ -1,5 +1,5 @@
 //
-//  Helpers.swift
+//  Helpers.swift - General Helpers (Data converters, Time Format, etc.)
 //  yaControl
 //
 //  Created by Sedoykin Alexey on 19/02/2025.
@@ -21,7 +21,7 @@ class Helpers:ObservableObject {
     deinit {
     }
     
-    func numberStringBinding(for intValue: Binding<Int?>) -> Binding<String> {
+    func restResponseToString(for intValue: Binding<Int?>) -> Binding<String> {
         Binding(
             get: {
                 // Convert Int? to String (use "" if nil)
@@ -66,6 +66,7 @@ class Helpers:ObservableObject {
         return ""
     }
     
+    // Button Start/Stop VM helper
     func startStopVM(iamToken:String,for vm: VMTableData) {
         if vm.status == "RUNNING" {
             //print("Stopping VM: \(vm.name)")
@@ -90,7 +91,7 @@ class Helpers:ObservableObject {
                 DispatchQueue.main.async {
                     switch result {
                         case .success:
-                            print("VM started successfully")
+                            //print("VM started successfully")
                             self.appState.isVirtualMachineRunning = true
                         case .failure(let error):
                             print("Failed to start VM: \(error.localizedDescription)")
@@ -155,7 +156,7 @@ class Helpers:ObservableObject {
         monitor.start(queue: queue)
     }
     
-    static func formattedBalance(amount: String, currency: String) -> String {
+    static func billingBalanceFormatter(amount: String, currency: String) -> String {
             guard !amount.isEmpty, !currency.isEmpty else { return "N/A" }
             
             // Clean the input string (remove any non-numeric characters except decimal point)

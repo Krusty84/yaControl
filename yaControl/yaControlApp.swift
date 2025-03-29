@@ -1,5 +1,5 @@
 //
-//  yaControlApp.swift
+//  yaControlApp.swift - ENTRY POINT OF APP
 //  yaControl
 //
 //  Created by Sedoykin Alexey on 17/02/2025.

@@ -1,5 +1,5 @@
 //
-//  AppState.swift
+//  AppState.swift - Global State Container
 //  yaControl
 //
 //  Created by Sedoykin Alexey on 22/03/2025.
@@ -9,6 +9,7 @@ import AppKit
 import Foundation
 import Combine
 import SwiftUI
+
 
 class AppState: ObservableObject {
     static let shared = AppState() // Singleton for reusability

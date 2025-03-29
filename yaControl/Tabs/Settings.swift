@@ -1,5 +1,5 @@
 //
-//  Settings.swift
+//  Settings.swift - Application Settings
 //  yaControl
 //
 //  Created by Sedoykin Alexey on 18/02/2025.
@@ -52,7 +52,7 @@ struct SettingsTabContent: View {
                     //
                 }
             }
-            TextField("Result", text: Helpers.shared.numberStringBinding(for: $responseCode))
+            TextField("Result", text: Helpers.shared.restResponseToString(for: $responseCode))
         }
         .onAppear {
             // Sync SettingsManager to ensure consistency

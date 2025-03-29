@@ -1,5 +1,5 @@
 //
-//  CloudComputing.swift
+//  CloudComputing.swift - Manage Yandex Cloud VM Instances
 //  yaControl
 //
 //  Created by Sedoykin Alexey on 17/02/2025.
@@ -130,7 +130,7 @@ struct CloudComputingTabContent: View {
                                 if let index = vmTableData.firstIndex(where: { $0.id == vm.id }) {
                                     vmTableData[index].isAutoStarted = newValue
                                     // Save the state in UserDefaults
-                                    SettingsManager.shared.saveCheckboxState(for: vm.id, isAutoStarted: newValue)
+                                    SettingsManager.shared.markVMtoAutostart(for: vm.id, isAutoStarted: newValue)
                                 }
                             }
                         ))

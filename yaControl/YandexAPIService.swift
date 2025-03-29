@@ -1,5 +1,5 @@
 //
-//  YandexAPIService.swift
+//  YandexAPIService.swift - Yandex Cloud Interaction
 //  yaControl
 //
 //  Created by Sedoykin Alexey on 19/02/2025.
@@ -12,6 +12,7 @@ class YandexAPIService:ObservableObject {
     @Published var lastUpdateTime: String = ""
     private init() {}
     
+    //MARK: - Get IAM token (step 1)
     func checkOauthKey(yandexPassportOauthToken: String, completion: @escaping (Result<(code: Int, iamToken: String, expiresAt: String), Error>) -> Void) {
         guard let url = URL(string: APIConfig.yaAuthEndpoint) else {
                 completion(.failure(NSError(domain: "Invalid URL", code: -1, userInfo: nil)))
@@ -68,6 +69,7 @@ class YandexAPIService:ObservableObject {
             }.resume()
         }
     
+    //MARK: - Get Exists Clouds (step 2)
     func getClouds(iamToken: String, completion: @escaping (Result<(code: Int, clouds: [Cloud]), Error>) -> Void) {
         guard let url = URL(string: APIConfig.yaCloudsEndpoint) else {
                completion(.failure(NSError(domain: "Invalid URL", code: -1, userInfo: nil)))
@@ -125,6 +127,7 @@ class YandexAPIService:ObservableObject {
            }.resume()
        }
     
+    //MARK: - Get Final Virtual Machines Data (step 3.1)
     func getVMs(iamToken: String, completion: @escaping (Result<[VMTableData], Error>) -> Void) {
             // Step 1: Get Clouds
             getClouds(iamToken: iamToken) { result in
@@ -142,7 +145,7 @@ class YandexAPIService:ObservableObject {
                                 for folder in folders {
                                     group.enter()
                                     // Step 3: Get VMs for each Folder
-                                    self.getInstances(iamToken: iamToken, folderId: folder.id) { result in
+                                    self.getVMInstances(iamToken: iamToken, folderId: folder.id) { result in
                                         switch result {
                                         case .success(let instances):
                                             // Map instances to VMTableData
@@ -152,7 +155,7 @@ class YandexAPIService:ObservableObject {
                                                 let dateFormatter = DateFormatter()
                                                 dateFormatter.dateFormat = "HH:mm:ss"
                                                 self.lastUpdateTime = dateFormatter.string(from: Date())
-                                                let isAutoStarted = SettingsManager.shared.getCheckboxState(for: instance.id)
+                                                let isAutoStarted = SettingsManager.shared.getAutostartedVMs(for: instance.id)
                                                 return VMTableData(
                                                     id: instance.id,
                                                     name: instance.name,
@@ -190,7 +193,8 @@ class YandexAPIService:ObservableObject {
                 }
             }
         }
-        
+    
+    //MARK: - Get Final Serverless Functions Data (step 3.2)
     func getServerLessFunctions(iamToken: String, completion: @escaping (Result<[ServerLessFunctionTableData], Error>) -> Void) {
             // Step 1: Get Clouds
             getClouds(iamToken: iamToken) { result in
@@ -208,7 +212,7 @@ class YandexAPIService:ObservableObject {
                                 for folder in folders {
                                     group.enter()
                                     // Step 3: Get ServerLess Functions for each Folder
-                                    self.getFunctions(iamToken: iamToken, folderId: folder.id) { result in
+                                    self.getSLFs(iamToken: iamToken, folderId: folder.id) { result in
                                         switch result {
                                         case .success(let functions):
                                             // Map functions to ServerLessFunctionTableData
@@ -249,7 +253,8 @@ class YandexAPIService:ObservableObject {
                 }
             }
         }
-        
+    
+    //MARK: - Get Final Buckets Data (step 3.3)
     func getBuckets(iamToken: String, completion: @escaping (Result<[BucketTableData], Error>) -> Void) {
         // Step 1: Get Clouds
         getClouds(iamToken: iamToken) { result in
@@ -323,6 +328,7 @@ class YandexAPIService:ObservableObject {
         }
     }
     
+    //MARK: - Get Final Billing Data (step 3.4)
     func getCosts(iamToken: String, completion: @escaping (Result<[BillingTableData], Error>) -> Void) {
         self.getBillings(iamToken: iamToken) { result in
             switch result {
@@ -344,9 +350,9 @@ class YandexAPIService:ObservableObject {
     }
 
         
-        // MARK: - local Helpers
-        // Helper function to get Clouds
-        private func getClouds(iamToken: String, completion: @escaping (Result<[Cloud], Error>) -> Void) {
+    // MARK: - Helpers
+    // Get Raw Exists Clouds Data
+    private func getClouds(iamToken: String, completion: @escaping (Result<[Cloud], Error>) -> Void) {
             guard let url = URL(string: APIConfig.yaCloudsEndpoint) else {
                 completion(.failure(NSError(domain: "Invalid URL", code: -1, userInfo: nil)))
                 return
@@ -382,7 +388,7 @@ class YandexAPIService:ObservableObject {
             }.resume()
         }
         
-        // Helper function to get Folders
+        // Get Raw Exists Folders in Cloud
         private func getFolders(iamToken: String, cloudId: String, completion: @escaping (Result<[Folder], Error>) -> Void) {
             guard let url = URL(string: "\(APIConfig.yaFoldersEndpoint)?cloudId=\(cloudId)") else {
                 completion(.failure(NSError(domain: "Invalid URL", code: -1, userInfo: nil)))
@@ -419,8 +425,8 @@ class YandexAPIService:ObservableObject {
             }.resume()
         }
         
-    // Helper function to get Instances
-    private func getInstances(iamToken: String, folderId: String, completion: @escaping (Result<[VMInstance], Error>) -> Void) {
+    // Get Raw Exists VM Instances
+    private func getVMInstances(iamToken: String, folderId: String, completion: @escaping (Result<[VMInstance], Error>) -> Void) {
         guard let url = URL(string: "\(APIConfig.yaVMInstancesEndpoint)?folderId=\(folderId)") else {
             completion(.failure(NSError(domain: "Invalid URL", code: -1, userInfo: nil)))
             return
@@ -478,8 +484,8 @@ class YandexAPIService:ObservableObject {
         }.resume()
     }
 
-    //Helper function to get Cloud Serverless Functions
-    private func getFunctions(iamToken: String, folderId: String, completion: @escaping (Result<[ServerLessFunction], Error>) -> Void) {
+    // Get Raw Exists Serverless Functions
+    private func getSLFs(iamToken: String, folderId: String, completion: @escaping (Result<[ServerLessFunction], Error>) -> Void) {
         guard let url = URL(string: "\(APIConfig.yaFunctionsEndpoint)?folderId=\(folderId)") else {
             completion(.failure(NSError(domain: "Invalid URL", code: -1, userInfo: nil)))
             return
@@ -537,6 +543,7 @@ class YandexAPIService:ObservableObject {
         }.resume()
     }
     
+    // Get Raw Exists Buckets
     private func getBuckets(iamToken: String, folderId: String, completion: @escaping (Result<[Bucket], Error>) -> Void) {
         guard let url = URL(string: "\(APIConfig.yaBucketsEndpoint)?folderId=\(folderId)") else {
             completion(.failure(NSError(domain: "Invalid URL", code: -1, userInfo: nil)))
@@ -595,6 +602,7 @@ class YandexAPIService:ObservableObject {
         }.resume()
     }
     
+    // Get Raw Buckets Details
     private func getBucketInfo(iamToken: String, bucketName: String, completion: @escaping (Result<BucketInfo, Error>) -> Void) {
         // Construct the URL
         guard let url = URL(string: "\(APIConfig.yaBucketsEndpoint)/\(bucketName):getStats") else {
@@ -638,7 +646,7 @@ class YandexAPIService:ObservableObject {
         }.resume()
     }
     
-    
+    // Get Raw Exists Billings Data
     private func getBillings(iamToken: String, completion: @escaping (Result<[Billing], Error>) -> Void) {
         guard let url = URL(string: "\(APIConfig.yaBillingEndpoint)") else {
             completion(.failure(NSError(domain: "Invalid URL", code: -1, userInfo: nil)))
@@ -697,7 +705,7 @@ class YandexAPIService:ObservableObject {
         }.resume()
     }
     
-    
+    // Start VM instance
     func startVM(iamToken: String,vmId: String, completion: @escaping (Result<Void, Error>) -> Void) {
         guard let url = URL(string: "\(APIConfig.yaVMInstancesEndpoint)/\(vmId):start") else {
             completion(.failure(NSError(domain: "Invalid URL", code: -1, userInfo: nil)))
@@ -722,7 +730,8 @@ class YandexAPIService:ObservableObject {
             completion(.success(()))
         }.resume()
     }
-
+    
+    // Stop VM Instance
     func stopVM(iamToken: String,vmId: String, completion: @escaping (Result<Void, Error>) -> Void) {
         guard let url = URL(string: "\(APIConfig.yaVMInstancesEndpoint)/\(vmId):stop") else {
             completion(.failure(NSError(domain: "Invalid URL", code: -1, userInfo: nil)))

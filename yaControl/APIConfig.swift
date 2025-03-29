@@ -1,5 +1,5 @@
 //
-//  APIConfig.swift
+//  APIConfig.swift - Yandex Cloud Endpoints
 //  yaControl
 //
 //  Created by Sedoykin Alexey on 20/02/2025.

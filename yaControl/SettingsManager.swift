@@ -1,5 +1,5 @@
 //
-//  SettingsManager.swift
+//  SettingsManager.swift - Settings manager
 //  WavesVista
 //
 //  Created by Sedoykin Alexey on 11/01/2025.
@@ -20,13 +20,13 @@ class SettingsManager {
         set { defaults.set(newValue, forKey: "oAuthKey") }
     }
     
-    // Save checkbox state
-     func saveCheckboxState(for vmId: String, isAutoStarted: Bool) {
+    // Mark VM for autostart
+     func markVMtoAutostart(for vmId: String, isAutoStarted: Bool) {
          defaults.set(isAutoStarted, forKey: "vm_\(vmId)_isSelected")
      }
      
-     // Retrieve checkbox state
-     func getCheckboxState(for vmId: String) -> Bool {
+     // Get all autostarted VM's
+     func getAutostartedVMs(for vmId: String) -> Bool {
          return defaults.bool(forKey: "vm_\(vmId)_isSelected")
      }
     

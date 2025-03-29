@@ -1,5 +1,5 @@
 //
-//  YandexCloud.swift
+//  YandexCloud.swift - Yandex Cloud API Data Structure
 //  yaControl
 //
 //  Created by Sedoykin Alexey on 20/02/2025.

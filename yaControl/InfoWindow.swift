@@ -1,5 +1,5 @@
 //
-//  InfoWindow.swift
+//  InfoWindow.swift - The short info about Yandex Cloud, hold Option key and click on App Icon
 //  yaControl
 //
 //  Created by Sedoykin Alexey on 24/03/2025.
@@ -8,32 +8,33 @@
 import SwiftUI
 
 struct InfoWindow: View {
-    // VM States
+    // VM's Data
     @State private var vmTableData: [VMTableData] = []
     @State private var runningVMsCount = 0
     @State private var totalVMsCount = 0
     
-    // Serverless Functions States
+    // Serverless Functions Data
     @State private var slfTableData: [ServerLessFunctionTableData] = []
     @State private var activeSLFsCount = 0
     @State private var totalSLFsCount = 0
     
-    // Bucket States
+    // Bucket Data
     @State private var bucketTableData: [BucketTableData] = []
     @State private var totalBucketsCount = 0
     
-    // Billing States
+    // Billing Data
     @State private var billingData: [BillingTableData] = []
     @State private var currentBalance: String = "Loading..."
     @State private var currency: String = ""
     @State private var billingUrl: URL? = nil
     
-    // Common States
+    // Common Data
     @State private var isLoading = false
     @State private var errorMessage: String?
     @State private var lastUpdated = Date()
     @State private var iamToken: String = ""
     
+    //MARK: - UI Infowindow
     var body: some View {
         VStack(spacing: 16) {
             Text("Yandex Cloud Statistics")
@@ -60,16 +61,15 @@ struct InfoWindow: View {
                             title: "Billing Information",
                             icon: "creditcard",
                             stats: [
-                                ("Current Balance", Helpers.formattedBalance(amount: currentBalance, currency: currency)),
+                                ("Current Balance", Helpers.billingBalanceFormatter(amount: currentBalance, currency: currency)),
                                 ("Details", "View Billing")
                             ],
                             url: billingUrl
                         )
 
-                        
                         Divider()
                         
-                        // VM Statistics Section
+                        // VM's Section
                         StatsSection(
                             title: "Virtual Machines",
                             icon: "desktopcomputer",
@@ -119,17 +119,63 @@ struct InfoWindow: View {
         }
     }
     
+    // MARK: - Infowindow Subviews
+    private struct StatsSection: View {
+        let title: String
+        let icon: String
+        let stats: [(String, String)]
+        var url: URL?
+        
+        var body: some View {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Image(systemName: icon)
+                    Text(title)
+                        .font(.subheadline.bold())
+                    Spacer()
+                }
+                
+                ForEach(stats, id: \.0) { stat in
+                    if stat.0 == "Details", let url = url {
+                        Link(destination: url) {
+                            StatRow(label: stat.0, value: stat.1)
+                        }
+                    } else {
+                        StatRow(label: stat.0, value: stat.1)
+                    }
+                }
+            }
+        }
+    }
+
+    private struct StatRow: View {
+        let label: String
+        let value: String
+        
+        var body: some View {
+            HStack {
+                Text(label)
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                Spacer()
+                Text(value)
+                    .font(.subheadline.bold())
+            }
+        }
+    }
+    
+    //MARK: - Getting all stat data
     private func loadAllData() {
         isLoading = true
         errorMessage = nil
         
-        // First get IAM token once and reuse it
+        // Getting IAM token and pushing it via other calls in the conveyor
         YandexAPIService.shared.checkOauthKey(yandexPassportOauthToken: SettingsManager.shared.oAuthKey) { result in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let response):
                     self.iamToken = response.iamToken
-                    self.loadResourcesWithToken()
+                    self.dataLoadingConveyor()
                 case .failure(let error):
                     self.isLoading = false
                     self.errorMessage = error.localizedDescription
@@ -138,7 +184,8 @@ struct InfoWindow: View {
         }
     }
     
-    private func loadResourcesWithToken() {
+    //MARK: - Data loading conveyor
+    private func dataLoadingConveyor() {
         let group = DispatchGroup()
         
         group.enter()
@@ -167,7 +214,7 @@ struct InfoWindow: View {
         }
     }
     
-    // MARK: - VM Functions
+    // MARK: - Get VM's
     private func getVMsStat(completion: @escaping () -> Void) {
         YandexAPIService.shared.getVMs(iamToken: iamToken) { result in
             DispatchQueue.main.async {
@@ -188,7 +235,7 @@ struct InfoWindow: View {
         totalVMsCount = vms.count
     }
     
-    // MARK: - Serverless Functions
+    // MARK: - Get Serverless Functions
     private func getServerLessFunctionsStat(completion: @escaping () -> Void) {
         YandexAPIService.shared.getServerLessFunctions(iamToken: iamToken) { result in
             DispatchQueue.main.async {
@@ -209,7 +256,7 @@ struct InfoWindow: View {
         totalSLFsCount = slf.count
     }
     
-    // MARK: - Bucket Functions
+    // MARK: - Get Buckets
     private func getBucketsStat(completion: @escaping () -> Void) {
         YandexAPIService.shared.getBuckets(iamToken: iamToken) { result in
             DispatchQueue.main.async {
@@ -229,7 +276,7 @@ struct InfoWindow: View {
         totalBucketsCount = bucketTableData.count
     }
     
-    // MARK: - Billing Functions
+    // MARK: - Get Billing
     private func getCosts(completion: @escaping () -> Void) {
         YandexAPIService.shared.getCosts(iamToken: iamToken) { result in
             DispatchQueue.main.async {
@@ -250,48 +297,5 @@ struct InfoWindow: View {
     }
 }
 
-// MARK: - Subviews (same as before)
-private struct StatsSection: View {
-    let title: String
-    let icon: String
-    let stats: [(String, String)]
-    var url: URL?
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Image(systemName: icon)
-                Text(title)
-                    .font(.subheadline.bold())
-                Spacer()
-            }
-            
-            ForEach(stats, id: \.0) { stat in
-                if stat.0 == "Details", let url = url {
-                    Link(destination: url) {
-                        StatRow(label: stat.0, value: stat.1)
-                    }
-                } else {
-                    StatRow(label: stat.0, value: stat.1)
-                }
-            }
-        }
-    }
-}
 
-private struct StatRow: View {
-    let label: String
-    let value: String
-    
-    var body: some View {
-        HStack {
-            Text(label)
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-            Spacer()
-            Text(value)
-                .font(.subheadline.bold())
-        }
-    }
-}
 

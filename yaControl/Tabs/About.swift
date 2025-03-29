@@ -1,5 +1,5 @@
 //
-//  About.swift
+//  About.swift - About as is
 //  yaControl
 //
 //  Created by Sedoykin Alexey on 18/02/2025.

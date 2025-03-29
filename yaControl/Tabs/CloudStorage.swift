@@ -1,5 +1,5 @@
 //
-//  CloudStorage.swift
+//  CloudStorage.swift - Yandex Cloud Storage
 //  yaControl
 //
 //  Created by Sedoykin Alexey on 09/03/2025.

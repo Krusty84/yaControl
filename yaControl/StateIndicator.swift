@@ -1,5 +1,5 @@
 //
-//  StateIndicator.swift
+//  StateIndicator.swift - Helper for change Icon tining in Menu Bar (System Tray on Windows manner)
 //  yaControl
 //
 //  Created by Sedoykin Alexey on 22/03/2025.
@@ -9,7 +9,6 @@ import SwiftUI
 import AppKit
 
 // MARK: - Icon Tinting
-
 func tintedIcon(named iconName: String, color: NSColor) -> NSImage {
     guard let icon = NSImage(named: iconName) else { return NSImage() } // Use your icon name here
     
@@ -33,6 +32,7 @@ func tintedIcon(named iconName: String, color: NSColor) -> NSImage {
     return tintedIcon
 }
 
+// MARK: - MenuBar (near clock:)) Implementation
 struct MenuBarIcon: View {
     @ObservedObject var appState: AppState
 
