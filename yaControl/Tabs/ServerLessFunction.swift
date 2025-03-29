@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ServerLessFunctionTabContent: View {
-    @ObservedObject var apiService = YandexAPIService.shared
+    @ObservedObject var yandexApi = YandexAPIService.shared
     @ObservedObject var helpers = Helpers.shared
     @State private var iamToken: String = ""
     @State private var slfTableData: [ServerLessFunctionTableData] = []
@@ -164,7 +164,7 @@ struct ServerLessFunctionTabContent: View {
                 }
             }
             HStack {
-                Text("Last updated: \(apiService.lastUpdateTime)")
+                Text("Last updated: \(yandexApi.lastUpdateTime)")
                     .font(.subheadline)
                     .foregroundColor(.gray)
                 Spacer()

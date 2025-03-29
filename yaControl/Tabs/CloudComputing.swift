@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct CloudComputingTabContent: View {
-    @ObservedObject var apiService = YandexAPIService.shared
+    @ObservedObject var yandexApi = YandexAPIService.shared
     @ObservedObject var helpers = Helpers.shared
     @StateObject var appState = AppState.shared
     @State private var iamToken: String = ""
@@ -122,7 +122,7 @@ struct CloudComputingTabContent: View {
             } else {
                 Table(filteredVMs, selection: $selectedVM) {
                     // Define columns
-                    TableColumn("Select") { vm in
+                    TableColumn("AS") { vm in
                         Toggle("", isOn: Binding(
                             get: { vm.isAutoStarted },
                             set: { newValue in
@@ -136,7 +136,7 @@ struct CloudComputingTabContent: View {
                         ))
                         //.toggleStyle(CheckboxToggleStyle())
                     }
-                    .width(min: 50, max: 50)
+                    .width(min: 20, max:20)
         
                     TableColumn("Name") { vm in
                         if let url = vm.vmUrl {
@@ -238,7 +238,7 @@ struct CloudComputingTabContent: View {
                         } else {
                             Text(vm.name)
                         }
-                    }.width(min: 150,max:150)
+                    }.width(min: 120, max:120)
                 }
                 .padding(.vertical, 6)
                 .onChange(of: selectedVM) { oldSelection, newSelection in
@@ -248,7 +248,7 @@ struct CloudComputingTabContent: View {
                 }
             }
             HStack {
-                Text("Last updated: \(apiService.lastUpdateTime)")
+                Text("Last updated: \(yandexApi.lastUpdateTime)")
                     .font(.subheadline)
                     .foregroundColor(.gray)
                 Spacer()

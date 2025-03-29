@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct BucketTabContent: View {
-    @ObservedObject var apiService = YandexAPIService.shared
+    @ObservedObject var yandexApi = YandexAPIService.shared
     @ObservedObject var helpers = Helpers.shared
     @State private var iamToken: String = ""
     @State private var bucketTableData: [BucketTableData] = []
@@ -142,7 +142,7 @@ struct BucketTabContent: View {
                 }
             }
             HStack {
-                Text("Last updated: \(apiService.lastUpdateTime)")
+                Text("Last updated: \(yandexApi.lastUpdateTime)")
                     .font(.subheadline)
                     .foregroundColor(.gray)
                 Spacer()

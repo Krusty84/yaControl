@@ -16,6 +16,8 @@ struct yaControlApp: App {
     init() {
             Helpers.checkInternetConnection {
                 AppState.shared.checkNumRunningVMs()
+                //AutoStartStopMVs.
+                print(SettingsManager.shared.getAllAutostartVMs())
             }
     }
     
