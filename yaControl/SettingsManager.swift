@@ -11,7 +11,7 @@ class SettingsManager {
     static let shared = SettingsManager() // Singleton instance
     
     private let defaults = UserDefaults.standard
-    private let autostartVMIdsKey = "autostart_vm_ids" // Key for storing autostart VM IDs
+    private let autostartKeyPrefix = "vm_autostart_"
     
     private init() {} // Private initializer to prevent instantiation
     
@@ -21,34 +21,43 @@ class SettingsManager {
         set { defaults.set(newValue, forKey: "oAuthKey") }
     }
     
-    // Mark VM for autostart
+    // Autostart Management
+    
     func markVMtoAutostart(for vmId: String, isAutoStarted: Bool) {
-        // Set the individual flag (existing behavior)
-        defaults.set(isAutoStarted, forKey: "vm_\(vmId)_isSelected")
-        
-        // Maintain a set of all VM IDs marked for autostart (new functionality)
-        var autostartIds = getAutostartVMIds()
-        if isAutoStarted {
-            autostartIds.insert(vmId)
-        } else {
-            autostartIds.remove(vmId)
-        }
-        defaults.set(Array(autostartIds), forKey: autostartVMIdsKey)
+        let key = autostartKeyPrefix + vmId
+        defaults.set(isAutoStarted, forKey: key)
     }
     
-    // Get autostart status for a VM (existing behavior)
     func getAutostartedVMs(for vmId: String) -> Bool {
-        return defaults.bool(forKey: "vm_\(vmId)_isSelected")
+        let key = autostartKeyPrefix + vmId
+        return defaults.bool(forKey: key)
     }
     
-    // Helper function to get all autostart VM IDs
-    private func getAutostartVMIds() -> Set<String> {
-        let ids = defaults.array(forKey: autostartVMIdsKey) as? [String] ?? []
-        return Set(ids)
+    // Cleanup Methods
+    func cleanupAutostartSettings(activeVMIds: [String]) {
+        // Get all autostart keys from UserDefaults
+        let allKeys = defaults.dictionaryRepresentation().keys
+        let autostartKeys = allKeys.filter { $0.hasPrefix(autostartKeyPrefix) }
+        
+        // Find orphaned keys (where the VM no longer exists)
+        let orphanedKeys = autostartKeys.filter { key in
+            let vmId = key.replacingOccurrences(of: autostartKeyPrefix, with: "")
+            return !activeVMIds.contains(vmId)
+        }
+        
+        // Remove orphaned entries
+        orphanedKeys.forEach { defaults.removeObject(forKey: $0) }
     }
     
-    // Optional: Get all VMs marked for autostart
+    // Gets all VMs marked for autostart that still exist
+    func getValidAutostartedVMs(activeVMIds: [String]) -> [String] {
+        return activeVMIds.filter { getAutostartedVMs(for: $0) }
+    }
+    
     func getAllAutostartVMs() -> [String] {
-        return Array(getAutostartVMIds())
+        let allKeys = defaults.dictionaryRepresentation().keys
+              return allKeys
+                  .filter { $0.hasPrefix(autostartKeyPrefix) }
+                  .map { $0.replacingOccurrences(of: autostartKeyPrefix, with: "") }
     }
 }

@@ -148,6 +148,9 @@ class YandexAPIService:ObservableObject {
                                     self.getVMInstances(iamToken: iamToken, folderId: folder.id) { result in
                                         switch result {
                                         case .success(let instances):
+                                            //Clean inactive VM's id
+                                            let activeVMIds = instances.map { $0.id }
+                                            SettingsManager.shared.cleanupAutostartSettings(activeVMIds: activeVMIds)
                                             // Map instances to VMTableData
                                             let vmTableData = instances.map { instance in
                                                 let memoryGB = String(Int(instance.resources.memory)! / 1024 / 1024 / 1024)
