@@ -12,51 +12,276 @@ struct SettingsTabContent: View {
     @AppStorage("oAuthKey") private var oAuthKey: String = SettingsManager.shared.oAuthKey
     @State private var responseCode: Int? = nil
     @State private var errorMessage: String? = nil
+    @State private var selectedTab: Int = 0
+    
+    // VM Management State
+    @State private var autoStartVM: Bool = SettingsManager.shared.autoStartEnabled
+    @State private var startOptions: [StartOption] = SettingsManager.shared.startOptions
+    @State private var shutdownOptions: [ShutdownOption] = SettingsManager.shared.shutdownOptions
+    
+    enum StartOption: String, CaseIterable {
+        case afterAppLaunched = "After app launched"
+        case afterMacOSStarted = "After macOS started"
+        case afterWakeup = "After wakeup"
+    }
+    
+    enum ShutdownOption: String, CaseIterable {
+        case afterAppExit = "After app exit"
+        case afterMacOSShutdown = "After macOS shutdown"
+        case afterMacOSSleep = "After macOS sleep"
+    }
+    
     var body: some View {
-        
-        VStack (spacing: 0) {
-            HStack {
-                VStack {
-                    TextField("OAuth Key", text: $oAuthKey)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                    //isabled(!isEditingEnabled)
-                    LaunchAtLogin.Toggle()
-                }
-                VStack {
-                    Button(action: {
-                        // Call the API directly from the button action
-                        YandexAPIService.shared.checkOauthKey(yandexPassportOauthToken: oAuthKey) { result in
-                            DispatchQueue.main.async {
-                                switch result {
-                                case .success(let response):
-                                        if(response.code == 200){
-                                            responseCode = response.code
-                                            print(response.iamToken)
-                                            errorMessage = nil
-                                        }else{
-                                            oAuthKey.removeAll()
-                                        }
-                                    responseCode = response.code
-                                    errorMessage = nil
-                                case .failure(let error):
-                                    errorMessage = error.localizedDescription
-                                    responseCode = nil
-                                }
-                            }
-                        }
-                    }, label: {
-                        Text("Check")
-                            .clipped()
-                    })
-                    .buttonStyle(.automatic)
-                    //
+        VStack(spacing: 0) {
+            // Tab Picker at the top
+            Picker("", selection: $selectedTab) {
+                Text("General").tag(0)
+                Text("VM Management").tag(1)
+            }
+            .pickerStyle(SegmentedPickerStyle())
+            .padding(.horizontal, 20)
+            .padding(.top, 20)
+            
+            Divider()
+            
+            // Tab content area
+            Group {
+                switch selectedTab {
+                    case 0:
+                        generalSettingsTab
+                    case 1:
+                        vmManagementTab
+                    default:
+                        EmptyView()
                 }
             }
-            TextField("Result", text: Helpers.shared.restResponseToString(for: $responseCode))
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .onAppear {
-            // Sync SettingsManager to ensure consistency
             oAuthKey = SettingsManager.shared.oAuthKey
+        }
+    }
+    
+    // MARK: - Tab Views
+    
+    private var generalSettingsTab: some View {
+        ScrollView {
+            VStack(spacing: 10) {
+                // Authentication Section
+                Section {
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack {
+                            TextField("OAuth Key", text: $oAuthKey)
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                            
+                            Button(action: checkOAuthKey) {
+                                Text("Verify")
+                                    .frame(minWidth: 60)
+                            }
+                        }
+                        
+                        statusIndicator
+                    }
+                    .padding(.horizontal, 8)
+                } header: {
+                    HStack {
+                        Label("Yandex Cloud Authentication", systemImage: "key.fill")
+                            .font(.headline)
+                        
+                        Spacer()
+                        
+                        Link("Get OAuth Key", destination: URL(string: APIConfig.yaGetOAuthKey)!)
+                            .font(.subheadline)
+                            .foregroundColor(.accentColor)
+                    }
+                    .padding(.bottom, 8)
+                }
+                
+                Divider()
+                
+                // Application Preferences Section
+                Section {
+                    VStack(alignment: .leading, spacing: 12) {
+                        LaunchAtLogin.Toggle()
+                            .toggleStyle(.switch)
+                        Spacer()
+                        // Add more preferences here
+                        // ExampleToggle("Some Option", isOn: $someOption)
+                    }
+                    .padding(.horizontal, 8)
+                } header: {
+                    SectionHeader(title: "Application Preferences", systemImage: "gearshape.fill")
+                }
+                
+                Spacer()
+            }
+            .padding(20)
+        }
+    }
+    
+    private var vmManagementTab: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 10) {
+                // Auto Start VM Section
+                Section {
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack {
+                            Text("Auto Start VM")
+                            Toggle("", isOn: $autoStartVM)
+                                .toggleStyle(.switch)
+                                .onChange(of: autoStartVM) { newValue in
+                                    SettingsManager.shared.autoStartEnabled = newValue
+                                }
+                            Spacer()
+                        }
+                    }
+                    .padding(.horizontal, 8)
+                } header: {
+                    SectionHeader(title: "VM Auto Start", systemImage: "power")
+                }
+                
+                Divider()
+                
+                // Two Column Layout
+                HStack(alignment: .top, spacing: 30) {
+                    // Startup Options Column
+                    VStack(alignment: .leading, spacing: 12) {
+                        Section {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("How to start VM")
+                                    .font(.subheadline)
+                                    .padding(.bottom, 4)
+                                
+                                ForEach(StartOption.allCases, id: \.self) { option in
+                                    HStack {
+                                        Toggle(option.rawValue, isOn: Binding(
+                                            get: { startOptions.contains(option) },
+                                            set: { isOn in
+                                                withAnimation {
+                                                    if isOn {
+                                                        startOptions.append(option)
+                                                    } else {
+                                                        startOptions.removeAll { $0 == option }
+                                                    }
+                                                    SettingsManager.shared.startOptions = startOptions
+                                                }
+                                            }
+                                        ))
+                                        .toggleStyle(.checkbox)
+                                        Spacer()
+                                    }
+                                }
+                            }
+                            .padding(.horizontal, 8)
+                        } header: {
+                            SectionHeader(title: "Startup Options", systemImage: "play.fill")
+                        }
+                    }
+                    .frame(minWidth: 0, maxWidth: .infinity)
+                    
+                    // Shutdown Options Column
+                    VStack(alignment: .leading, spacing: 12) {
+                        Section {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("How to shutdown VM")
+                                    .font(.subheadline)
+                                    .padding(.bottom, 4)
+                                
+                                ForEach(ShutdownOption.allCases, id: \.self) { option in
+                                    HStack {
+                                        Toggle(option.rawValue, isOn: Binding(
+                                            get: { shutdownOptions.contains(option) },
+                                            set: { isOn in
+                                                withAnimation {
+                                                    if isOn {
+                                                        shutdownOptions.append(option)
+                                                    } else {
+                                                        shutdownOptions.removeAll { $0 == option }
+                                                    }
+                                                    SettingsManager.shared.shutdownOptions = shutdownOptions
+                                                }
+                                            }
+                                        ))
+                                        .toggleStyle(.checkbox)
+                                        Spacer()
+                                    }
+                                }
+                            }
+                            .padding(.horizontal, 8)
+                        } header: {
+                            SectionHeader(title: "Shutdown Options", systemImage: "stop.fill")
+                        }
+                    }
+                    .frame(minWidth: 0, maxWidth: .infinity)
+                }
+                .padding(.horizontal, 8)
+                
+                Spacer()
+            }
+            .padding(10)
+        }
+    }
+    
+    private var statusIndicator: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            if let code = responseCode {
+                HStack(spacing: 4) {
+                    Image(systemName: code == 200 ? "checkmark.circle.fill" : "xmark.circle.fill")
+                        .foregroundColor(code == 200 ? .green : .red)
+                    Text(code == 200 ? "Valid credentials" : "Invalid credentials")
+                        .foregroundColor(code == 200 ? .green : .red)
+                }
+                .font(.caption)
+            }
+            
+            if let error = errorMessage {
+                HStack(spacing: 4) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .foregroundColor(.orange)
+                    Text(error)
+                        .foregroundColor(.orange)
+                }
+                .font(.caption)
+            }
+        }
+    }
+    
+    // MARK: - Subviews
+    
+    private struct SectionHeader: View {
+        let title: String
+        let systemImage: String
+        
+        var body: some View {
+            HStack {
+                Label(title, systemImage: systemImage)
+                    .font(.headline)
+                    .foregroundColor(.primary)
+                Spacer()
+            }
+            .padding(.bottom, 8)
+        }
+    }
+    
+    // MARK: - Actions
+    
+    private func checkOAuthKey() {
+        YandexAPIService.shared.checkOauthKey(yandexPassportOauthToken: oAuthKey) { result in
+            DispatchQueue.main.async {
+                switch result {
+                    case .success(let response):
+                        responseCode = response.code
+                        if response.code == 200 {
+                            errorMessage = nil
+                            print(response.iamToken)
+                        } else {
+                            errorMessage = "Invalid OAuth key (Code: \(response.code))"
+                        }
+                    case .failure(let error):
+                        errorMessage = error.localizedDescription
+                        responseCode = nil
+                }
+            }
         }
     }
 }

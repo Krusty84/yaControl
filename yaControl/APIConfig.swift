@@ -16,6 +16,7 @@ struct APIConfig {
     static let yaBucketsEndpoint = "https://storage.api.cloud.yandex.net/storage/v1/buckets"
     static let yaBillingEndpoint = "https://billing.api.cloud.yandex.net/billing/v1/billingAccounts"
     static let yaBillingConsoleUrl = "https://center.yandex.cloud/billing/accounts"
+    static let yaGetOAuthKey = "https://yandex.cloud/en-ru/docs/iam/concepts/authorization/oauth-token"
 
     //
     static let yaFoldersWebUrl = "https://console.yandex.cloud/folders/"

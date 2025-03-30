@@ -8,21 +8,61 @@
 import Foundation
 
 class SettingsManager {
-    static let shared = SettingsManager() // Singleton instance
+    static let shared = SettingsManager()
+      private let defaults = UserDefaults.standard
+      
+      // Keys - Add "Key" suffix to avoid naming conflicts
+      private let oAuthKeyKey = "oAuthKey"
+      private let autoStartEnabledKey = "autoStartEnabled"
+      private let startOptionsKey = "startOptions"
+      private let shutdownOptionsKey = "shutdownOptions"
+      private let autostartKeyPrefix = "vm_autostart_"
+      
+      // General Settings
+      var oAuthKey: String {
+          get { defaults.string(forKey: oAuthKeyKey) ?? "" }
+          set { defaults.set(newValue, forKey: oAuthKeyKey) }
+      }
     
-    private let defaults = UserDefaults.standard
-    private let autostartKeyPrefix = "vm_autostart_"
-    
-    private init() {} // Private initializer to prevent instantiation
-    
-    // Properties with default values
-    var oAuthKey: String {
-        get { defaults.string(forKey: "oAuthKey") ?? "" }
-        set { defaults.set(newValue, forKey: "oAuthKey") }
+    // VM Management Settings
+    var autoStartEnabled: Bool {
+        get { defaults.bool(forKey: autoStartEnabledKey) }
+        set { defaults.set(newValue, forKey: autoStartEnabledKey) }
     }
     
-    // Autostart Management
+    var startOptions: [SettingsTabContent.StartOption] {
+        get {
+            guard let data = defaults.data(forKey: startOptionsKey),
+                  let options = try? JSONDecoder().decode([String].self, from: data) else {
+                return [.afterAppLaunched, .afterMacOSStarted] // Default values
+            }
+            return options.compactMap { SettingsTabContent.StartOption(rawValue: $0) }
+        }
+        set {
+            let strings = newValue.map { $0.rawValue }
+            if let data = try? JSONEncoder().encode(strings) {
+                defaults.set(data, forKey: startOptionsKey)
+            }
+        }
+    }
     
+    var shutdownOptions: [SettingsTabContent.ShutdownOption] {
+        get {
+            guard let data = defaults.data(forKey: shutdownOptionsKey),
+                  let options = try? JSONDecoder().decode([String].self, from: data) else {
+                return [.afterAppExit, .afterMacOSShutdown] // Default values
+            }
+            return options.compactMap { SettingsTabContent.ShutdownOption(rawValue: $0) }
+        }
+        set {
+            let strings = newValue.map { $0.rawValue }
+            if let data = try? JSONEncoder().encode(strings) {
+                defaults.set(data, forKey: shutdownOptionsKey)
+            }
+        }
+    }
+    
+    // VM-specific autostart methods (unchanged from your original)
     func markVMtoAutostart(for vmId: String, isAutoStarted: Bool) {
         let key = autostartKeyPrefix + vmId
         defaults.set(isAutoStarted, forKey: key)
@@ -33,31 +73,27 @@ class SettingsManager {
         return defaults.bool(forKey: key)
     }
     
-    // Cleanup Methods
     func cleanupAutostartSettings(activeVMIds: [String]) {
-        // Get all autostart keys from UserDefaults
         let allKeys = defaults.dictionaryRepresentation().keys
         let autostartKeys = allKeys.filter { $0.hasPrefix(autostartKeyPrefix) }
         
-        // Find orphaned keys (where the VM no longer exists)
         let orphanedKeys = autostartKeys.filter { key in
             let vmId = key.replacingOccurrences(of: autostartKeyPrefix, with: "")
             return !activeVMIds.contains(vmId)
         }
         
-        // Remove orphaned entries
         orphanedKeys.forEach { defaults.removeObject(forKey: $0) }
     }
     
-    // Gets all VMs marked for autostart that still exist
     func getValidAutostartedVMs(activeVMIds: [String]) -> [String] {
         return activeVMIds.filter { getAutostartedVMs(for: $0) }
     }
     
     func getAllAutostartVMs() -> [String] {
         let allKeys = defaults.dictionaryRepresentation().keys
-              return allKeys
-                  .filter { $0.hasPrefix(autostartKeyPrefix) }
-                  .map { $0.replacingOccurrences(of: autostartKeyPrefix, with: "") }
+        return allKeys
+            .filter { $0.hasPrefix(autostartKeyPrefix) }
+            .map { $0.replacingOccurrences(of: autostartKeyPrefix, with: "") }
     }
 }
+

@@ -77,4 +77,30 @@ class AppState: ObservableObject {
         let runningVMs = vms.filter { $0.status == "RUNNING" }.count
         self.isVirtualMachineRunning = runningVMs >= 1
     }
+    
+    //MARK: - Handlers for AppLifecycleObserver catcher
+    func handleShutdown() {
+            print("Handling application shutdown")
+            // Add your shutdown logic here:
+            // - Save any persistent state
+            // - Stop running processes
+            // - Clean up resources
+        }
+        
+        func handleSleep() {
+            print("Handling system sleep")
+            // Add your sleep logic here:
+            // - Pause ongoing operations
+            // - Save temporary state
+            // - Disconnect from network resources
+        }
+        
+        func handleWake() {
+            print("Handling system wake")
+            // Add your wake logic here:
+            // - Resume operations
+            // - Restore connections
+            // - Check system state
+            checkNumRunningVMs() // You already have this method
+        }
 }

@@ -14,9 +14,11 @@ struct yaControlApp: App {
     @StateObject private var appState = AppState.shared
     
     init() {
+        // Initialize the app lifecycle observer
+        _ = AppLifecycleObserver.shared
+        
             Helpers.checkInternetConnection {
                 AppState.shared.checkNumRunningVMs()
-                //AutoStartStopMVs.
                 print(SettingsManager.shared.getAllAutostartVMs())
             }
     }
