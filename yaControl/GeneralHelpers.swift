@@ -101,22 +101,54 @@ class Helpers:ObservableObject {
         }
     }
     
-    func stopAllRunningVMs(iamToken: String, vms: [VMTableData]) {
-        let runningVMs = vms.filter { $0.status == "RUNNING" }
-        self.processingVMName="Sopping all VM's"
-        let group = DispatchGroup()
-        
-        for vm in runningVMs {
-            group.enter()
-            YandexAPIService.shared.stopVM(iamToken: iamToken, vmId: vm.id) { result in
-                DispatchQueue.main.async {
+//    func stopAllRunningVMs(iamToken: String, vms: [VMTableData]) {
+//        let runningVMs = vms.filter { $0.status == "RUNNING" }
+//        self.processingVMName="Sopping all VM's"
+//        let group = DispatchGroup()
+//        
+//        for vm in runningVMs {
+//            group.enter()
+//            YandexAPIService.shared.stopVM(iamToken: iamToken, vmId: vm.id) { result in
+//                DispatchQueue.main.async {
+//                    switch result {
+//                        case .success:
+//                            print("VM stopped successfully: \(vm.name)")
+//                        case .failure(let error):
+//                            print("Failed to stop VM: \(error.localizedDescription)")
+//                    }
+//                    group.leave()
+//                }
+//            }
+//        }
+//    }
+    func stopAllRunningVMs(iamToken: String, vms: [VMTableData]? = nil, vmIds: [String]? = nil) {
+        if let vms = vms {
+            let runningVMs = vms.filter { $0.status == "RUNNING" }
+            self.processingVMName = "Stopping all VM's"
+            for vm in runningVMs {
+                // Just send requeust withpout waiting and main queue
+                YandexAPIService.shared.stopVM(iamToken: iamToken, vmId: vm.id) { result in
+                    // Логируем в фоне, если нужно
                     switch result {
-                        case .success:
-                            print("VM stopped successfully: \(vm.name)")
-                        case .failure(let error):
-                            print("Failed to stop VM: \(error.localizedDescription)")
+                    case .success:
+                        print("VM stopped successfully: \(vm.name)")
+                    case .failure(let error):
+                        print("Failed to stop VM: \(error.localizedDescription)")
                     }
-                    group.leave()
+                }
+            }
+        } else if let vmIds = vmIds {
+            self.processingVMName = "Stopping VMs by IDs"
+            
+            for vmId in vmIds {
+                // Just send requeust withpout waiting and main queue
+                YandexAPIService.shared.stopVM(iamToken: iamToken, vmId: vmId) { result in
+                    switch result {
+                    case .success:
+                        print("VM stopped successfully: \(vmId)")
+                    case .failure(let error):
+                        print("Failed to stop VM: \(error.localizedDescription)")
+                    }
                 }
             }
         }

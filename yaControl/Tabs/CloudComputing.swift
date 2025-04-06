@@ -76,6 +76,8 @@ struct CloudComputingTabContent: View {
                     } else if (proccessingVMType == 1 && runningVMs > previousRunningVMs){
                         fetchVMs()
                         helpers.processingVMName.removeAll()
+                    } else {
+                        fetchVMs()
                     }
                     if (vmTableData.filter { $0.status == "RUNNING" }.count == 0){
                         appState.isVirtualMachineRunning = false
@@ -283,7 +285,6 @@ struct CloudComputingTabContent: View {
     private func fetchVMs() {
         isLoading = true
         errorMessage = nil
-        
         // Step 1: Get IAM Token
         YandexAPIService.shared.checkOauthKey(yandexPassportOauthToken: SettingsManager.shared.oAuthKey) { result in
             DispatchQueue.main.async {
@@ -296,7 +297,6 @@ struct CloudComputingTabContent: View {
                                 isLoading = false
                                 switch result {
                                     case .success(let allVMs):
-                                        print("result: ", allVMs)
                                         vmTableData = allVMs
                                         self.sortTableDataByStatus()
                                     case .failure(let error):

@@ -73,23 +73,43 @@ class SettingsManager {
         return defaults.bool(forKey: key)
     }
     
+//    func cleanupAutostartSettings(activeVMIds: [String]) {
+//        let allKeys = defaults.dictionaryRepresentation().keys
+//        let autostartKeys = allKeys.filter { $0.hasPrefix(autostartKeyPrefix) }
+//        
+//        let orphanedKeys = autostartKeys.filter { key in
+//            let vmId = key.replacingOccurrences(of: autostartKeyPrefix, with: "")
+//            return !activeVMIds.contains(vmId)
+//        }
+//        
+//        orphanedKeys.forEach { defaults.removeObject(forKey: $0) }
+//    }
+    
     func cleanupAutostartSettings(activeVMIds: [String]) {
+        // Create a set for faster lookups (O(1) instead of O(n))
+        let activeIdsSet = Set(activeVMIds)
+        print("zzzzz", activeIdsSet)
+        // Get all autostart keys
         let allKeys = defaults.dictionaryRepresentation().keys
         let autostartKeys = allKeys.filter { $0.hasPrefix(autostartKeyPrefix) }
         
-        let orphanedKeys = autostartKeys.filter { key in
+        // Process each key
+        autostartKeys.forEach { key in
+            print("key", key)
             let vmId = key.replacingOccurrences(of: autostartKeyPrefix, with: "")
-            return !activeVMIds.contains(vmId)
+            
+            // Check if the VM ID is empty or not in active IDs
+            if vmId.isEmpty || !activeIdsSet.contains(vmId) {
+                defaults.removeObject(forKey: key)
+            }
         }
-        
-        orphanedKeys.forEach { defaults.removeObject(forKey: $0) }
     }
     
-    func getValidAutostartedVMs(activeVMIds: [String]) -> [String] {
+    func getValidAutostartedVMs_SUS(activeVMIds: [String]) -> [String] {
         return activeVMIds.filter { getAutostartedVMs(for: $0) }
     }
     
-    func getAllAutostartVMs() -> [String] {
+    func getAllAutostartVMs_SUS() -> [String] {
         let allKeys = defaults.dictionaryRepresentation().keys
         return allKeys
             .filter { $0.hasPrefix(autostartKeyPrefix) }

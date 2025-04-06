@@ -148,17 +148,14 @@ class YandexAPIService:ObservableObject {
                                     self.getVMInstances(iamToken: iamToken, folderId: folder.id) { result in
                                         switch result {
                                         case .success(let instances):
-                                            //Clean inactive VM's id
-                                            let activeVMIds = instances.map { $0.id }
-                                            SettingsManager.shared.cleanupAutostartSettings(activeVMIds: activeVMIds)
-                                            // Map instances to VMTableData
+                                            // First create all VMTableData with their saved states
                                             let vmTableData = instances.map { instance in
                                                 let memoryGB = String(Int(instance.resources.memory)! / 1024 / 1024 / 1024)
                                                 let addresses = instance.networkInterfaces.compactMap { $0.primaryV4Address.oneToOneNat?.address }
                                                 let dateFormatter = DateFormatter()
                                                 dateFormatter.dateFormat = "HH:mm:ss"
                                                 self.lastUpdateTime = dateFormatter.string(from: Date())
-                                                let isAutoStarted = SettingsManager.shared.getAutostartedVMs(for: instance.id)
+                                                
                                                 return VMTableData(
                                                     id: instance.id,
                                                     name: instance.name,
@@ -169,11 +166,15 @@ class YandexAPIService:ObservableObject {
                                                     preemptible: instance.schedulingPolicy.preemptible,
                                                     addresses: addresses,
                                                     folderName: folder.name,
-                                                    folderUrl: URL(string:APIConfig.yaFoldersWebUrl+folder.id),
-                                                    vmUrl:URL(string:APIConfig.yaVMsWebUrl(folderID: folder.id, instanceID: instance.id)),
-                                                    isAutoStarted:isAutoStarted
+                                                    folderUrl: URL(string: APIConfig.yaFoldersWebUrl + folder.id),
+                                                    vmUrl: URL(string: APIConfig.yaVMsWebUrl(folderID: folder.id, instanceID: instance.id)),
+                                                    isAutoStarted: SettingsManager.shared.getAutostartedVMs(for: instance.id) // Load before cleanup
                                                 )
                                             }
+                                            
+                                            // THEN clean up settings for any VMs that no longer exist
+                                            SettingsManager.shared.cleanupAutostartSettings(activeVMIds: instances.map { $0.id })
+                                            
                                             allVMs.append(contentsOf: vmTableData)
                                         case .failure(let error):
                                             completion(.failure(error))

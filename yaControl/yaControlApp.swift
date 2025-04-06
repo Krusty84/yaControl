@@ -10,16 +10,15 @@ import AppKit
 
 @main
 struct yaControlApp: App {
+    @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @Environment(\.openWindow) var openWindow
     @StateObject private var appState = AppState.shared
     
     init() {
         // Initialize the app lifecycle observer
         _ = AppLifecycleObserver.shared
-        
             Helpers.checkInternetConnection {
                 AppState.shared.checkNumRunningVMs()
-                print(SettingsManager.shared.getAllAutostartVMs())
             }
     }
     
