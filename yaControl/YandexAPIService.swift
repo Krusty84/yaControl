@@ -130,13 +130,14 @@ class YandexAPIService:ObservableObject {
     //MARK: - Get Final Virtual Machines Data (step 3.1)
     func getVMs(iamToken: String, completion: @escaping (Result<[VMTableData], Error>) -> Void) {
             // Step 1: Get Clouds
-            getClouds(iamToken: iamToken) { result in
-                switch result {
-                case .success(let clouds):
-                    var allVMs: [VMTableData] = []
-                    let group = DispatchGroup()
-                    
-                    for cloud in clouds {
+        getClouds(iamToken: iamToken) { result in
+            switch result {
+            case .success(let response):
+                let clouds = response.clouds  // Extract the array from the tuple
+                var allVMs: [VMTableData] = []
+                let group = DispatchGroup()
+                
+                for cloud in clouds {
                         group.enter()
                         // Step 2: Get Folders for each Cloud
                         self.getFolders(iamToken: iamToken, cloudId: cloud.id) { result in
@@ -155,7 +156,7 @@ class YandexAPIService:ObservableObject {
                                                 let dateFormatter = DateFormatter()
                                                 dateFormatter.dateFormat = "HH:mm:ss"
                                                 self.lastUpdateTime = dateFormatter.string(from: Date())
-                                                
+                                                SettingsManager.shared.cleanupAutostartSettings(activeVMIds: instance.id)
                                                 return VMTableData(
                                                     id: instance.id,
                                                     name: instance.name,
@@ -171,10 +172,6 @@ class YandexAPIService:ObservableObject {
                                                     isAutoStarted: SettingsManager.shared.getAutostartedVMs(for: instance.id) // Load before cleanup
                                                 )
                                             }
-                                            
-                                            // THEN clean up settings for any VMs that no longer exist
-                                            SettingsManager.shared.cleanupAutostartSettings(activeVMIds: instances.map { $0.id })
-                                            
                                             allVMs.append(contentsOf: vmTableData)
                                         case .failure(let error):
                                             completion(.failure(error))
