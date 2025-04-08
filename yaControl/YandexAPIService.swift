@@ -129,71 +129,75 @@ class YandexAPIService:ObservableObject {
     
     //MARK: - Get Final Virtual Machines Data (step 3.1)
     func getVMs(iamToken: String, completion: @escaping (Result<[VMTableData], Error>) -> Void) {
-            // Step 1: Get Clouds
+        // Step 1: Get Clouds
         getClouds(iamToken: iamToken) { result in
             switch result {
             case .success(let response):
-                let clouds = response.clouds  // Extract the array from the tuple
+                let clouds = response.clouds
                 var allVMs: [VMTableData] = []
                 let group = DispatchGroup()
                 
                 for cloud in clouds {
-                        group.enter()
-                        // Step 2: Get Folders for each Cloud
-                        self.getFolders(iamToken: iamToken, cloudId: cloud.id) { result in
-                            switch result {
-                            case .success(let folders):
-                                for folder in folders {
-                                    group.enter()
-                                    // Step 3: Get VMs for each Folder
-                                    self.getVMInstances(iamToken: iamToken, folderId: folder.id) { result in
-                                        switch result {
-                                        case .success(let instances):
-                                            // First create all VMTableData with their saved states
-                                            let vmTableData = instances.map { instance in
-                                                let memoryGB = String(Int(instance.resources.memory)! / 1024 / 1024 / 1024)
-                                                let addresses = instance.networkInterfaces.compactMap { $0.primaryV4Address.oneToOneNat?.address }
-                                                let dateFormatter = DateFormatter()
-                                                dateFormatter.dateFormat = "HH:mm:ss"
-                                                self.lastUpdateTime = dateFormatter.string(from: Date())
-                                                SettingsManager.shared.cleanupAutostartSettings(activeVMIds: instance.id)
-                                                return VMTableData(
-                                                    id: instance.id,
-                                                    name: instance.name,
-                                                    status: instance.status,
-                                                    createdAt: Helpers.shared.convertGMTToLocalTime(utcDateString: instance.createdAt),
-                                                    cores: instance.resources.cores,
-                                                    memoryGB: memoryGB,
-                                                    preemptible: instance.schedulingPolicy.preemptible,
-                                                    addresses: addresses,
-                                                    folderName: folder.name,
-                                                    folderUrl: URL(string: APIConfig.yaFoldersWebUrl + folder.id),
-                                                    vmUrl: URL(string: APIConfig.yaVMsWebUrl(folderID: folder.id, instanceID: instance.id)),
-                                                    isAutoStarted: SettingsManager.shared.getAutostartedVMs(for: instance.id) // Load before cleanup
-                                                )
-                                            }
-                                            allVMs.append(contentsOf: vmTableData)
-                                        case .failure(let error):
-                                            completion(.failure(error))
+                    group.enter()
+                    // Step 2: Get Folders for each Cloud
+                    self.getFolders(iamToken: iamToken, cloudId: cloud.id) { result in
+                        switch result {
+                        case .success(let folders):
+                            for folder in folders {
+                                group.enter()
+                                // Step 3: Get VMs for each Folder
+                                self.getVMInstances(iamToken: iamToken, folderId: folder.id) { result in
+                                    switch result {
+                                    case .success(let instances):
+                                        // Create VMTableData with their saved states
+                                        let vmTableData = instances.map { instance in
+                                            let memoryGB = String(Int(instance.resources.memory)! / 1024 / 1024 / 1024)
+                                            let addresses = instance.networkInterfaces.compactMap { $0.primaryV4Address.oneToOneNat?.address }
+                                            let dateFormatter = DateFormatter()
+                                            dateFormatter.dateFormat = "HH:mm:ss"
+                                            self.lastUpdateTime = dateFormatter.string(from: Date())
+                                            return VMTableData(
+                                                id: instance.id,
+                                                name: instance.name,
+                                                status: instance.status,
+                                                createdAt: Helpers.shared.convertGMTToLocalTime(utcDateString: instance.createdAt),
+                                                cores: instance.resources.cores,
+                                                memoryGB: memoryGB,
+                                                preemptible: instance.schedulingPolicy.preemptible,
+                                                addresses: addresses,
+                                                folderName: folder.name,
+                                                folderUrl: URL(string: APIConfig.yaFoldersWebUrl + folder.id),
+                                                vmUrl: URL(string: APIConfig.yaVMsWebUrl(folderID: folder.id, instanceID: instance.id)),
+                                                isAutoStarted: SettingsManager.shared.getAutostartedVMs(for: instance.id)
+                                            )
                                         }
-                                        group.leave()
+                                        allVMs.append(contentsOf: vmTableData)
+                                    case .failure(let error):
+                                        completion(.failure(error))
                                     }
+                                    group.leave()
                                 }
-                            case .failure(let error):
-                                completion(.failure(error))
                             }
-                            group.leave()
+                        case .failure(let error):
+                            completion(.failure(error))
                         }
+                        group.leave()
                     }
-                    
-                    group.notify(queue: .main) {
-                        completion(.success(allVMs))
-                    }
-                case .failure(let error):
-                    completion(.failure(error))
                 }
+                
+                group.notify(queue: .main) {
+                    // After collecting all VMs, clean up orphaned settings
+                    let currentVMIds = Set(allVMs.map { $0.id })
+                    SettingsManager.shared.cleanupAutostartSettings(validVMIds: currentVMIds)
+                    
+                    completion(.success(allVMs))
+                }
+                
+            case .failure(let error):
+                completion(.failure(error))
             }
         }
+    }
     
     //MARK: - Get Final Serverless Functions Data (step 3.2)
     func getServerLessFunctions(iamToken: String, completion: @escaping (Result<[ServerLessFunctionTableData], Error>) -> Void) {

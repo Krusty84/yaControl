@@ -90,34 +90,20 @@ class SettingsManager {
         return Array(getAutostartVMIds())
     }
     
-    //    func cleanupAutostartSettings(activeVMIds: [String]) {
-    //        let allKeys = defaults.dictionaryRepresentation().keys
-    //        let autostartKeys = allKeys.filter { $0.hasPrefix(autostartKeyPrefix) }
-    //
-    //        let orphanedKeys = autostartKeys.filter { key in
-    //            let vmId = key.replacingOccurrences(of: autostartKeyPrefix, with: "")
-    //            return !activeVMIds.contains(vmId)
-    //        }
-    //
-    //        orphanedKeys.forEach { defaults.removeObject(forKey: $0) }
-    //    }
-    
-    func cleanupAutostartSettings(activeVMId: [String]) {
-        // 1. Check if this VM exists in your system (you'll need to implement this)
-        let vmExists = /* Your check if VM exists */
+    // clean autostart marker for unavaliable VM's in cloud
+    func cleanupAutostartSettings(validVMIds: Set<String>) {
+        let storedAutostartIds = getAutostartVMIds()
+        let idsToRemove = storedAutostartIds.subtracting(validVMIds)
         
-        if !vmExists {
-            // 2. Remove from autostart IDs list if present
-            var autostartIds = getAutostartVMIds()
-            if autostartIds.remove(activeVMId) != nil {
-                defaults.set(Array(autostartIds), forKey: autostartVMIdsKey)
+        if !idsToRemove.isEmpty {
+            // Update master list
+            let updatedIds = storedAutostartIds.subtracting(idsToRemove)
+            defaults.set(Array(updatedIds), forKey: autostartVMIdsKey)
+            
+            // Remove individual settings
+            for id in idsToRemove {
+                defaults.removeObject(forKey: "vm_\(id)_isSelected")
             }
-            
-            // 3. Remove individual setting
-            let key = "vm_\(activeVMId)_isSelected"
-            defaults.removeObject(forKey: key)
-            
-            print("Cleaned up settings for removed VM: \(vmId)")
         }
     }
 }
