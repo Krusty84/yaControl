@@ -36,7 +36,7 @@ struct SettingsTabContent: View {
             // Tab Picker at the top
             Picker("", selection: $selectedTab) {
                 Text("General").tag(0)
-                Text("VM Management").tag(1)
+                Text("Virtual Machine Management").tag(1)
             }
             .pickerStyle(SegmentedPickerStyle())
             .padding(.horizontal, 20)
@@ -126,7 +126,7 @@ struct SettingsTabContent: View {
                 Section {
                     VStack(alignment: .leading, spacing: 12) {
                         HStack {
-                            Text("Auto Start VM")
+                            //Text("Auto Start VM")
                             Toggle("", isOn: $autoStartVM)
                                 .toggleStyle(.switch)
                                 .onChange(of: autoStartVM) { newValue in
@@ -137,7 +137,7 @@ struct SettingsTabContent: View {
                     }
                     .padding(.horizontal, 8)
                 } header: {
-                    SectionHeader(title: "VM Auto Start", systemImage: "power")
+                    SectionHeader(title: "Auto Start/Stop Mode", systemImage: "power")
                 }
                 
                 Divider()
@@ -168,6 +168,7 @@ struct SettingsTabContent: View {
                                             }
                                         ))
                                         .toggleStyle(.checkbox)
+                                        .disabled(!autoStartVM) // Disable when autoStartVM is false
                                         Spacer()
                                     }
                                 }
@@ -203,6 +204,7 @@ struct SettingsTabContent: View {
                                             }
                                         ))
                                         .toggleStyle(.checkbox)
+                                        .disabled(!autoStartVM) // Disable when autoStartVM is false
                                         Spacer()
                                     }
                                 }
