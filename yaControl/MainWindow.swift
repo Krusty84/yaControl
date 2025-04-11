@@ -15,7 +15,8 @@ struct MainWindow: View {
                 (title: "Computing", icon: "system:desktopcomputer", view: AnyView(CloudComputingTabContent())),
                 (title: "Function", icon: "system:function", view: AnyView(ServerLessFunctionTabContent())),
                 (title: "Storage", icon: "system:archivebox", view: AnyView(BucketTabContent())),
-                (title: "Billing", icon: "system:creditcard", view: AnyView(BillingTabContent())),
+                //TODO: for future, maybe, for that is need to add gRPC support
+                //(title: "Billing", icon: "system:creditcard", view: AnyView(BillingTabContent())),
                 (title: "Settings", icon: "system:gear", view: AnyView(SettingsTabContent())),
                 (title: "About", icon: "system:info", view: AnyView(AboutTabContent()))
                 ]).onAppear {

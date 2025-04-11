@@ -154,6 +154,31 @@ class Helpers:ObservableObject {
         }
     }
     
+    func startAllMarkedVMs(iamToken: String, vmIds: [String]? = nil) {
+        // 1. Check if VM IDs were provided, otherwise fetch from SettingsManager
+        let vmIdsToStart = vmIds ?? SettingsManager.shared.getAllAutostartVMs()
+        
+        // 2. Early return if no VMs to start
+        guard !vmIdsToStart.isEmpty else {
+            print("No VMs marked for auto-start")
+            return
+        }
+        
+        // 3. Start each VM asynchronously without blocking the main queue
+        for vmId in vmIdsToStart {
+            YandexAPIService.shared.startVM(iamToken: iamToken, vmId: vmId) { result in
+                DispatchQueue.main.async {  // Ensure UI updates (if any) are on main thread
+                    switch result {
+                    case .success:
+                        print("VM started successfully: \(vmId)")
+                    case .failure(let error):
+                        print("Failed to start VM \(vmId): \(error.localizedDescription)")
+                    }
+                }
+            }
+        }
+    }
+
     func convertBytesToGB(bytes: String) -> String {
         // Convert the input string (bytes) to a Double
         guard let bytesValue = Double(bytes) else {

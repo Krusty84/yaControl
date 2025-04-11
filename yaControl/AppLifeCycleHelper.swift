@@ -11,15 +11,18 @@ import AppKit
 //handle termination and ensure async code executes before the app quits, the nuance of shutdown
 class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
-        AppState.shared.handleShutdown { success in
-            if success {
-                print("Shutdown tasks completed successfully.")
-            } else {
-                print("Shutdown tasks finished with errors.")
+        if SettingsManager.shared.autoStartEnabled {
+            let shutdownOptions = SettingsManager.shared.shutdownOptions
+            if shutdownOptions.contains(.afterAppExit) {
+                AppState.shared.handleShutdown { success in
+                    print(success ? "Shutdown tasks completed successfully." : "Shutdown tasks finished with errors.")
+                    NSApplication.shared.reply(toApplicationShouldTerminate: true)
+                }
+                return .terminateLater  // Wait for async completion
             }
-            NSApplication.shared.reply(toApplicationShouldTerminate: true)
         }
-        return .terminateLater
+        // Default: Terminate immediately if conditions aren't met
+        return .terminateNow
     }
 }
 

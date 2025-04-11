@@ -17,10 +17,32 @@ struct yaControlApp: App {
     init() {
         // Initialize the app lifecycle observer
         _ = AppLifecycleObserver.shared
-            Helpers.checkInternetConnection {
-                AppState.shared.checkNumRunningVMs()
-                print("Autostart: ",SettingsManager.shared.getAllAutostartVMs())
+        
+        // Create local copies of the properties we need to modify
+        let autoStartEnabled = SettingsManager.shared.autoStartEnabled
+        let startOptions = SettingsManager.shared.startOptions
+        let oAuthKey = SettingsManager.shared.oAuthKey
+        let vmsToStart = SettingsManager.shared.getAllAutostartVMs()
+        
+        Helpers.checkInternetConnection {
+            if autoStartEnabled && startOptions.contains(.afterAppLaunched) && !vmsToStart.isEmpty {
+                YandexAPIService.shared.checkOauthKey(yandexPassportOauthToken: oAuthKey) { result in
+                    DispatchQueue.main.async {
+                        switch result {
+                        case .success(let response):
+                            Helpers.shared.startAllMarkedVMs(iamToken: response.iamToken, vmIds: vmsToStart)
+                        case .failure(let error):
+                            // Update shared state instead of local @State
+                            //AppState.shared.errorMessage = error.localizedDescription
+                            print(error.localizedDescription)
+                        }
+                    }
+                }
+            } else {
+                print("No VMs selected for auto-start on app launch")
             }
+            AppState.shared.checkNumRunningVMs()
+        }
     }
     
     var body: some Scene {
