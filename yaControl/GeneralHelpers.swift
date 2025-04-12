@@ -213,27 +213,48 @@ class Helpers:ObservableObject {
         monitor.start(queue: queue)
     }
     
-    static func billingBalanceFormatter(amount: String, currency: String) -> String {
-            guard !amount.isEmpty, !currency.isEmpty else { return "N/A" }
-            
-            // Clean the input string (remove any non-numeric characters except decimal point)
-            let cleanedAmount = amount
-                .replacingOccurrences(of: "[^0-9.]", with: "", options: .regularExpression)
-            
-            // Convert to Double and format
-            if let balanceValue = Double(cleanedAmount) {
-                let formatter = NumberFormatter()
-                formatter.numberStyle = .decimal
-                formatter.minimumFractionDigits = 2
-                formatter.maximumFractionDigits = 2
-                formatter.roundingMode = .halfUp
-                
-                if let formattedString = formatter.string(from: NSNumber(value: balanceValue)) {
-                    return "\(formattedString) \(currency)"
-                }
-            }
-            
-            // Fallback to original if formatting fails
-            return "\(amount) \(currency)"
+    static func billingBalanceFormatter(
+        amount: String,
+        currency: String,
+        warningThreshold: Double = 50.0  // Default value of 50, but customizable
+    ) -> AttributedString {
+        guard !amount.isEmpty, !currency.isEmpty else {
+            var result = AttributedString("N/A")
+            result.foregroundColor = .primary
+            return result
         }
+        
+        // Clean the input string
+        let cleanedAmount = amount.replacingOccurrences(of: "[^0-9.-]", with: "", options: .regularExpression)
+        
+        // Convert to Double and format
+        if let balanceValue = Double(cleanedAmount) {
+            let formatter = NumberFormatter()
+            formatter.numberStyle = .decimal
+            formatter.minimumFractionDigits = 2
+            formatter.maximumFractionDigits = 2
+            formatter.roundingMode = .halfUp
+            
+            if let formattedString = formatter.string(from: NSNumber(value: balanceValue)) {
+                let fullString = "\(formattedString) \(currency)"
+                var result = AttributedString(fullString)
+                
+                // Set color based on value using the warningThreshold
+                if balanceValue < 0 {
+                    result.foregroundColor = .red
+                } else if balanceValue > 0 && balanceValue < warningThreshold {
+                    result.foregroundColor = .yellow
+                } else {
+                    result.foregroundColor = .green
+                }
+                
+                return result
+            }
+        }
+        
+        // Fallback
+        var result = AttributedString("\(amount) \(currency)")
+        result.foregroundColor = .primary
+        return result
+    }
 }

@@ -57,11 +57,11 @@ struct InfoWindow: View {
                 ScrollView {
                     VStack(spacing: 20) {
                         // Billing Section (added at top)
-                        StatsSection(
+                        StatsBillingSection(
                             title: "Billing Information",
                             icon: "creditcard",
                             stats: [
-                                ("Current Balance", Helpers.billingBalanceFormatter(amount: currentBalance, currency: currency)),
+                                ("Current Balance", Helpers.billingBalanceFormatter(amount: currentBalance, currency: currency, warningThreshold:50)),
                                 ("Details", "View Billing")
                             ],
                             url: billingUrl
@@ -147,6 +147,40 @@ struct InfoWindow: View {
             }
         }
     }
+    
+    
+    private struct StatsBillingSection: View {
+        let title: String
+        let icon: String
+        let stats: [(String, Any)]  // Changed to accept Any (String or AttributedString)
+        var url: URL?
+        
+        var body: some View {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Image(systemName: icon)
+                    Text(title)
+                        .font(.subheadline.bold())
+                    Spacer()
+                }
+                
+                ForEach(stats.indices, id: \.self) { index in
+                    let stat = stats[index]
+                    if stat.0 == "Details", let url = url {
+                        Link(destination: url) {
+                            StatBillingRow(label: stat.0, value: AttributedString(stat.1 as? String ?? ""))
+                        }
+                    } else {
+                        if let attributedValue = stat.1 as? AttributedString {
+                            StatBillingRow(label: stat.0, value: attributedValue)
+                        } else {
+                            StatBillingRow(label: stat.0, value: AttributedString(stat.1 as? String ?? ""))
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     private struct StatRow: View {
         let label: String
@@ -160,6 +194,19 @@ struct InfoWindow: View {
                 Spacer()
                 Text(value)
                     .font(.subheadline.bold())
+            }
+        }
+    }
+    
+    struct StatBillingRow: View {
+        let label: String
+        let value: AttributedString  // Changed from String to AttributedString
+        
+        var body: some View {
+            HStack {
+                Text(label)
+                Spacer()
+                Text(value)  // This will automatically use the attributes
             }
         }
     }
