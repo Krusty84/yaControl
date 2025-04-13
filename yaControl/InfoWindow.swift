@@ -66,14 +66,7 @@ struct InfoWindow: View {
                                 ("Details", "View Billing")
                             ],
                             url: billingUrl
-                        ).onHover { hovering in
-                            isHovering = hovering
-                            if hovering {
-                                NSCursor.pointingHand.push()
-                            } else {
-                                NSCursor.pop()
-                            }
-                        }
+                        )
 
                         Divider()
                         
@@ -176,7 +169,7 @@ struct InfoWindow: View {
                     let stat = stats[index]
                     if stat.0 == "Details", let url = url {
                         Link(destination: url) {
-                            StatBillingRow(label: stat.0, value: AttributedString(stat.1 as? String ?? ""))
+                            StatBillingRow(label: stat.0, value: AttributedString(stat.1 as? String ?? ""), isLink: true)
                         }
                     } else {
                         if let attributedValue = stat.1 as? AttributedString {
@@ -190,6 +183,31 @@ struct InfoWindow: View {
         }
     }
 
+    struct StatBillingRow: View {
+        let label: String
+        let value: AttributedString
+        var isLink: Bool = false
+        @State private var isHovering = false
+        
+        var body: some View {
+            HStack {
+                Text(label).font(.subheadline).foregroundColor(.secondary)
+                Spacer()
+                Text(value).font(.subheadline.bold())
+            }
+            .onHover { hovering in
+                if isLink {
+                    isHovering = hovering
+                    if hovering {
+                        NSCursor.pointingHand.push()
+                    } else {
+                        NSCursor.pop()
+                    }
+                }
+            }
+        }
+    }
+    
     private struct StatRow: View {
         let label: String
         let value: String
@@ -205,20 +223,7 @@ struct InfoWindow: View {
             }
         }
     }
-    
-    struct StatBillingRow: View {
-        let label: String
-        let value: AttributedString  // Changed from String to AttributedString
-        @State private var isHovering = false
-        
-        var body: some View {
-            HStack {
-                Text(label).font(.subheadline).foregroundColor(.secondary)
-                Spacer()
-                Text(value).font(.subheadline.bold())
-            }
-        }
-    }
+
     
     //MARK: - Getting all stat data
     private func loadAllData() {

@@ -39,8 +39,11 @@ struct SettingsTabContent: View {
             // Tab Picker at the top
             Picker("", selection: $selectedTab) {
                 Text("General").tag(0)
+                    .help("Configure general application settings and preferences")
                 Text("Virtual Machine Management").tag(1)
+                    .help("Manage your virtual machines and compute resources")
                 Text("Billing Management").tag(2)
+                    .help("View and manage your billing information and usage")
             }
             .pickerStyle(SegmentedPickerStyle())
             .padding(.horizontal, 20)
@@ -71,8 +74,28 @@ struct SettingsTabContent: View {
     // MARK: - Tab Views
     
     private var generalSettingsTab: some View {
+
         ScrollView {
             VStack(spacing: 10) {
+                // Application Preferences Section
+                Section {
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack {
+                            LaunchAtLogin.Toggle()
+                                .toggleStyle(.switch)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .help("Launch this app automatically when you log in")
+                            //Spacer()
+                            // Add more preferences here
+                            // ExampleToggle("Some Option", isOn: $someOption)
+                        }
+                        }
+                    .padding(.horizontal, 8)
+                } header: {
+                    SectionHeader(title: "Application Preferences", systemImage: "gearshape.fill")
+                }
+                Spacer()
+                Divider()
                 // Authentication Section
                 Section {
                     VStack(alignment: .leading, spacing: 12) {
@@ -85,7 +108,6 @@ struct SettingsTabContent: View {
                                     .frame(minWidth: 60)
                             }
                         }
-                        
                         statusIndicator
                     }
                     .padding(.horizontal, 8)
@@ -102,24 +124,6 @@ struct SettingsTabContent: View {
                     }
                     .padding(.bottom, 8)
                 }
-                
-                Divider()
-                
-                // Application Preferences Section
-                Section {
-                    VStack(alignment: .leading, spacing: 12) {
-                        LaunchAtLogin.Toggle()
-                            .toggleStyle(.switch)
-                        Spacer()
-                        // Add more preferences here
-                        // ExampleToggle("Some Option", isOn: $someOption)
-                    }
-                    .padding(.horizontal, 8)
-                } header: {
-                    SectionHeader(title: "Application Preferences", systemImage: "gearshape.fill")
-                }
-                
-                Spacer()
             }
             .padding(20)
         }
@@ -236,17 +240,16 @@ struct SettingsTabContent: View {
                  Section {
                      VStack(alignment: .leading, spacing: 12) {
                          HStack {
-                             TextField("Monthly Limit", text: $billingThreshold.toFormattedString())
+                             TextField("The Lower Limit", text: $billingThreshold.toFormattedString())
                                  .textFieldStyle(RoundedBorderTextFieldStyle())
+                                 .help("Set the minimum balance threshold for pay attention")
                              
                          }
-                    
                      }
                      .padding(.horizontal, 8)
                  } header: {
                      SectionHeader(title: "Billing Threshold", systemImage: "dollarsign.circle.fill")
                  }
-                 
                  Spacer()
              }
              .padding(20)
