@@ -33,6 +33,7 @@ struct InfoWindow: View {
     @State private var errorMessage: String?
     @State private var lastUpdated = Date()
     @State private var iamToken: String = ""
+    @State private var isHovering = false
     
     //MARK: - UI Infowindow
     var body: some View {
@@ -61,11 +62,18 @@ struct InfoWindow: View {
                             title: "Billing Information",
                             icon: "creditcard",
                             stats: [
-                                ("Current Balance", Helpers.billingBalanceFormatter(amount: currentBalance, currency: currency, warningThreshold:50)),
+                                ("Current Balance", Helpers.billingBalanceFormatter(amount: currentBalance, currency: currency, warningThreshold:SettingsManager.shared.billingThreshold)),
                                 ("Details", "View Billing")
                             ],
                             url: billingUrl
-                        )
+                        ).onHover { hovering in
+                            isHovering = hovering
+                            if hovering {
+                                NSCursor.pointingHand.push()
+                            } else {
+                                NSCursor.pop()
+                            }
+                        }
 
                         Divider()
                         
@@ -201,12 +209,13 @@ struct InfoWindow: View {
     struct StatBillingRow: View {
         let label: String
         let value: AttributedString  // Changed from String to AttributedString
+        @State private var isHovering = false
         
         var body: some View {
             HStack {
-                Text(label)
+                Text(label).font(.subheadline).foregroundColor(.secondary)
                 Spacer()
-                Text(value)  // This will automatically use the attributes
+                Text(value).font(.subheadline.bold())
             }
         }
     }

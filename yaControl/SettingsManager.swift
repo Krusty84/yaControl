@@ -12,16 +12,24 @@ class SettingsManager {
     private let defaults = UserDefaults.standard
     
     // Keys - Add "Key" suffix to avoid naming conflicts
-    private let oAuthKeyKey = "oAuthKey"
-    private let autoStartEnabledKey = "autoStartEnabled"
-    private let startOptionsKey = "startOptions"
-    private let shutdownOptionsKey = "shutdownOptions"
-    private let autostartVMIdsKey = "autostart_vm_ids"
+    private let oAuthKey_ = "com.krusty84.yaControl.settings.oAuthKey"
+    private let billingThresholdKey = "com.krusty84.yaControl.settings.billingThreshold"
+    private let billingDefaultThreshold = 50.0
+    private let autoStartEnabledKey = "com.krusty84.yaControl.settings.autoStartEnabled"
+    private let startOptionsKey = "com.krusty84.yaControl.settings.startOptions"
+    private let shutdownOptionsKey = "com.krusty84.yaControl.settings.shutdownOptions"
+    private let autostartVMIdsKey = "com.krusty84.yaControl.settings.autostart_vm_ids"
     
     // General Settings
     var oAuthKey: String {
-        get { defaults.string(forKey: oAuthKeyKey) ?? "" }
-        set { defaults.set(newValue, forKey: oAuthKeyKey) }
+        get { defaults.string(forKey: oAuthKey_) ?? "" }
+        set { defaults.set(newValue, forKey: oAuthKey_) }
+    }
+    
+    // Biiling Settings
+    var billingThreshold: Double {
+        get { defaults.double(forKey: billingThresholdKey) }
+        set { defaults.set(newValue, forKey: billingThresholdKey) }
     }
     
     // VM Management Settings
@@ -106,5 +114,6 @@ class SettingsManager {
             }
         }
     }
+    
 }
 

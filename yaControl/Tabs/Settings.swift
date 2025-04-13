@@ -9,7 +9,7 @@ import SwiftUI
 import LaunchAtLogin
 
 struct SettingsTabContent: View {
-    @AppStorage("oAuthKey") private var oAuthKey: String = SettingsManager.shared.oAuthKey
+    @AppStorage("com.krusty84.yaControl.settings.oAuthKey") private var oAuthKey: String = SettingsManager.shared.oAuthKey
     @State private var responseCode: Int? = nil
     @State private var errorMessage: String? = nil
     @State private var selectedTab: Int = 0
@@ -18,6 +18,9 @@ struct SettingsTabContent: View {
     @State private var autoStartVM: Bool = SettingsManager.shared.autoStartEnabled
     @State private var startOptions: [StartOption] = SettingsManager.shared.startOptions
     @State private var shutdownOptions: [ShutdownOption] = SettingsManager.shared.shutdownOptions
+    
+    //Billing Management State
+    @AppStorage("com.krusty84.yaControl.settings.billingThreshold") private var billingThreshold: Double = SettingsManager.shared.billingThreshold
     
     enum StartOption: String, CaseIterable {
         case afterAppLaunched = "After app launched"
@@ -37,6 +40,7 @@ struct SettingsTabContent: View {
             Picker("", selection: $selectedTab) {
                 Text("General").tag(0)
                 Text("Virtual Machine Management").tag(1)
+                Text("Billing Management").tag(2)
             }
             .pickerStyle(SegmentedPickerStyle())
             .padding(.horizontal, 20)
@@ -51,6 +55,8 @@ struct SettingsTabContent: View {
                         generalSettingsTab
                     case 1:
                         vmManagementTab
+                    case 2:
+                        billingManagementTab
                     default:
                         EmptyView()
                 }
@@ -223,6 +229,30 @@ struct SettingsTabContent: View {
             .padding(10)
         }
     }
+    
+    private var billingManagementTab: some View {
+         ScrollView {
+             VStack(spacing: 10) {
+                 Section {
+                     VStack(alignment: .leading, spacing: 12) {
+                         HStack {
+                             TextField("Monthly Limit", text: $billingThreshold.toFormattedString())
+                                 .textFieldStyle(RoundedBorderTextFieldStyle())
+                             
+                         }
+                    
+                     }
+                     .padding(.horizontal, 8)
+                 } header: {
+                     SectionHeader(title: "Billing Threshold", systemImage: "dollarsign.circle.fill")
+                 }
+                 
+                 Spacer()
+             }
+             .padding(20)
+         }
+     }
+    
     
     private var statusIndicator: some View {
         VStack(alignment: .leading, spacing: 4) {

@@ -223,7 +223,6 @@ class Helpers:ObservableObject {
             result.foregroundColor = .primary
             return result
         }
-        
         // Clean the input string
         let cleanedAmount = amount.replacingOccurrences(of: "[^0-9.-]", with: "", options: .regularExpression)
         
@@ -243,7 +242,7 @@ class Helpers:ObservableObject {
                 if balanceValue < 0 {
                     result.foregroundColor = .red
                 } else if balanceValue > 0 && balanceValue < warningThreshold {
-                    result.foregroundColor = .yellow
+                    result.foregroundColor = .orange
                 } else {
                     result.foregroundColor = .green
                 }
@@ -256,5 +255,29 @@ class Helpers:ObservableObject {
         var result = AttributedString("\(amount) \(currency)")
         result.foregroundColor = .primary
         return result
+    }
+}
+
+extension Binding where Value == Double {
+    /// Converts a `Binding<Double>` to a `Binding<String>` with number formatting.
+    func toFormattedString(
+        numberStyle: NumberFormatter.Style = .decimal,
+        maximumFractionDigits: Int = 2
+    ) -> Binding<String> {
+        Binding<String>(
+            get: {
+                let formatter = NumberFormatter()
+                formatter.numberStyle = numberStyle
+                formatter.maximumFractionDigits = maximumFractionDigits
+                return formatter.string(from: NSNumber(value: self.wrappedValue)) ?? ""
+            },
+            set: { newValue in
+                let formatter = NumberFormatter()
+                formatter.numberStyle = numberStyle
+                if let number = formatter.number(from: newValue) {
+                    self.wrappedValue = number.doubleValue
+                }
+            }
+        )
     }
 }
