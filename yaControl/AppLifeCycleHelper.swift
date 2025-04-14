@@ -13,7 +13,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
         if SettingsManager.shared.autoStartEnabled {
             let shutdownOptions = SettingsManager.shared.shutdownOptions
-            if shutdownOptions.contains(.afterAppExit) {
+            if shutdownOptions.contains(.afterAppExit) ||  shutdownOptions.contains(.afterMacOSShutdown) {
                 AppState.shared.handleShutdown { success in
                     print(success ? "Shutdown tasks completed successfully." : "Shutdown tasks finished with errors.")
                     NSApplication.shared.reply(toApplicationShouldTerminate: true)

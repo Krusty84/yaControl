@@ -85,7 +85,6 @@ class AppState: ObservableObject {
     }
     
     func handleShutdown(completion: @escaping (Bool) -> Void) {
-        print("Shutdown started")
             guard !isLoading else {
                 completion(false)
                 return
@@ -165,7 +164,6 @@ class AppState: ObservableObject {
         }
 
     func handleSleep(completion: @escaping (Bool) -> Void) {
-        print("Shutdown started")
             guard !isLoading else {
                 completion(false)
                 return
@@ -244,7 +242,7 @@ class AppState: ObservableObject {
             }
         }
         
-        func handleWake() {
+    func handleWake() {
             print("Handling system wake")
             // Add your wake logic here:
             // - Resume operations

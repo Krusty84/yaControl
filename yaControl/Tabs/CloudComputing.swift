@@ -136,10 +136,11 @@ struct CloudComputingTabContent: View {
                                 }
                             }
                         ))
-                        //.toggleStyle(CheckboxToggleStyle())
+                        .toggleStyle(CheckboxToggleStyle())
+                        .help("Auto power management")
                     }
                     .width(min: 20, max:20)
-        
+                    
                     TableColumn("Name") { vm in
                         if let url = vm.vmUrl {
                             Link(destination: url) {

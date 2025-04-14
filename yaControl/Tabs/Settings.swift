@@ -136,12 +136,12 @@ struct SettingsTabContent: View {
                 Section {
                     VStack(alignment: .leading, spacing: 12) {
                         HStack {
-                            //Text("Auto Start VM")
                             Toggle("", isOn: $autoStartVM)
                                 .toggleStyle(.switch)
                                 .onChange(of: autoStartVM) { newValue in
                                     SettingsManager.shared.autoStartEnabled = newValue
                                 }
+                                .help("Enable/disable virtual machine power management by monitoring the status of your Mac")
                             Spacer()
                         }
                     }
