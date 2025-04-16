@@ -114,7 +114,7 @@ class Helpers:ObservableObject {
                 if vm.status == "RUNNING" {
                     try await YandexAPIService.shared.stopVM(iamToken: iamToken, vmId: vm.id)
                     print("VM stopped successfully")
-                } else {
+                } else if vm.status == "STOPPED"{
                     try await YandexAPIService.shared.startVM(iamToken: iamToken, vmId: vm.id)
                     await MainActor.run {
                         self.appState.isVirtualMachineRunning = true
@@ -250,7 +250,7 @@ class Helpers:ObservableObject {
     func startAllMarkedVMs(iamToken: String, vmIds: [String]? = nil) async {
         // 1. Get VM IDs to start
         let vmIdsToStart = vmIds ?? SettingsManager.shared.getAllAutostartVMs()
-        
+        print("vmsss: ",vmIdsToStart)
         // 2. Early return if no VMs to start
         guard !vmIdsToStart.isEmpty else {
             print("No VMs marked for auto-start")

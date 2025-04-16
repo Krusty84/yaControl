@@ -174,7 +174,6 @@ struct CloudComputingTabContent: View {
                     TableColumn("Status") { vm in
                         // Determine if this VM is currently being processed
                         let isProcessing = helpers.processingVMName.contains(vm.name)
-                        //TODO: ОБРАТИ ВНИМАНИЕ НА СТАТУСЫ, ИХ БОЛЬШЕ И МОЖЕТ ИСПОЛЬЗОВАТЬ САРЗУ ИХ!?
                         Button(action: {
                             if (vm.status == "RUNNING") {
                                 previousRunningVMs = runningVMs
