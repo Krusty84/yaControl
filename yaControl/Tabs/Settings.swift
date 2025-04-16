@@ -301,20 +301,41 @@ struct SettingsTabContent: View {
     // MARK: - Actions
     
     private func checkOAuthKey() {
-        YandexAPIService.shared.checkOauthKey(yandexPassportOauthToken: oAuthKey) { result in
-            DispatchQueue.main.async {
-                switch result {
-                    case .success(let response):
-                        responseCode = response.code
-                        if response.code == 200 {
-                            errorMessage = nil
-                            print(response.iamToken)
-                        } else {
-                            errorMessage = "Invalid OAuth key (Code: \(response.code))"
-                        }
-                    case .failure(let error):
-                        errorMessage = error.localizedDescription
-                        responseCode = nil
+//        YandexAPIService.shared.checkOauthKey(yandexPassportOauthToken: oAuthKey) { result in
+//            DispatchQueue.main.async {
+//                switch result {
+//                    case .success(let response):
+//                        responseCode = response.code
+//                        if response.code == 200 {
+//                            errorMessage = nil
+//                            print(response.iamToken)
+//                        } else {
+//                            errorMessage = "Invalid OAuth key (Code: \(response.code))"
+//                        }
+//                    case .failure(let error):
+//                        errorMessage = error.localizedDescription
+//                        responseCode = nil
+//                }
+//            }
+//        }
+        
+        Task {
+            do {
+                let response = try await YandexAPIService.shared.checkOauthKey(yandexPassportOauthToken: oAuthKey)
+                
+                await MainActor.run {
+                    responseCode = response.code
+                    if response.code == 200 {
+                        errorMessage = nil
+                        print(response.iamToken)
+                    } else {
+                        errorMessage = "Invalid OAuth key (Code: \(response.code))"
+                    }
+                }
+            } catch {
+                await MainActor.run {
+                    errorMessage = error.localizedDescription
+                    responseCode = nil
                 }
             }
         }

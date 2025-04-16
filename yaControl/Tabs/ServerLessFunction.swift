@@ -185,28 +185,62 @@ struct ServerLessFunctionTabContent: View {
         isLoading = true
         errorMessage = nil
         // Step 1: Get IAM Token
-        YandexAPIService.shared.checkOauthKey(yandexPassportOauthToken: SettingsManager.shared.oAuthKey) { result in
-            DispatchQueue.main.async {
-                switch result {
-                    case .success(let response):
-                        // Step 2: Get VMs using the IAM Token
-                        iamToken=response.iamToken
-                        YandexAPIService.shared.getServerLessFunctions(iamToken: response.iamToken) { result in
-                            DispatchQueue.main.async {
-                                isLoading = false
-                                switch result {
-                                    case .success(let allSLFs):
-                                        print("result: ", allSLFs)
-                                        slfTableData = allSLFs
-                                    case .failure(let error):
-                                        errorMessage = error.localizedDescription
-                                }
-                            }
-                        }
-                    case .failure(let error):
-                        isLoading = false
-                        print(error.localizedDescription)
-                        errorMessage = error.localizedDescription
+//        YandexAPIService.shared.checkOauthKey(yandexPassportOauthToken: SettingsManager.shared.oAuthKey) { result in
+//            DispatchQueue.main.async {
+//                switch result {
+//                    case .success(let response):
+//                        // Step 2: Get VMs using the IAM Token
+//                        iamToken=response.iamToken
+//                        YandexAPIService.shared.getServerLessFunctions(iamToken: response.iamToken) { result in
+//                            DispatchQueue.main.async {
+//                                isLoading = false
+//                                switch result {
+//                                    case .success(let allSLFs):
+//                                        print("result: ", allSLFs)
+//                                        slfTableData = allSLFs
+//                                    case .failure(let error):
+//                                        errorMessage = error.localizedDescription
+//                                }
+//                            }
+//                        }
+//                    case .failure(let error):
+//                        isLoading = false
+//                        print(error.localizedDescription)
+//                        errorMessage = error.localizedDescription
+//                }
+//            }
+//        }
+        
+        Task {
+            do {
+                // 1. Authenticate and get IAM token
+                let authResponse = try await YandexAPIService.shared.checkOauthKey(
+                    yandexPassportOauthToken: SettingsManager.shared.oAuthKey
+                )
+                
+                // 2. Store IAM token
+                await MainActor.run {
+                    self.iamToken = authResponse.iamToken
+                }
+                
+                // 3. Fetch serverless functions
+                let allSLFs = try await YandexAPIService.shared.getServerLessFunctions(
+                    iamToken: authResponse.iamToken
+                )
+                
+                // 4. Update UI state
+                await MainActor.run {
+                    self.isLoading = false
+                    print("result: ", allSLFs)
+                    self.slfTableData = allSLFs
+                }
+                
+            } catch {
+                // 5. Handle errors
+                await MainActor.run {
+                    self.isLoading = false
+                    print(error.localizedDescription)
+                    self.errorMessage = error.localizedDescription
                 }
             }
         }

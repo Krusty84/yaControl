@@ -174,7 +174,7 @@ struct CloudComputingTabContent: View {
                     TableColumn("Status") { vm in
                         // Determine if this VM is currently being processed
                         let isProcessing = helpers.processingVMName.contains(vm.name)
-                        
+                        //TODO: ОБРАТИ ВНИМАНИЕ НА СТАТУСЫ, ИХ БОЛЬШЕ И МОЖЕТ ИСПОЛЬЗОВАТЬ САРЗУ ИХ!?
                         Button(action: {
                             if (vm.status == "RUNNING") {
                                 previousRunningVMs = runningVMs
@@ -185,21 +185,51 @@ struct CloudComputingTabContent: View {
                             }
                             helpers.startStopVM(iamToken: iamToken, for: vm)
                         }) {
-                            if isProcessing {
-                                // Show loading indicator when processing
-                                Image(systemName: "arrow.triangle.2.circlepath")
-                                    .foregroundColor(.gray)
-                                    .rotationEffect(.degrees(isProcessing ? 360 : 0))
-                                    .animation(
-                                        Animation.linear(duration: 1.0)
-                                            .repeatForever(autoreverses: false),
-                                        value: isProcessing
-                                    )
-                            } else {
-                                // Show normal play/stop icon when not processing
-                                Image(systemName: vm.status == "RUNNING" ? "stop.fill" : "play.fill")
-                                    .foregroundColor(vm.status == "RUNNING" ? .red : .green)
-                            }
+//                            if isProcessing {
+//                                // Show loading indicator when processing
+//                                Image(systemName: "arrow.triangle.2.circlepath")
+//                                    .foregroundColor(.gray)
+//                                    .rotationEffect(.degrees(isProcessing ? 360 : 0))
+//                                    .animation(
+//                                        Animation.linear(duration: 1.0)
+//                                            .repeatForever(autoreverses: false),
+//                                        value: isProcessing
+//                                    )
+//                            } else {
+//                                // Show normal play/stop icon when not processing
+//                                Image(systemName: vm.status == "RUNNING" ? "stop.fill" : "play.fill")
+//                                    .foregroundColor(vm.status == "RUNNING" ? .red : .green)
+//                            }
+                            Image(systemName: {
+                                switch vm.status {
+                                case "RUNNING": "stop.fill"
+                                case "STOPPED": "play.fill"
+                                case "STARTING": "arrow.triangle.2.circlepath"
+                                case "STOPPING": "arrow.triangle.2.circlepath"
+                                case "RESTARTING": "arrow.triangle.2.circlepath"
+                                case "UPDATING": "arrow.triangle.2.circlepath"
+                                case "PROVISIONING": "arrow.triangle.2.circlepath"
+                                case "ERROR": "exclamationmark.triangle.fill"
+                                case "CRASHED": "exclamationmark.octagon.fill"
+                                case "DELETING": "trash.fill"
+                                default: "questionmark"  // fallback for unknown status
+                                }
+                            }())
+                            .foregroundColor({
+                                switch vm.status {
+                                case "RUNNING": .red
+                                case "STOPPED": .green
+                                case "STARTING": .gray
+                                case "STOPPING": .gray
+                                case "RESTARTING": .gray
+                                case "UPDATING": .gray
+                                case "PROVISIONING": .gray
+                                case "ERROR": .red
+                                case "CRASHED": .red
+                                case "DELETING": .gray
+                                default: .gray  // fallback for unknown status
+                                }
+                            }())
                         }
                         .buttonStyle(PlainButtonStyle())
                         .disabled(isProcessing) // Disable button while processing
@@ -283,35 +313,71 @@ struct CloudComputingTabContent: View {
             }
     }
     
+//    private func fetchVMs() {
+//        isLoading = true
+//        errorMessage = nil
+//        // Step 1: Get IAM Token
+//        YandexAPIService.shared.checkOauthKey(yandexPassportOauthToken: SettingsManager.shared.oAuthKey) { result in
+//            DispatchQueue.main.async {
+//                switch result {
+//                    case .success(let response):
+//                        // Step 2: Get VMs using the IAM Token
+//                        iamToken=response.iamToken
+//                        YandexAPIService.shared.getVMs(iamToken: response.iamToken) { result in
+//                            DispatchQueue.main.async {
+//                                isLoading = false
+//                                switch result {
+//                                    case .success(let allVMs):
+//                                        vmTableData = allVMs
+//                                        self.sortTableDataByStatus()
+//                                    case .failure(let error):
+//                                        errorMessage = error.localizedDescription
+//                                }
+//                            }
+//                        }
+//                    case .failure(let error):
+//                        isLoading = false
+//                        print(error.localizedDescription)
+//                        errorMessage = error.localizedDescription
+//                }
+//            }
+//        }
+//    }
+    
     private func fetchVMs() {
         isLoading = true
         errorMessage = nil
-        // Step 1: Get IAM Token
-        YandexAPIService.shared.checkOauthKey(yandexPassportOauthToken: SettingsManager.shared.oAuthKey) { result in
-            DispatchQueue.main.async {
-                switch result {
-                    case .success(let response):
-                        // Step 2: Get VMs using the IAM Token
-                        iamToken=response.iamToken
-                        YandexAPIService.shared.getVMs(iamToken: response.iamToken) { result in
-                            DispatchQueue.main.async {
-                                isLoading = false
-                                switch result {
-                                    case .success(let allVMs):
-                                        vmTableData = allVMs
-                                        self.sortTableDataByStatus()
-                                    case .failure(let error):
-                                        errorMessage = error.localizedDescription
-                                }
-                            }
-                        }
-                    case .failure(let error):
-                        isLoading = false
-                        print(error.localizedDescription)
-                        errorMessage = error.localizedDescription
+        
+        Task {
+            do {
+                // Step 1: Get IAM Token
+                let authResponse = try await YandexAPIService.shared.checkOauthKey(
+                    yandexPassportOauthToken: SettingsManager.shared.oAuthKey
+                )
+                
+                // Store the IAM token
+                await MainActor.run {
+                    iamToken = authResponse.iamToken
+                }
+                
+                // Step 2: Get VMs using the IAM Token
+                let allVMs = try await YandexAPIService.shared.getVMs(iamToken: authResponse.iamToken)
+                
+                // Update UI on main thread
+                await MainActor.run {
+                    vmTableData = allVMs
+                    self.sortTableDataByStatus()
+                    isLoading = false
+                }
+                
+            } catch {
+                // Handle errors on main thread
+                await MainActor.run {
+                    isLoading = false
+                    errorMessage = error.localizedDescription
+                    print("Error fetching VMs: \(error.localizedDescription)")
                 }
             }
         }
     }
-    
 }

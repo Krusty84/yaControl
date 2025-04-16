@@ -163,28 +163,61 @@ struct BucketTabContent: View {
         isLoading = true
         errorMessage = nil
         // Step 1: Get IAM Token
-        YandexAPIService.shared.checkOauthKey(yandexPassportOauthToken: SettingsManager.shared.oAuthKey) { result in
-            DispatchQueue.main.async {
-                switch result {
-                    case .success(let response):
-                        // Step 2: Get Buckets using the IAM Token
-                        iamToken=response.iamToken
-                        YandexAPIService.shared.getBuckets(iamToken: response.iamToken) { result in
-                            DispatchQueue.main.async {
-                                isLoading = false
-                                switch result {
-                                    case .success(let allBuckets):
-                                        print("result: ", allBuckets)
-                                        bucketTableData = allBuckets
-                                    case .failure(let error):
-                                        errorMessage = error.localizedDescription
-                                }
-                            }
-                        }
-                    case .failure(let error):
-                        isLoading = false
-                        print(error.localizedDescription)
-                        errorMessage = error.localizedDescription
+//        YandexAPIService.shared.checkOauthKey(yandexPassportOauthToken: SettingsManager.shared.oAuthKey) { result in
+//            DispatchQueue.main.async {
+//                switch result {
+//                    case .success(let response):
+//                        // Step 2: Get Buckets using the IAM Token
+//                        iamToken=response.iamToken
+//                        YandexAPIService.shared.getBuckets(iamToken: response.iamToken) { result in
+//                            DispatchQueue.main.async {
+//                                isLoading = false
+//                                switch result {
+//                                    case .success(let allBuckets):
+//                                        print("result: ", allBuckets)
+//                                        bucketTableData = allBuckets
+//                                    case .failure(let error):
+//                                        errorMessage = error.localizedDescription
+//                                }
+//                            }
+//                        }
+//                    case .failure(let error):
+//                        isLoading = false
+//                        print(error.localizedDescription)
+//                        errorMessage = error.localizedDescription
+//                }
+//            }
+//        }
+        
+        Task {
+            do {
+                // 1. Authenticate and get IAM token
+                let authResponse = try await YandexAPIService.shared.checkOauthKey(
+                    yandexPassportOauthToken: SettingsManager.shared.oAuthKey
+                )
+                
+                // 2. Store IAM token and fetch buckets
+                await MainActor.run {
+                    self.iamToken = authResponse.iamToken
+                }
+                
+                let allBuckets = try await YandexAPIService.shared.getBuckets(
+                    iamToken: authResponse.iamToken
+                )
+                
+                // 3. Update UI with results
+                await MainActor.run {
+                    self.isLoading = false
+                    print("result: ", allBuckets)
+                    self.bucketTableData = allBuckets
+                }
+                
+            } catch {
+                // 4. Handle errors
+                await MainActor.run {
+                    self.isLoading = false
+                    print(error.localizedDescription)
+                    self.errorMessage = error.localizedDescription
                 }
             }
         }
