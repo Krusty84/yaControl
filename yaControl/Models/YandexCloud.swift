@@ -113,7 +113,7 @@ enum VMError: Error {
 struct VMTableData:Decodable,Identifiable,Equatable {
     let id: String
     let name: String
-    let status: String
+    var status: String
     let createdAt: String
     let cores: String
     let memoryGB: String

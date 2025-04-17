@@ -250,7 +250,6 @@ class Helpers:ObservableObject {
     func startAllMarkedVMs(iamToken: String, vmIds: [String]? = nil) async {
         // 1. Get VM IDs to start
         let vmIdsToStart = vmIds ?? SettingsManager.shared.getAllAutostartVMs()
-        print("vmsss: ",vmIdsToStart)
         // 2. Early return if no VMs to start
         guard !vmIdsToStart.isEmpty else {
             print("No VMs marked for auto-start")

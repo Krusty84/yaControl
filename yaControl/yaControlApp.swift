@@ -7,6 +7,7 @@
 
 import SwiftUI
 import AppKit
+import UserNotifications
 
 @main
 struct yaControlApp: App {
@@ -14,7 +15,21 @@ struct yaControlApp: App {
     @Environment(\.openWindow) var openWindow
     @StateObject private var appState = AppState.shared
     
+    private func setupNotifications() {
+        let center = UNUserNotificationCenter.current()
+        center.requestAuthorization(options: [.alert, .sound]) { granted, error in
+            if granted {
+                print("Notification permission granted")
+            } else if let error = error {
+                print("Notification permission error: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    
     init() {
+        // Request notification permissions at launch
+        setupNotifications()
         // Initialize the app lifecycle observer
         _ = AppLifecycleObserver.shared
         

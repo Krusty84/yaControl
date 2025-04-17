@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UserNotifications
 
 struct CloudComputingTabContent: View {
     @ObservedObject var yandexApi = YandexAPIService.shared
@@ -21,6 +22,13 @@ struct CloudComputingTabContent: View {
     //
     @State private var sortKey: KeyPath<VMTableData, String>? = nil
     @State private var sortOrder: [KeyPathComparator<VMTableData>] = []
+    //
+    @State private var isPolling = false
+    @State private var pollingTask: Task<Void, Never>?
+    @State private var currentlyProcessingVMID: String? = nil
+    
+    @State private var activePollingTasks: [String: Task<Void, Never>] = [:] // VM ID -> Task
+    @State private var processingStates: [String: String] = [:] // VM ID -> Status
     //
     var filteredVMs: [VMTableData] {
         if searchText.isEmpty {
@@ -173,65 +181,48 @@ struct CloudComputingTabContent: View {
                     }.width(min: 150,max:200)
                     TableColumn("Status") { vm in
                         // Determine if this VM is currently being processed
-                        let isProcessing = helpers.processingVMName.contains(vm.name)
+                        //let isProcessing = helpers.processingVMName.contains(vm.name)
                         Button(action: {
-                            if (vm.status == "RUNNING") {
+                            // Store the VM we're processing
+                            currentlyProcessingVMID = vm.id
+                            guard processingStates[vm.id] == nil else { return } // Prevent duplicate clicks
+                            // Determine action type (start or stop)
+                            if vm.status == "RUNNING" {
                                 previousRunningVMs = runningVMs
                                 proccessingVMType = 0
                             } else {
                                 previousRunningVMs = runningVMs
                                 proccessingVMType = 1
                             }
+                            
+                            // Start the initial action
                             helpers.startStopVM(iamToken: iamToken, for: vm)
+                            
+                            // Start polling for status updates
+                            startPolling(for: vm.id)
                         }) {
-//                            if isProcessing {
-//                                // Show loading indicator when processing
-//                                Image(systemName: "arrow.triangle.2.circlepath")
-//                                    .foregroundColor(.gray)
-//                                    .rotationEffect(.degrees(isProcessing ? 360 : 0))
-//                                    .animation(
-//                                        Animation.linear(duration: 1.0)
-//                                            .repeatForever(autoreverses: false),
-//                                        value: isProcessing
-//                                    )
-//                            } else {
-//                                // Show normal play/stop icon when not processing
-//                                Image(systemName: vm.status == "RUNNING" ? "stop.fill" : "play.fill")
-//                                    .foregroundColor(vm.status == "RUNNING" ? .red : .green)
-//                            }
-                            Image(systemName: {
+                           // Image(systemName: processingStates[vm.id] != nil ? "arrow.triangle.2.circlepath" : {
+                            Image(systemName: processingStates[vm.id] == vm.id ? "arrow.triangle.2.circlepath" : {
                                 switch vm.status {
                                 case "RUNNING": "stop.fill"
                                 case "STOPPED": "play.fill"
-                                case "STARTING": "arrow.triangle.2.circlepath"
-                                case "STOPPING": "arrow.triangle.2.circlepath"
-                                case "RESTARTING": "arrow.triangle.2.circlepath"
-                                case "UPDATING": "arrow.triangle.2.circlepath"
-                                case "PROVISIONING": "arrow.triangle.2.circlepath"
+                                case "STARTING", "STOPPING": "arrow.triangle.2.circlepath"
                                 case "ERROR": "exclamationmark.triangle.fill"
                                 case "CRASHED": "exclamationmark.octagon.fill"
-                                case "DELETING": "trash.fill"
-                                default: "questionmark"  // fallback for unknown status
+                                default: "questionmark"
                                 }
                             }())
                             .foregroundColor({
                                 switch vm.status {
                                 case "RUNNING": .red
                                 case "STOPPED": .green
-                                case "STARTING": .gray
-                                case "STOPPING": .gray
-                                case "RESTARTING": .gray
-                                case "UPDATING": .gray
-                                case "PROVISIONING": .gray
-                                case "ERROR": .red
-                                case "CRASHED": .red
-                                case "DELETING": .gray
-                                default: .gray  // fallback for unknown status
+                                case "ERROR", "CRASHED": .orange
+                                default: .gray
                                 }
                             }())
                         }
                         .buttonStyle(PlainButtonStyle())
-                        .disabled(isProcessing) // Disable button while processing
+                        .disabled(processingStates[vm.id] != nil) // Disable while processing
                     }
                     .width(min:40,max:40)
                     TableColumn("Created At", value: \.createdAt).width(min: 120,max:120)
@@ -375,6 +366,159 @@ struct CloudComputingTabContent: View {
                     isLoading = false
                     errorMessage = error.localizedDescription
                     print("Error fetching VMs: \(error.localizedDescription)")
+                }
+            }
+        }
+    }
+    
+    private func startPolling(for vmID: String) {
+        // Cancel any existing task for this VM
+        activePollingTasks[vmID]?.cancel()
+        
+        // Create new task
+        let task = Task {
+            // Set initial processing state
+            await setProcessingState(for: vmID, status: nil)
+            
+            var retryCount = 0
+            let maxRetries = 20
+            let pollingInterval: UInt64 = 3_000_000_000
+            
+            while retryCount < maxRetries && !Task.isCancelled {
+                do {
+                    try await Task.sleep(nanoseconds: pollingInterval)
+                    
+                    let updatedVMs = try await YandexAPIService.shared.getVMs(iamToken: iamToken)
+                    
+                    guard let updatedVM = updatedVMs.first(where: { $0.id == vmID }) else {
+                        retryCount += 1
+                        continue
+                    }
+                    
+                    // Update UI immediately
+                    await updateVMInTable(updatedVM)
+                    
+                    // Check completion
+                    if await isOperationComplete(for: vmID, currentStatus: updatedVM.status) {
+                        await cleanupPolling(for: vmID)
+                        notifyCompletion(for: updatedVM)
+                        return
+                    }
+                    
+                    retryCount += 1
+                    
+                } catch {
+                    retryCount += 1
+                    if Task.isCancelled { return }
+                }
+            }
+            
+            // Timeout handling
+            await cleanupPolling(for: vmID)
+            notifyTimeout(for: vmID)
+        }
+        
+        // Store the task
+        activePollingTasks[vmID] = task
+    }
+
+    // 3. Helper functions
+    @MainActor
+    private func setProcessingState(for vmID: String, status: String?) {
+        if let status = status {
+            processingStates[vmID] = status
+        } else {
+            processingStates.removeValue(forKey: vmID)
+        }
+    }
+
+    @MainActor
+    private func updateVMInTable(_ vm: VMTableData) {
+        if let index = vmTableData.firstIndex(where: { $0.id == vm.id }) {
+            vmTableData[index] = vm
+        }
+    }
+
+    private func isOperationComplete(for vmID: String, currentStatus: String) async -> Bool {
+        // Get the original VM state safely
+        let originalVM = await MainActor.run {
+            vmTableData.first { $0.id == vmID }
+        }
+        
+        guard let originalVM = originalVM else {
+            return true
+        }
+        
+        let isStartAction = originalVM.status == "STOPPED"
+        
+        // Success cases
+        if (isStartAction && currentStatus == "RUNNING") ||
+           (!isStartAction && currentStatus == "STOPPED") {
+            return true
+        }
+        
+        // Error cases
+        return ["ERROR", "CRASHED"].contains(currentStatus)
+    }
+
+    @MainActor
+    private func cleanupPolling(for vmID: String) {
+        activePollingTasks.removeValue(forKey: vmID)
+        processingStates.removeValue(forKey: vmID)
+    }
+
+//    private func notifyUser(title: String, body: String, isError: Bool = false) {
+//        let notification = NSUserNotification()
+//        notification.title = title
+//        notification.informativeText = body
+//        notification.soundName = isError ? NSUserNotificationDefaultSoundName : nil
+//        
+//        NSUserNotificationCenter.default.deliver(notification)
+//    }
+    
+    private func notifyCompletion(for vm: VMTableData) {
+        let isStartAction = vm.status == "RUNNING"
+        let title = isStartAction ? "VM Started" : "VM Stopped"
+        let body = "\(vm.name) is now \(vm.status)"
+        sendNotification(title: title, body: body)
+    }
+
+    private func notifyTimeout(for vmID: String) {
+        if let vm = vmTableData.first(where: { $0.id == vmID }) {
+            sendNotification(title: "Operation Timed Out",
+                            body: "Couldn't verify final status for \(vm.name)",
+                            isError: true)
+        }
+    }
+
+    private func sendNotification(title: String, body: String, isError: Bool = false) {
+        let center = UNUserNotificationCenter.current()
+        
+        // Check current notification settings first
+        center.getNotificationSettings { settings in
+            guard settings.authorizationStatus == .authorized else {
+                print("Notifications not authorized")
+                return
+            }
+            
+            let content = UNMutableNotificationContent()
+            content.title = title
+            content.body = body
+            if isError {
+                content.sound = .default
+            }
+            
+            let request = UNNotificationRequest(
+                identifier: UUID().uuidString,
+                content: content,
+                trigger: nil // Deliver immediately
+            )
+            
+            center.add(request) { error in
+                if let error = error {
+                    print("Failed to show notification: \(error.localizedDescription)")
+                } else {
+                    print("Notification shown successfully")
                 }
             }
         }
