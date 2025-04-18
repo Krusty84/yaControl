@@ -146,10 +146,6 @@ struct BucketTabContent: View {
                     .font(.subheadline)
                     .foregroundColor(.gray)
                 Spacer()
-                Text(helpers.processingVMName)
-                    .font(.subheadline)
-                    .foregroundColor(.red)
-                
             }
             .padding(.horizontal)
             .padding(.vertical, 8)

@@ -168,9 +168,6 @@ struct ServerLessFunctionTabContent: View {
                     .font(.subheadline)
                     .foregroundColor(.gray)
                 Spacer()
-                Text(helpers.processingVMName)
-                        .font(.subheadline)
-                        .foregroundColor(.red)
                 
             }
             .padding(.horizontal)

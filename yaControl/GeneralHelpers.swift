@@ -15,7 +15,6 @@ class Helpers:ObservableObject {
     static let shared = Helpers() // Singleton for reusability
     let appState = AppState.shared
     // Polling-related properties
-    @Published var processingVMName: String = ""
     @Published private var pollingVMs: Set<String> = []
     private var cancellables: Set<AnyCancellable> = []
     private let pollingInterval: TimeInterval = 2.0
@@ -107,7 +106,6 @@ class Helpers:ObservableObject {
 //    }
     func startStopVM(iamToken: String, for vm: VMTableData) {
         // Update UI state immediately
-        processingVMName = vm.status == "RUNNING" ? "Stopping VM: \(vm.name)" : "Starting VM: \(vm.name)"
         
         Task {
             do {
@@ -134,9 +132,9 @@ class Helpers:ObservableObject {
             }
             
             // Clear processing state
-            await MainActor.run {
-                self.processingVMName = ""
-            }
+//            await MainActor.run {
+//                self.processingVMName = ""
+//            }
         }
     }
 
@@ -174,9 +172,7 @@ class Helpers:ObservableObject {
 //    }
     
     func stopAllRunningVMs(iamToken: String, vms: [VMTableData]? = nil, vmIds: [String]? = nil) {
-        // Set processing state
-        processingVMName = vms != nil ? "Stopping all VMs" : "Stopping VMs by IDs"
-        
+ 
         Task {
             do {
                 if let vms = vms {
@@ -216,7 +212,7 @@ class Helpers:ObservableObject {
                 await MainActor.run {
                     print("Error stopping VMs: \(error.localizedDescription)")
                     //self.processingVMName = nil
-                    self.processingVMName = ""
+                    //self.processingVMName = ""
                 }
             }
         }

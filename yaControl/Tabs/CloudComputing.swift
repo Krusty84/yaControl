@@ -50,7 +50,7 @@ struct CloudComputingTabContent: View {
     @State private var previousRunningVMs: Int = 0
     // 0 - stopping, 1 - running
     @State private var proccessingVMType: Int = 0
-
+    
     var body: some View {
         VStack(spacing: 0) {
             // Search Bar
@@ -64,7 +64,7 @@ struct CloudComputingTabContent: View {
                     .font(.subheadline)
                     .fontWeight(.regular))
                 .padding(.horizontal)
-
+                
                 // Running VMs
                 (Text("Running VMs: ")
                     .font(.subheadline)
@@ -78,12 +78,12 @@ struct CloudComputingTabContent: View {
                         fetchVMs()
                     } else if(proccessingVMType == 0 && runningVMs < previousRunningVMs){
                         fetchVMs()
-                        helpers.processingVMName.removeAll()
+                        //helpers.processingVMName.removeAll()
                     } else if (proccessingVMType == 1 && runningVMs == previousRunningVMs){
                         fetchVMs()
                     } else if (proccessingVMType == 1 && runningVMs > previousRunningVMs){
                         fetchVMs()
-                        helpers.processingVMName.removeAll()
+                        //helpers.processingVMName.removeAll()
                     } else {
                         fetchVMs()
                     }
@@ -100,6 +100,7 @@ struct CloudComputingTabContent: View {
                 //
                 Button(action: {
                     helpers.stopAllRunningVMs(iamToken: iamToken, vms: vmTableData)
+                    for vm in vmTableData {startPolling(for: vm.id)}
                 }) {
                     HStack {
                         Image(systemName: "stop.fill")
@@ -166,19 +167,20 @@ struct CloudComputingTabContent: View {
                                         }
                                     }
                                     .contextMenu {
-                                           Button("Copy") {
-                                               let combinedText = "\(vm.name) (\(vm.id))"
-                                               let pasteboard = NSPasteboard.general
-                                               pasteboard.clearContents()
-                                               pasteboard.setString(combinedText, forType: .string)
-                                           }
-                                       }
+                                        Button("Copy") {
+                                            let combinedText = "\(vm.name) (\(vm.id))"
+                                            let pasteboard = NSPasteboard.general
+                                            pasteboard.clearContents()
+                                            pasteboard.setString(combinedText, forType: .string)
+                                        }
+                                    }
                             }
                             .buttonStyle(PlainButtonStyle()) // Remove the button styling
                         } else {
                             Text(vm.name)
                         }
                     }.width(min: 150,max:200)
+                    
                     TableColumn("Status") { vm in
                         // Determine if this VM is currently being processed
                         //let isProcessing = helpers.processingVMName.contains(vm.name)
@@ -201,23 +203,22 @@ struct CloudComputingTabContent: View {
                             // Start polling for status updates
                             startPolling(for: vm.id)
                         }) {
-                           // Image(systemName: processingStates[vm.id] != nil ? "arrow.triangle.2.circlepath" : {
                             Image(systemName: processingStates[vm.id] == vm.id ? "arrow.triangle.2.circlepath" : {
                                 switch vm.status {
-                                case "RUNNING": "stop.fill"
-                                case "STOPPED": "play.fill"
-                                case "STARTING", "STOPPING": "arrow.triangle.2.circlepath"
-                                case "ERROR": "exclamationmark.triangle.fill"
-                                case "CRASHED": "exclamationmark.octagon.fill"
-                                default: "questionmark"
+                                    case "RUNNING": "stop.fill"
+                                    case "STOPPED": "play.fill"
+                                    case "STARTING", "STOPPING", "PROVISIONING", "RESTARTING","UPDATING": "arrow.triangle.2.circlepath"
+                                    case "ERROR": "exclamationmark.triangle.fill"
+                                    case "CRASHED": "exclamationmark.octagon.fill"
+                                    default: "questionmark"
                                 }
                             }())
                             .foregroundColor({
                                 switch vm.status {
-                                case "RUNNING": .red
-                                case "STOPPED": .green
-                                case "ERROR", "CRASHED": .orange
-                                default: .gray
+                                    case "RUNNING": .red
+                                    case "STOPPED": .green
+                                    case "ERROR", "CRASHED": .orange
+                                    default: .gray
                                 }
                             }())
                         }
@@ -225,6 +226,7 @@ struct CloudComputingTabContent: View {
                         .disabled(processingStates[vm.id] != nil) // Disable while processing
                     }
                     .width(min:40,max:40)
+                    
                     TableColumn("Created At", value: \.createdAt).width(min: 120,max:120)
                     TableColumn("Cores", value: \.cores).width(min:40,max:40)
                     TableColumn("RAM", value: \.memoryGB).width(min:30,max:30)
@@ -233,13 +235,14 @@ struct CloudComputingTabContent: View {
                             .fixedSize(horizontal: false, vertical: true)
                             .lineLimit(nil)
                             .contextMenu {
-                                   Button("Copy") {
-                                       let pasteboard = NSPasteboard.general
-                                       pasteboard.clearContents()
-                                       pasteboard.setString(vm.addresses.joined(separator: ", "), forType: .string)
-                                   }
-                               }
+                                Button("Copy") {
+                                    let pasteboard = NSPasteboard.general
+                                    pasteboard.clearContents()
+                                    pasteboard.setString(vm.addresses.joined(separator: ", "), forType: .string)
+                                }
+                            }
                     }.width(min: 120,max:120)
+                    
                     TableColumn("Folder") { vm in
                         if let url = vm.folderUrl {
                             Link(destination: url) {
@@ -275,9 +278,9 @@ struct CloudComputingTabContent: View {
                     .font(.subheadline)
                     .foregroundColor(.gray)
                 Spacer()
-                Text(helpers.processingVMName)
-                        .font(.subheadline)
-                        .foregroundColor(.red)
+//                Text(helpers.processingVMName)
+//                    .font(.subheadline)
+//                    .foregroundColor(.red)
                 
             }
             .padding(.horizontal)
@@ -290,50 +293,19 @@ struct CloudComputingTabContent: View {
     
     private func sortTableDataByStatus() {
         let statusPriority = ["RUNNING", "STARTING", "STOPPED", "STOPPING"]
+        
+        vmTableData.sort { a, b in
+            let aPriority = statusPriority.firstIndex(of: a.status) ?? Int.max
+            let bPriority = statusPriority.firstIndex(of: b.status) ?? Int.max
             
-            vmTableData.sort { a, b in
-                let aPriority = statusPriority.firstIndex(of: a.status) ?? Int.max
-                let bPriority = statusPriority.firstIndex(of: b.status) ?? Int.max
-                
-                // If same status, sort by name (optional)
-                if aPriority == bPriority {
-                    return a.name < b.name
-                }
-                return aPriority < bPriority
+            // If same status, sort by name (optional)
+            if aPriority == bPriority {
+                return a.name < b.name
             }
+            return aPriority < bPriority
+        }
     }
-    
-//    private func fetchVMs() {
-//        isLoading = true
-//        errorMessage = nil
-//        // Step 1: Get IAM Token
-//        YandexAPIService.shared.checkOauthKey(yandexPassportOauthToken: SettingsManager.shared.oAuthKey) { result in
-//            DispatchQueue.main.async {
-//                switch result {
-//                    case .success(let response):
-//                        // Step 2: Get VMs using the IAM Token
-//                        iamToken=response.iamToken
-//                        YandexAPIService.shared.getVMs(iamToken: response.iamToken) { result in
-//                            DispatchQueue.main.async {
-//                                isLoading = false
-//                                switch result {
-//                                    case .success(let allVMs):
-//                                        vmTableData = allVMs
-//                                        self.sortTableDataByStatus()
-//                                    case .failure(let error):
-//                                        errorMessage = error.localizedDescription
-//                                }
-//                            }
-//                        }
-//                    case .failure(let error):
-//                        isLoading = false
-//                        print(error.localizedDescription)
-//                        errorMessage = error.localizedDescription
-//                }
-//            }
-//        }
-//    }
-    
+        
     private func fetchVMs() {
         isLoading = true
         errorMessage = nil
@@ -421,7 +393,7 @@ struct CloudComputingTabContent: View {
         // Store the task
         activePollingTasks[vmID] = task
     }
-
+    
     // 3. Helper functions
     @MainActor
     private func setProcessingState(for vmID: String, status: String?) {
@@ -431,14 +403,19 @@ struct CloudComputingTabContent: View {
             processingStates.removeValue(forKey: vmID)
         }
     }
-
+    
     @MainActor
     private func updateVMInTable(_ vm: VMTableData) {
         if let index = vmTableData.firstIndex(where: { $0.id == vm.id }) {
             vmTableData[index] = vm
         }
+        
+        let runningCount = vmTableData.filter { $0.status == "RUNNING" }.count
+        appState.isVirtualMachineRunning = runningCount > 0
+        print("Updated running state: \(appState.isVirtualMachineRunning ? "RUNNING" : "STOPPED")")
+        
     }
-
+    
     private func isOperationComplete(for vmID: String, currentStatus: String) async -> Bool {
         // Get the original VM state safely
         let originalVM = await MainActor.run {
@@ -453,28 +430,28 @@ struct CloudComputingTabContent: View {
         
         // Success cases
         if (isStartAction && currentStatus == "RUNNING") ||
-           (!isStartAction && currentStatus == "STOPPED") {
+            (!isStartAction && currentStatus == "STOPPED") {
             return true
         }
         
         // Error cases
         return ["ERROR", "CRASHED"].contains(currentStatus)
     }
-
+    
     @MainActor
     private func cleanupPolling(for vmID: String) {
         activePollingTasks.removeValue(forKey: vmID)
         processingStates.removeValue(forKey: vmID)
     }
-
-//    private func notifyUser(title: String, body: String, isError: Bool = false) {
-//        let notification = NSUserNotification()
-//        notification.title = title
-//        notification.informativeText = body
-//        notification.soundName = isError ? NSUserNotificationDefaultSoundName : nil
-//        
-//        NSUserNotificationCenter.default.deliver(notification)
-//    }
+    
+    //    private func notifyUser(title: String, body: String, isError: Bool = false) {
+    //        let notification = NSUserNotification()
+    //        notification.title = title
+    //        notification.informativeText = body
+    //        notification.soundName = isError ? NSUserNotificationDefaultSoundName : nil
+    //
+    //        NSUserNotificationCenter.default.deliver(notification)
+    //    }
     
     private func notifyCompletion(for vm: VMTableData) {
         let isStartAction = vm.status == "RUNNING"
@@ -482,15 +459,15 @@ struct CloudComputingTabContent: View {
         let body = "\(vm.name) is now \(vm.status)"
         sendNotification(title: title, body: body)
     }
-
+    
     private func notifyTimeout(for vmID: String) {
         if let vm = vmTableData.first(where: { $0.id == vmID }) {
             sendNotification(title: "Operation Timed Out",
-                            body: "Couldn't verify final status for \(vm.name)",
-                            isError: true)
+                             body: "Couldn't verify final status for \(vm.name)",
+                             isError: true)
         }
     }
-
+    
     private func sendNotification(title: String, body: String, isError: Bool = false) {
         let center = UNUserNotificationCenter.current()
         
