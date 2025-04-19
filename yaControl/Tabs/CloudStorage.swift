@@ -18,6 +18,12 @@ struct BucketTabContent: View {
     @State private var isHovering = false
     @State private var selectedBucket: BucketTableData.ID? = nil
     //
+    // Billing Data
+    @State private var billingData: [BillingTableData] = []
+    @State private var currentBalance: String = ""
+    @State private var currency: String = ""
+    @State private var billingUrl: URL? = nil
+    //
     @State private var sortKey: KeyPath<BucketTableData, String>? = nil
     @State private var sortOrder: [KeyPathComparator<BucketTableData>] = []
     //
@@ -135,20 +141,18 @@ struct BucketTabContent: View {
                     }.width(min: 80, ideal: 80,max:150)
                 }
                 .padding(.vertical, 6)
-                .onChange(of: selectedBucket) { oldSelection, newSelection in
-                    if let selectedBucketId = newSelection, let selectedBucket = filteredBuckets.first(where: { $0.id == selectedBucketId }) {
-                        print("Selected Bucket ID: \(selectedBucket.id)")
-                    }
-                }
+//                .onChange(of: selectedBucket) { oldSelection, newSelection in
+//                    if let selectedBucketId = newSelection, let selectedBucket = filteredBuckets.first(where: { $0.id == selectedBucketId }) {
+//                        print("Selected Bucket ID: \(selectedBucket.id)")
+//                    }
+//                }
             }
-            HStack {
-                Text("Last updated: \(yandexApi.lastUpdateTime.formatted(date: .omitted, time: .shortened))")
-                    .font(.subheadline)
-                    .foregroundColor(.gray)
-                Spacer()
-            }
-            .padding(.horizontal)
-            .padding(.vertical, 8)
+            StatusPanel(
+                lastUpdateTime: yandexApi.lastUpdateTime,
+                currentBalance: currentBalance,
+                currency: currency,
+                billingUrl:billingUrl
+            )
         }
         .onAppear {
             fetchBuckets()
@@ -175,12 +179,17 @@ struct BucketTabContent: View {
                 let allBuckets = try await YandexAPIService.shared.getBuckets(
                     iamToken: authResponse.iamToken
                 )
-                
+                let billings = try await YandexAPIService.shared.getCosts(iamToken: iamToken)
                 // 3. Update UI with results
                 await MainActor.run {
-                    self.isLoading = false
-                    print("result: ", allBuckets)
                     self.bucketTableData = allBuckets
+                    self.billingData = billings
+                    if let firstBilling = billings.first {
+                        self.currentBalance = firstBilling.balance
+                        self.currency = firstBilling.currency
+                        self.billingUrl = firstBilling.billingUrl
+                    }
+                    self.isLoading = false
                 }
                 
             } catch {

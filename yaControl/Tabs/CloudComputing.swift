@@ -20,6 +20,12 @@ struct CloudComputingTabContent: View {
     @State private var isHovering = false
     @State private var selectedVM: VMTableData.ID? = nil
     //
+    // Billing Data
+    @State private var billingData: [BillingTableData] = []
+    @State private var currentBalance: String = ""
+    @State private var currency: String = ""
+    @State private var billingUrl: URL? = nil
+    //
     @State private var sortKey: KeyPath<VMTableData, String>? = nil
     @State private var sortOrder: [KeyPathComparator<VMTableData>] = []
     //
@@ -267,24 +273,19 @@ struct CloudComputingTabContent: View {
                     }.width(min: 120, max:120)
                 }
                 .padding(.vertical, 6)
-                .onChange(of: selectedVM) { oldSelection, newSelection in
-                    if let selectedVMId = newSelection, let selectedVM = filteredVMs.first(where: { $0.id == selectedVMId }) {
-                        print("Selected VM ID: \(selectedVM.id)")
-                    }
-                }
+//                .onChange(of: selectedVM) { oldSelection, newSelection in
+//                    if let selectedVMId = newSelection, let selectedVM = filteredVMs.first(where: { $0.id == selectedVMId }) {
+//                        print("Selected VM ID: \(selectedVM.id)")
+//                    }
+//                }
             }
-            HStack {
-                Text("Last updated: \(yandexApi.lastUpdateTime.formatted(date: .omitted, time: .shortened))")
-                    .font(.subheadline)
-                    .foregroundColor(.gray)
-                Spacer()
-//                Text(helpers.processingVMName)
-//                    .font(.subheadline)
-//                    .foregroundColor(.red)
-                
-            }
-            .padding(.horizontal)
-            .padding(.vertical, 8)
+            
+            StatusPanel(
+                lastUpdateTime: yandexApi.lastUpdateTime,
+                currentBalance: currentBalance,
+                currency: currency,
+                billingUrl:billingUrl
+            )
         }
         .onAppear {
             fetchVMs()
@@ -324,11 +325,18 @@ struct CloudComputingTabContent: View {
                 
                 // Step 2: Get VMs using the IAM Token
                 let allVMs = try await YandexAPIService.shared.getVMs(iamToken: authResponse.iamToken)
-                
+                let billings = try await YandexAPIService.shared.getCosts(iamToken: iamToken)
                 // Update UI on main thread
                 await MainActor.run {
                     vmTableData = allVMs
                     self.sortTableDataByStatus()
+                    //
+                    self.billingData = billings
+                    if let firstBilling = billings.first {
+                        self.currentBalance = firstBilling.balance
+                        self.currency = firstBilling.currency
+                        self.billingUrl = firstBilling.billingUrl
+                    }
                     isLoading = false
                 }
                 

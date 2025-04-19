@@ -18,6 +18,12 @@ struct ServerLessFunctionTabContent: View {
     @State private var isHovering = false
     @State private var selectedSlf: ServerLessFunctionTableData.ID? = nil
     //
+    // Billing Data
+    @State private var billingData: [BillingTableData] = []
+    @State private var currentBalance: String = ""
+    @State private var currency: String = ""
+    @State private var billingUrl: URL? = nil
+    //
     @State private var sortKey: KeyPath<ServerLessFunctionTableData, String>? = nil
     @State private var sortOrder: [KeyPathComparator<ServerLessFunctionTableData>] = []
     //
@@ -157,21 +163,18 @@ struct ServerLessFunctionTabContent: View {
                     }.width(min: 150,max:150)
                 }
                 .padding(.vertical, 6)
-                .onChange(of: selectedSlf) { oldSelection, newSelection in
-                    if let selectedSLFId = newSelection, let selectedSLF = filteredSLFs.first(where: { $0.id == selectedSLFId }) {
-                        print("Selected SLF ID: \(selectedSLF.id)")
-                    }
-                }
+//                .onChange(of: selectedSlf) { oldSelection, newSelection in
+//                    if let selectedSLFId = newSelection, let selectedSLF = filteredSLFs.first(where: { $0.id == selectedSLFId }) {
+//                        print("Selected SLF ID: \(selectedSLF.id)")
+//                    }
+//                }
             }
-            HStack {
-                Text("Last updated: \(yandexApi.lastUpdateTime.formatted(date: .omitted, time: .shortened))")
-                    .font(.subheadline)
-                    .foregroundColor(.gray)
-                Spacer()
-                
-            }
-            .padding(.horizontal)
-            .padding(.vertical, 8)
+            StatusPanel(
+                lastUpdateTime: yandexApi.lastUpdateTime,
+                currentBalance: currentBalance,
+                currency: currency,
+                billingUrl:billingUrl
+            )
         }
         .onAppear {
             fetchServerLessFunctions()
@@ -199,12 +202,17 @@ struct ServerLessFunctionTabContent: View {
                 let allSLFs = try await YandexAPIService.shared.getServerLessFunctions(
                     iamToken: authResponse.iamToken
                 )
-                
+                let billings = try await YandexAPIService.shared.getCosts(iamToken: iamToken)
                 // 4. Update UI state
                 await MainActor.run {
-                    self.isLoading = false
-                    print("result: ", allSLFs)
                     self.slfTableData = allSLFs
+                    self.billingData = billings
+                    if let firstBilling = billings.first {
+                        self.currentBalance = firstBilling.balance
+                        self.currency = firstBilling.currency
+                        self.billingUrl = firstBilling.billingUrl
+                    }
+                    self.isLoading = false
                 }
                 
             } catch {

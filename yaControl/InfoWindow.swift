@@ -149,7 +149,6 @@ struct InfoWindow: View {
         }
     }
     
-    
     private struct StatsBillingSection: View {
         let title: String
         let icon: String
@@ -231,18 +230,6 @@ struct InfoWindow: View {
         errorMessage = nil
         
         // Getting IAM token and pushing it via other calls in the conveyor
-//        YandexAPIService.shared.checkOauthKey(yandexPassportOauthToken: SettingsManager.shared.oAuthKey) { result in
-//            DispatchQueue.main.async {
-//                switch result {
-//                case .success(let response):
-//                    self.iamToken = response.iamToken
-//                    self.dataLoadingConveyor()
-//                case .failure(let error):
-//                    self.isLoading = false
-//                    self.errorMessage = error.localizedDescription
-//                }
-//            }
-//        }
         
         Task {
             do {
@@ -299,18 +286,6 @@ struct InfoWindow: View {
     
     // MARK: - Get VM's
     private func getVMsStat(completion: @escaping () -> Void) {
-//        YandexAPIService.shared.getVMs(iamToken: iamToken) { result in
-//            DispatchQueue.main.async {
-//                switch result {
-//                case .success(let allVMs):
-//                    self.vmTableData = allVMs
-//                    self.getStatData(with: allVMs)
-//                case .failure(let error):
-//                    self.errorMessage = error.localizedDescription
-//                }
-//                completion()
-//            }
-//        }
         
         Task {
             do {
@@ -335,18 +310,6 @@ struct InfoWindow: View {
     
     // MARK: - Get Serverless Functions
     private func getServerLessFunctionsStat(completion: @escaping () -> Void) {
-//        YandexAPIService.shared.getServerLessFunctions(iamToken: iamToken) { result in
-//            DispatchQueue.main.async {
-//                switch result {
-//                case .success(let allSLFs):
-//                    self.slfTableData = allSLFs
-//                    self.getSLFsStatData(with: allSLFs)
-//                case .failure(let error):
-//                    self.errorMessage = error.localizedDescription
-//                }
-//                completion()
-//            }
-//        }
         
         Task {
             do {
@@ -371,18 +334,6 @@ struct InfoWindow: View {
     
     // MARK: - Get Buckets
     private func getBucketsStat(completion: @escaping () -> Void) {
-//        YandexAPIService.shared.getBuckets(iamToken: iamToken) { result in
-//            DispatchQueue.main.async {
-//                switch result {
-//                case .success(let allBuckets):
-//                    self.bucketTableData = allBuckets
-//                    self.getBucketsStatData(with: allBuckets)
-//                case .failure(let error):
-//                    self.errorMessage = error.localizedDescription
-//                }
-//                completion()
-//            }
-//        }
         
         Task {
             do {
@@ -412,23 +363,7 @@ struct InfoWindow: View {
     
     // MARK: - Get Billing
     private func getCosts(completion: @escaping () -> Void) {
-//        YandexAPIService.shared.getCosts(iamToken: iamToken) { result in
-//            DispatchQueue.main.async {
-//                switch result {
-//                case .success(let billings):
-//                    self.billingData = billings
-//                    if let firstBilling = billings.first {
-//                        self.currentBalance = firstBilling.balance
-//                        self.currency = firstBilling.currency
-//                        self.billingUrl = firstBilling.billingUrl
-//                    }
-//                case .failure(let error):
-//                    self.errorMessage = error.localizedDescription
-//                }
-//                completion() // Make sure to call completion in all cases
-//            }
-//        }
-        
+
         Task {
             do {
                 // 1. Fetch billing data asynchronously
