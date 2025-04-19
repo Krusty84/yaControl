@@ -274,7 +274,7 @@ struct CloudComputingTabContent: View {
                 }
             }
             HStack {
-                Text("Last updated: \(yandexApi.lastUpdateTime)")
+                Text("Last updated: \(yandexApi.lastUpdateTime.formatted(date: .omitted, time: .shortened))")
                     .font(.subheadline)
                     .foregroundColor(.gray)
                 Spacer()

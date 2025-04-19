@@ -128,77 +128,7 @@ class AppState: ObservableObject {
         }
         isLoading = true
         errorMessage = nil
-        
-        //            YandexAPIService.shared.checkOauthKey(yandexPassportOauthToken: SettingsManager.shared.oAuthKey) { [weak self] result in
-        //                guard let self = self else {
-        //                    completion(false)
-        //                    return
-        //                }
-        //
-        //                switch result {
-        //                case .success(let response):
-        //                    let iamToken = response.iamToken
-        //                    print("IAM token acquired successfully")
-        //
-        //                    // First, get the list of running VMs
-        //                    YandexAPIService.shared.getVMs(iamToken: iamToken) { [weak self] result in
-        //                        guard let self = self else {
-        //                            completion(false)
-        //                            return
-        //                        }
-        //
-        //                        switch result {
-        //                        case .success(let allVMs):
-        //                            let runningVMIds = allVMs.filter { $0.status == "RUNNING" }.map { $0.id }
-        //                            print("Running VM IDs: \(runningVMIds)")
-        //
-        //                            guard !runningVMIds.isEmpty else {
-        //                                print("No running VMs found")
-        //                                self.isLoading = false
-        //                                completion(true)
-        //                                return
-        //                            }
-        //
-        //                            // Now stop the running VMs
-        //                            let vmStopGroup = DispatchGroup()
-        //                            var stopErrors: [Error] = []
-        //
-        //                            for vmId in runningVMIds {
-        //                                vmStopGroup.enter()
-        //                                YandexAPIService.shared.stopVM(iamToken: iamToken, vmId: vmId) { result in
-        //                                    switch result {
-        //                                    case .success:
-        //                                        print("Successfully stopped VM: \(vmId)")
-        //                                    case .failure(let error):
-        //                                        print("Failed to stop VM \(vmId): \(error.localizedDescription)")
-        //                                        stopErrors.append(error)
-        //                                    }
-        //                                    vmStopGroup.leave()
-        //                                }
-        //                            }
-        //
-        //                            vmStopGroup.notify(queue: .main) {
-        //                                self.isLoading = false
-        //                                let success = stopErrors.isEmpty
-        //                                completion(success)
-        //                            }
-        //
-        //                        case .failure(let error):
-        //                            self.isLoading = false
-        //                            self.errorMessage = error.localizedDescription
-        //                            print("Failed to fetch VM list: \(error.localizedDescription)")
-        //                            completion(false)
-        //                        }
-        //                    }
-        //
-        //                case .failure(let error):
-        //                    self.isLoading = false
-        //                    self.errorMessage = error.localizedDescription
-        //                    print("Critical: Failed to acquire IAM token: \(error.localizedDescription)")
-        //                    completion(false)
-        //                }
-        //            }
-        
+                
         Task { [weak self] in
             guard let self else {
                 completion(false)
@@ -268,77 +198,7 @@ class AppState: ObservableObject {
         }
         isLoading = true
         errorMessage = nil
-        
-        //            YandexAPIService.shared.checkOauthKey(yandexPassportOauthToken: SettingsManager.shared.oAuthKey) { [weak self] result in
-        //                guard let self = self else {
-        //                    completion(false)
-        //                    return
-        //                }
-        //
-        //                switch result {
-        //                case .success(let response):
-        //                    let iamToken = response.iamToken
-        //                    print("IAM token acquired successfully")
-        //
-        //                    // First, get the list of running VMs
-        //                    YandexAPIService.shared.getVMs(iamToken: iamToken) { [weak self] result in
-        //                        guard let self = self else {
-        //                            completion(false)
-        //                            return
-        //                        }
-        //
-        //                        switch result {
-        //                        case .success(let allVMs):
-        //                            let runningVMIds = allVMs.filter { $0.status == "RUNNING" }.map { $0.id }
-        //                            print("Running VM IDs: \(runningVMIds)")
-        //
-        //                            guard !runningVMIds.isEmpty else {
-        //                                print("No running VMs found")
-        //                                self.isLoading = false
-        //                                completion(true)
-        //                                return
-        //                            }
-        //
-        //                            // Now stop the running VMs
-        //                            let vmStopGroup = DispatchGroup()
-        //                            var stopErrors: [Error] = []
-        //
-        //                            for vmId in runningVMIds {
-        //                                vmStopGroup.enter()
-        //                                YandexAPIService.shared.stopVM(iamToken: iamToken, vmId: vmId) { result in
-        //                                    switch result {
-        //                                    case .success:
-        //                                        print("Successfully stopped VM: \(vmId)")
-        //                                    case .failure(let error):
-        //                                        print("Failed to stop VM \(vmId): \(error.localizedDescription)")
-        //                                        stopErrors.append(error)
-        //                                    }
-        //                                    vmStopGroup.leave()
-        //                                }
-        //                            }
-        //
-        //                            vmStopGroup.notify(queue: .main) {
-        //                                self.isLoading = false
-        //                                let success = stopErrors.isEmpty
-        //                                completion(success)
-        //                            }
-        //
-        //                        case .failure(let error):
-        //                            self.isLoading = false
-        //                            self.errorMessage = error.localizedDescription
-        //                            print("Failed to fetch VM list: \(error.localizedDescription)")
-        //                            completion(false)
-        //                        }
-        //                    }
-        //
-        //                case .failure(let error):
-        //                    self.isLoading = false
-        //                    self.errorMessage = error.localizedDescription
-        //                    print("Critical: Failed to acquire IAM token: \(error.localizedDescription)")
-        //                    completion(false)
-        //                }
-        //            }
-    
+            
         Task { [weak self] in
             guard let self else {
                 completion(false)

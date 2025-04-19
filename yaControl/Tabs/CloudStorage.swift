@@ -142,7 +142,7 @@ struct BucketTabContent: View {
                 }
             }
             HStack {
-                Text("Last updated: \(yandexApi.lastUpdateTime)")
+                Text("Last updated: \(yandexApi.lastUpdateTime.formatted(date: .omitted, time: .shortened))")
                     .font(.subheadline)
                     .foregroundColor(.gray)
                 Spacer()
@@ -159,32 +159,7 @@ struct BucketTabContent: View {
         isLoading = true
         errorMessage = nil
         // Step 1: Get IAM Token
-//        YandexAPIService.shared.checkOauthKey(yandexPassportOauthToken: SettingsManager.shared.oAuthKey) { result in
-//            DispatchQueue.main.async {
-//                switch result {
-//                    case .success(let response):
-//                        // Step 2: Get Buckets using the IAM Token
-//                        iamToken=response.iamToken
-//                        YandexAPIService.shared.getBuckets(iamToken: response.iamToken) { result in
-//                            DispatchQueue.main.async {
-//                                isLoading = false
-//                                switch result {
-//                                    case .success(let allBuckets):
-//                                        print("result: ", allBuckets)
-//                                        bucketTableData = allBuckets
-//                                    case .failure(let error):
-//                                        errorMessage = error.localizedDescription
-//                                }
-//                            }
-//                        }
-//                    case .failure(let error):
-//                        isLoading = false
-//                        print(error.localizedDescription)
-//                        errorMessage = error.localizedDescription
-//                }
-//            }
-//        }
-        
+                
         Task {
             do {
                 // 1. Authenticate and get IAM token

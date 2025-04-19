@@ -40,20 +40,6 @@ struct yaControlApp: App {
         let vmsToStart = SettingsManager.shared.getAllAutostartVMs()
         
         Helpers.checkInternetConnection {
-//            if autoStartEnabled && startOptions.contains(.afterAppLaunched) && !vmsToStart.isEmpty {
-//                YandexAPIService.shared.checkOauthKey(yandexPassportOauthToken: oAuthKey) { result in
-//                    DispatchQueue.main.async {
-//                        switch result {
-//                        case .success(let response):
-//                            Helpers.shared.startAllMarkedVMs(iamToken: response.iamToken, vmIds: vmsToStart)
-//                        case .failure(let error):
-//                            // Update shared state instead of local @State
-//                            //AppState.shared.errorMessage = error.localizedDescription
-//                            print(error.localizedDescription)
-//                        }
-//                    }
-//                }
-//            }
             if autoStartEnabled && startOptions.contains(.afterAppLaunched) && !vmsToStart.isEmpty {
                 Task {
                     do {

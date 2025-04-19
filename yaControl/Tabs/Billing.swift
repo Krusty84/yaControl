@@ -38,7 +38,7 @@ struct BillingTabContent: View {
     var body: some View {
         VStack(spacing: 0) {
         }
-        Text("FFFFF")
+        Text("Under constraction")
     }
 }
 

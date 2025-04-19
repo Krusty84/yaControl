@@ -71,39 +71,6 @@ class Helpers:ObservableObject {
     }
     
     // Button Start/Stop VM helper
-//    func startStopVM(iamToken:String,for vm: VMTableData) {
-//        if vm.status == "RUNNING" {
-//            //print("Stopping VM: \(vm.name)")
-//            self.processingVMName="Stopping VM: \(vm.name)"
-//            // Call API to stop the VM
-//            YandexAPIService.shared.stopVM(iamToken:iamToken, vmId: vm.id) { result in
-//                DispatchQueue.main.async {
-//                    switch result {
-//                        case .success:
-//                            print("VM stopped successfully")
-//                            // Update the VM status in the UI
-//                        case .failure(let error):
-//                            print("Failed to stop VM: \(error.localizedDescription)")
-//                    }
-//                }
-//            }
-//        } else {
-//            //print("Starting VM: \(vm.name)")
-//            self.processingVMName="Starting VM: \(vm.name)"
-//            // Call API to start the VM
-//            YandexAPIService.shared.startVM(iamToken:iamToken,vmId: vm.id) { result in
-//                DispatchQueue.main.async {
-//                    switch result {
-//                        case .success:
-//                            //print("VM started successfully")
-//                            self.appState.isVirtualMachineRunning = true
-//                        case .failure(let error):
-//                            print("Failed to start VM: \(error.localizedDescription)")
-//                    }
-//                }
-//            }
-//        }
-//    }
     func startStopVM(iamToken: String, for vm: VMTableData) {
         // Update UI state immediately
         
@@ -137,39 +104,6 @@ class Helpers:ObservableObject {
 //            }
         }
     }
-
-//    func stopAllRunningVMs(iamToken: String, vms: [VMTableData]? = nil, vmIds: [String]? = nil) {
-//        if let vms = vms {
-//            let runningVMs = vms.filter { $0.status == "RUNNING" }
-//            self.processingVMName = "Stopping all VM's"
-//            for vm in runningVMs {
-//                // Just send requeust withpout waiting and main queue
-//                YandexAPIService.shared.stopVM(iamToken: iamToken, vmId: vm.id) { result in
-//                    // Логируем в фоне, если нужно
-//                    switch result {
-//                    case .success:
-//                        print("VM stopped successfully: \(vm.name)")
-//                    case .failure(let error):
-//                        print("Failed to stop VM: \(error.localizedDescription)")
-//                    }
-//                }
-//            }
-//        } else if let vmIds = vmIds {
-//            self.processingVMName = "Stopping VMs by IDs"
-//            
-//            for vmId in vmIds {
-//                // Just send requeust withpout waiting and main queue
-//                YandexAPIService.shared.stopVM(iamToken: iamToken, vmId: vmId) { result in
-//                    switch result {
-//                    case .success:
-//                        print("VM stopped successfully: \(vmId)")
-//                    case .failure(let error):
-//                        print("Failed to stop VM: \(error.localizedDescription)")
-//                    }
-//                }
-//            }
-//        }
-//    }
     
     func stopAllRunningVMs(iamToken: String, vms: [VMTableData]? = nil, vmIds: [String]? = nil) {
  
@@ -217,32 +151,7 @@ class Helpers:ObservableObject {
             }
         }
     }
-    
-//    func startAllMarkedVMs(iamToken: String, vmIds: [String]? = nil) {
-//        // 1. Check if VM IDs were provided, otherwise fetch from SettingsManager
-//        let vmIdsToStart = vmIds ?? SettingsManager.shared.getAllAutostartVMs()
-//        
-//        // 2. Early return if no VMs to start
-//        guard !vmIdsToStart.isEmpty else {
-//            print("No VMs marked for auto-start")
-//            return
-//        }
-//        
-//        // 3. Start each VM asynchronously without blocking the main queue
-//        for vmId in vmIdsToStart {
-//            YandexAPIService.shared.startVM(iamToken: iamToken, vmId: vmId) { result in
-//                DispatchQueue.main.async {  // Ensure UI updates (if any) are on main thread
-//                    switch result {
-//                    case .success:
-//                        print("VM started successfully: \(vmId)")
-//                    case .failure(let error):
-//                        print("Failed to start VM \(vmId): \(error.localizedDescription)")
-//                    }
-//                }
-//            }
-//        }
-//    }
-    
+        
     func startAllMarkedVMs(iamToken: String, vmIds: [String]? = nil) async {
         // 1. Get VM IDs to start
         let vmIdsToStart = vmIds ?? SettingsManager.shared.getAllAutostartVMs()

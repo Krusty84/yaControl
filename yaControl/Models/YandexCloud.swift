@@ -7,8 +7,7 @@
 
 import Foundation
 
-// MARK: Move on Async/Await
-//OAuth
+//MARK: OAuth
 struct AuthResponse {
     let code: Int
     let iamToken: String
@@ -22,7 +21,8 @@ enum AuthError: Error {
     case noDataReceived
     case invalidResponseFormat
 }
-//Cloud
+
+//MARK: Cloud
 enum CloudError: Error {
     case invalidURL
     case invalidResponse
@@ -40,7 +40,8 @@ struct CloudsResponse {
     let code: Int
     let clouds: [Cloud]
 }
-//Folder
+
+//MARK: Folder
 enum FolderError: Error {
     case invalidURL
     case invalidResponse
@@ -55,7 +56,8 @@ struct Folder: Decodable {
     let name: String
     let status: String
 }
-//VM
+
+//MARK: VM
 enum VMInstanceError: Error {
     case invalidURL
     case invalidResponse
@@ -124,7 +126,8 @@ struct VMTableData:Decodable,Identifiable,Equatable {
     let vmUrl: URL?
     var isAutoStarted: Bool
 }
-//SLF
+
+//MARK: Serverless Function
 enum ServerlessFunctionError: Error {
     case invalidURL
     case invalidResponse
@@ -158,7 +161,8 @@ struct ServerLessFunctionTableData:Decodable,Identifiable,Equatable {
     let httpInvokeUrl: String
     let slfUrl: URL?
 }
-//Bucket
+
+//MARK: Bucket
 enum BucketError: Error {
     case invalidURL
     case invalidResponse
@@ -224,160 +228,6 @@ struct BucketTableData:Decodable,Identifiable,Equatable {
             String(totalObjectCount)
     }
 }
-//
-//Billing
-enum BillingError: Error {
-    case invalidURL
-    case invalidResponse
-    case httpError(statusCode: Int)
-    case noDataReceived
-    case apiError(code: Int, message: String)
-    case decodingError
-}
-struct Billing: Decodable {
-    let id: String
-    let currency: String
-    let balance: String
-}
-//Final Billing Table Data
-struct BillingTableData: Decodable,Identifiable,Equatable {
-    let id: UUID
-    let currency: String
-    let balance: String
-    let billingUrl: URL?
-}
-//VM Start/Stop/Get
-enum VMOperationError: Error {
-    case invalidURL
-    case apiError(statusCode: Int)
-    case operationFailed
-}
-
-// MARK: END Move on Async/Await
-// Model for Cloud
-struct CloudOLD: Decodable {
-    let id: String
-    let createdAt: String
-    let name: String
-    let organizationId: String
-}
-
-// Model for Folder
-struct FolderOLD: Decodable {
-    let id: String
-    let cloudId: String
-    let createdAt: String
-    let name: String
-    let status: String
-}
-
-// Model for VM Instance
-struct VMInstanceOLD: Decodable {
-    struct Resources: Decodable {
-        let memory: String
-        let cores: String
-        let coreFraction: String
-    }
-    
-    struct NetworkInterface: Decodable {
-        struct PrimaryV4Address: Decodable {
-            let address: String
-            let oneToOneNat: OneToOneNat?
-        }
-        
-        struct OneToOneNat: Decodable {
-            let address: String? // Make this optional
-            let ipVersion: String?
-        }
-        
-        let primaryV4Address: PrimaryV4Address
-        let index: String
-        let macAddress: String
-        let subnetId: String
-    }
-    
-    struct SchedulingPolicy: Decodable {
-        let preemptible: Bool
-    }
-    
-    let resources: Resources
-    let networkInterfaces: [NetworkInterface]
-    let schedulingPolicy: SchedulingPolicy
-    let id: String
-    let folderId: String
-    let createdAt: String
-    let name: String
-    let status: String
-}
-
-// Model for Final VM Table Data
-struct VMTableDataOLD:Decodable,Identifiable,Equatable {
-    let id: String
-    let name: String
-    let status: String
-    let createdAt: String
-    let cores: String
-    let memoryGB: String
-    let preemptible: Bool
-    let addresses: [String]
-    let folderName: String
-    let folderUrl: URL?
-    let vmUrl: URL?
-    var isAutoStarted: Bool
-}
-
-// Model for Functions
-struct ServerLessFunctionOLD: Decodable {
-    let id: String
-    let folderId: String
-    let createdAt: String
-    let name: String
-    let httpInvokeUrl: String
-    let status: String
-}
-
-// Model for Final Functions Table Data
-struct ServerLessFunctionTableDataOLD:Decodable,Identifiable,Equatable {
-    let id: String
-    let name: String
-    let status: String
-    let createdAt: String
-    let folderName: String
-    let folderUrl: URL?
-    let httpInvokeUrl: String
-    let slfUrl: URL?
-}
-
-// Model for Buckets
-struct BucketOLD: Decodable {
-   // let id: Int
-    let folderId: String
-    let createdAt: String
-    let name: String
-    let maxSize: String
-}
-
-struct BucketInfoOLD: Decodable {
-    let storageClassUsedSizes: [StorageClassUsedSize]
-    let storageClassCounters: [StorageClassCounter]
-    let anonymousAccessFlags: AnonymousAccessFlags
-    let name: String
-    let maxSize: String
-    let usedSize: String
-    let defaultStorageClass: String
-    let createdAt: String
-    let updatedAt: String
-    
-    // Computed property to get the total object count
-    var totalObjectCount: Int {
-        storageClassCounters.reduce(0) { result, counter in
-            let simpleCount = Int(counter.counters.simpleObjectCount) ?? 0
-            let multipartCount = Int(counter.counters.multipartObjectsCount ?? "0") ?? 0 // Handle optional multipartObjectsCount
-            return result + simpleCount + multipartCount
-        }
-    }
-}
-
 struct StorageClassUsedSize: Decodable {
     let storageClass: String
     let classSize: String? // Make classSize optional
@@ -429,46 +279,32 @@ struct AnonymousAccessFlags: Decodable {
     let configRead: Bool
 }
 
-// Model for Final Buckets Table Data
-struct BucketTableDataOLD:Decodable,Identifiable,Equatable {
-    let id: UUID
-    let name: String
-    let maxSize: String
-    let usedSize: String
-    let totalObjectCount: Int
-    let createdAt: String
-    let updatedAt: String
-    let folderName: String
-    let folderUrl: URL?
-    let bucketUrl: URL?
-    // Computed property to convert totalObjectCount to String
-    var totalObjectCountString: String {
-            String(totalObjectCount)
-    }
+//MARK: Billing
+enum BillingError: Error {
+    case invalidURL
+    case invalidResponse
+    case httpError(statusCode: Int)
+    case noDataReceived
+    case apiError(code: Int, message: String)
+    case decodingError
 }
-
-
-// Model for VM Instance
-struct BillingOLD: Decodable {
+struct Billing: Decodable {
     let id: String
     let currency: String
     let balance: String
 }
-
-struct BillingTableDataOLD: Decodable,Identifiable,Equatable {
+//Final Billing Table Data
+struct BillingTableData: Decodable,Identifiable,Equatable {
     let id: UUID
     let currency: String
     let balance: String
     let billingUrl: URL?
 }
 
-/*
- "id": "d4e38851c0ofsnkki9f7",
- "folderId": "b1gqcrohfu85p2fc6fkc",
- "createdAt": "2022-04-21T19:56:18.176Z",
- "name": "teamcenter-alice",
- "httpInvokeUrl": "https://functions.yandexcloud.net/d4e38851c0ofsnkki9f7",
- "status": "ACTIVE"
- */
+//MARK: VM Start/Stop/Get
+enum VMOperationError: Error {
+    case invalidURL
+    case apiError(statusCode: Int)
+    case operationFailed
+}
 
-//https://console.yandex.cloud/folders/b1gqcrohfu85p2fc6fkc/compute/instance/epddn33ae5rr4ep7to3i/overview

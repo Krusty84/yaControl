@@ -164,7 +164,7 @@ struct ServerLessFunctionTabContent: View {
                 }
             }
             HStack {
-                Text("Last updated: \(yandexApi.lastUpdateTime)")
+                Text("Last updated: \(yandexApi.lastUpdateTime.formatted(date: .omitted, time: .shortened))")
                     .font(.subheadline)
                     .foregroundColor(.gray)
                 Spacer()
@@ -182,31 +182,6 @@ struct ServerLessFunctionTabContent: View {
         isLoading = true
         errorMessage = nil
         // Step 1: Get IAM Token
-//        YandexAPIService.shared.checkOauthKey(yandexPassportOauthToken: SettingsManager.shared.oAuthKey) { result in
-//            DispatchQueue.main.async {
-//                switch result {
-//                    case .success(let response):
-//                        // Step 2: Get VMs using the IAM Token
-//                        iamToken=response.iamToken
-//                        YandexAPIService.shared.getServerLessFunctions(iamToken: response.iamToken) { result in
-//                            DispatchQueue.main.async {
-//                                isLoading = false
-//                                switch result {
-//                                    case .success(let allSLFs):
-//                                        print("result: ", allSLFs)
-//                                        slfTableData = allSLFs
-//                                    case .failure(let error):
-//                                        errorMessage = error.localizedDescription
-//                                }
-//                            }
-//                        }
-//                    case .failure(let error):
-//                        isLoading = false
-//                        print(error.localizedDescription)
-//                        errorMessage = error.localizedDescription
-//                }
-//            }
-//        }
         
         Task {
             do {
