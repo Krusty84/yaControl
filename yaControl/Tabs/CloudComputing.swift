@@ -275,7 +275,6 @@ struct CloudComputingTabContent: View {
                                             print("AppleScript error: \(error)")
                                         }
                                     }
-
                                     // 4. As a belt‑and‑suspenders, explicitly activate Terminal via AppKit
                                     if let term = NSRunningApplication.runningApplications(withBundleIdentifier: "com.apple.Terminal").first {
                                         term.activate(options: [.activateAllWindows, .activateIgnoringOtherApps])

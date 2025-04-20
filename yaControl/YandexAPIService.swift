@@ -171,7 +171,7 @@ class YandexAPIService:ObservableObject {
                                         preemptible: instance.schedulingPolicy.preemptible,
                                         addresses: addresses,
                                         folderName: folder.name,
-                                        folderUrl: URL(string: APIConfig.yaFoldersWebUrl + folder.id),
+                                        folderUrl: URL(string: APIConfig.yaFoldersWebUrl + folder.id+"/compute/instances"),
                                         vmUrl: URL(string: APIConfig.yaVMsWebUrl(folderID: folder.id, instanceID: instance.id)),
                                         isAutoStarted: SettingsManager.shared.getAutostartedVMs(for: instance.id)
                                     )
@@ -234,7 +234,7 @@ class YandexAPIService:ObservableObject {
                                         status: function.status,
                                         createdAt: Helpers.shared.convertGMTToLocalTime(utcDateString: function.createdAt),
                                         folderName: folder.name,
-                                        folderUrl: URL(string: APIConfig.yaFoldersWebUrl + folder.id),
+                                        folderUrl: URL(string: APIConfig.yaFoldersWebUrl + folder.id+"/functions/functions"),
                                         httpInvokeUrl: function.httpInvokeUrl,
                                         slfUrl: URL(string: APIConfig.yaSLFsWebUrl(folderID: folder.id, slfID: function.id))
                                     )
@@ -306,7 +306,7 @@ class YandexAPIService:ObservableObject {
                                                 createdAt: Helpers.shared.convertGMTToLocalTime(utcDateString: bucketInfo.createdAt),
                                                 updatedAt: Helpers.shared.convertGMTToLocalTime(utcDateString: bucketInfo.updatedAt),
                                                 folderName: folder.name,
-                                                folderUrl: URL(string: APIConfig.yaFoldersWebUrl + folder.id),
+                                                folderUrl: URL(string: APIConfig.yaFoldersWebUrl + folder.id+"/storage/buckets"),
                                                 bucketUrl: URL(string: APIConfig.yaBucketsWebUrl(folderID: folder.id, bucketName: bucket.name))
                                             )
                                         }
