@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import AppKit
 import UserNotifications
 
 struct CloudComputingTabContent: View {
@@ -246,6 +247,43 @@ struct CloudComputingTabContent: View {
                                     pasteboard.clearContents()
                                     pasteboard.setString(vm.addresses.joined(separator: ", "), forType: .string)
                                 }
+
+                                Button(action: {
+                                    guard let ipAddress = vm.addresses.first else { return }
+
+                                    // 1. Build the SSH command
+                                    let username = SettingsManager.shared.generalUsername4VMs
+                                    let sshCommand = "ssh -l \(username) \(ipAddress)"
+
+                                    // 2. Copy to clipboard
+                                    let pb = NSPasteboard.general
+                                    pb.clearContents()
+                                    pb.setString(sshCommand, forType: .string)
+
+                                    // 3. Tell Terminal to run it and become frontmost
+                                    let appleScript = """
+                                    tell application "Terminal"
+                                        do script "\(sshCommand)"
+                                        activate
+                                        set frontmost to true
+                                    end tell
+                                    """
+                                    if let script = NSAppleScript(source: appleScript) {
+                                        var err: NSDictionary?
+                                        script.executeAndReturnError(&err)
+                                        if let error = err {
+                                            print("AppleScript error: \(error)")
+                                        }
+                                    }
+
+                                    // 4. As a belt‑and‑suspenders, explicitly activate Terminal via AppKit
+                                    if let term = NSRunningApplication.runningApplications(withBundleIdentifier: "com.apple.Terminal").first {
+                                        term.activate(options: [.activateAllWindows, .activateIgnoringOtherApps])
+                                    }
+                                }) {
+                                    Text(SettingsManager.shared.generalUsername4VMs.isEmpty ? "Go to settings to set username" : "Open SSH")
+                                }
+                                .disabled(SettingsManager.shared.generalUsername4VMs.isEmpty)
                             }
                     }.width(min: 120,max:120)
                     

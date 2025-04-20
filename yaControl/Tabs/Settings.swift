@@ -10,6 +10,7 @@ import LaunchAtLogin
 
 struct SettingsTabContent: View {
     @AppStorage("com.krusty84.yaControl.settings.oAuthKey") private var oAuthKey: String = SettingsManager.shared.oAuthKey
+    @AppStorage("com.krusty84.yaControl.settings.generalUsername4VMs") private var generalUsername4VMs: String = SettingsManager.shared.generalUsername4VMs
     @State private var responseCode: Int? = nil
     @State private var errorMessage: String? = nil
     @State private var selectedTab: Int = 0
@@ -68,6 +69,7 @@ struct SettingsTabContent: View {
         }
         .onAppear {
             oAuthKey = SettingsManager.shared.oAuthKey
+            generalUsername4VMs = SettingsManager.shared.generalUsername4VMs
         }
     }
     
@@ -85,17 +87,15 @@ struct SettingsTabContent: View {
                                 .toggleStyle(.switch)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .help("Launch this app automatically when you log in")
-                            //Spacer()
-                            // Add more preferences here
-                            // ExampleToggle("Some Option", isOn: $someOption)
                         }
-                        }
+                    }
                     .padding(.horizontal, 8)
                 } header: {
                     SectionHeader(title: "Application Preferences", systemImage: "gearshape.fill")
                 }
-                Spacer()
+                
                 Divider()
+
                 // Authentication Section
                 Section {
                     VStack(alignment: .leading, spacing: 12) {
@@ -123,6 +123,17 @@ struct SettingsTabContent: View {
                             .foregroundColor(.accentColor)
                     }
                     .padding(.bottom, 8)
+                }
+                // VM Username Section
+                Section {
+                    VStack(alignment: .leading, spacing: 12) {
+                        TextField("General VM's Username", text: $generalUsername4VMs)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .help("Username for managing your virtual machines")
+                    }
+                    .padding(.horizontal, 8)
+                } header: {
+                    SectionHeader(title: "General VM's Username", systemImage: "person.fill")
                 }
             }
             .padding(20)
@@ -178,7 +189,7 @@ struct SettingsTabContent: View {
                                             }
                                         ))
                                         .toggleStyle(.checkbox)
-                                        .disabled(!autoStartVM) // Disable when autoStartVM is false
+                                        .disabled(!autoStartVM)
                                         Spacer()
                                     }
                                 }
@@ -214,7 +225,7 @@ struct SettingsTabContent: View {
                                             }
                                         ))
                                         .toggleStyle(.checkbox)
-                                        .disabled(!autoStartVM) // Disable when autoStartVM is false
+                                        .disabled(!autoStartVM)
                                         Spacer()
                                     }
                                 }
@@ -243,7 +254,6 @@ struct SettingsTabContent: View {
                              TextField("The Lower Limit", text: $billingThreshold.toFormattedString())
                                  .textFieldStyle(RoundedBorderTextFieldStyle())
                                  .help("Set the minimum balance threshold for pay attention")
-                             
                          }
                      }
                      .padding(.horizontal, 8)
@@ -255,7 +265,6 @@ struct SettingsTabContent: View {
              .padding(20)
          }
      }
-    
     
     private var statusIndicator: some View {
         VStack(alignment: .leading, spacing: 4) {

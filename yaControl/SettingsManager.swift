@@ -19,11 +19,17 @@ class SettingsManager {
     private let startOptionsKey = "com.krusty84.yaControl.settings.startOptions"
     private let shutdownOptionsKey = "com.krusty84.yaControl.settings.shutdownOptions"
     private let autostartVMIdsKey = "com.krusty84.yaControl.settings.autostart_vm_ids"
+    private let generalUsername4VMs_ = "com.krusty84.yaControl.settings.generalUsername4VMs"
     
     // General Settings
     var oAuthKey: String {
         get { defaults.string(forKey: oAuthKey_) ?? "" }
         set { defaults.set(newValue, forKey: oAuthKey_) }
+    }
+    
+    var generalUsername4VMs: String {
+        get { defaults.string(forKey: generalUsername4VMs_) ?? "" }
+        set { defaults.set(newValue, forKey: generalUsername4VMs_) }
     }
     
     // Biiling Settings
