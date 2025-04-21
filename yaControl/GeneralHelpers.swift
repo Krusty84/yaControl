@@ -72,7 +72,6 @@ class Helpers:ObservableObject {
     
     // Button Start/Stop VM helper
     func startStopVM(iamToken: String, for vm: VMTableData) {
-        // Update UI state immediately
         
         Task {
             do {
@@ -181,6 +180,11 @@ class Helpers:ObservableObject {
 //        }
     }
     
+    func openTerminal() {
+        if let url = URL(string: "file:///System/Applications/Utilities/Terminal.app") {
+                NSWorkspace.shared.open(url)
+            }
+    }
     
     func convertBytesToGB(bytes: String) -> String {
         // Convert the input string (bytes) to a Double

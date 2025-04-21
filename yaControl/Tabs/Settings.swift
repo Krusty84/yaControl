@@ -102,13 +102,13 @@ struct SettingsTabContent: View {
                         HStack {
                             TextField("OAuth Key", text: $oAuthKey)
                                 .textFieldStyle(RoundedBorderTextFieldStyle())
-                            
+                            oAuthStatusIndicator
                             Button(action: checkOAuthKey) {
                                 Text("Verify")
                                     .frame(minWidth: 60)
                             }
                         }
-                        statusIndicator
+                        
                     }
                     .padding(.horizontal, 8)
                 } header: {
@@ -266,7 +266,7 @@ struct SettingsTabContent: View {
          }
      }
     
-    private var statusIndicator: some View {
+    private var oAuthStatusIndicator: some View {
         VStack(alignment: .leading, spacing: 4) {
             if let code = responseCode {
                 HStack(spacing: 4) {
@@ -281,9 +281,9 @@ struct SettingsTabContent: View {
             if let error = errorMessage {
                 HStack(spacing: 4) {
                     Image(systemName: "exclamationmark.triangle.fill")
-                        .foregroundColor(.orange)
-                    Text(error)
-                        .foregroundColor(.orange)
+                        .foregroundColor(.red)
+                    Text("Invalid credentials or Errors")
+                        .foregroundColor(.red)
                 }
                 .font(.caption)
             }
