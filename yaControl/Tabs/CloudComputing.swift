@@ -252,8 +252,7 @@ struct CloudComputingTabContent: View {
                                     guard let ipAddress = vm.addresses.first else { return }
 
                                     // 1. Build the SSH command
-                                    let username = SettingsManager.shared.generalUsername4VMs
-                                    let sshCommand = "ssh -l \(username) \(ipAddress)"
+                                    let sshCommand = "ssh -l \(SettingsManager.shared.generalUsername4VMs) \(ipAddress)"
 
                                     // 2. Copy to clipboard
                                     let pb = NSPasteboard.general
@@ -265,6 +264,13 @@ struct CloudComputingTabContent: View {
                                     Text(SettingsManager.shared.generalUsername4VMs.isEmpty ? "Go to settings to set username" : "Open SSH")
                                 }
                                 .disabled(SettingsManager.shared.generalUsername4VMs.isEmpty)
+                                
+                                Button(action: {
+                                    guard let ipAddress = vm.addresses.first else { return }
+                                    helpers.openRDPClient(to:ipAddress,username:SettingsManager.shared.generalUsername4VMs)
+                                }) {
+                                    Text("Open RDP")
+                                }
                             }
                     }.width(min: 120,max:120)
                     

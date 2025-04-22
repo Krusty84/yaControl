@@ -186,6 +186,25 @@ class Helpers:ObservableObject {
             }
     }
     
+    func openRDPClient(to ip: String, username: String = "Administrator") {
+        let lines = [
+            "full address:s:\(ip):3389",
+            "username:s:\(username)"
+        ]
+        let content = lines.joined(separator: "\r\n")
+        do {
+            // Create a temp file
+            let tempDir = FileManager.default.temporaryDirectory
+            let fileURL = tempDir.appendingPathComponent("connection.rdp")
+            try content.write(to: fileURL, atomically: true, encoding: .utf8)
+            // Open it in Remote Desktop
+            NSWorkspace.shared.open(fileURL)
+        } catch {
+            print("❌ Could not write RDP file:", error)
+        }
+    }
+
+    
     func convertBytesToGB(bytes: String) -> String {
         // Convert the input string (bytes) to a Double
         guard let bytesValue = Double(bytes) else {
