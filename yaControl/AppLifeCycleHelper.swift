@@ -15,7 +15,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             let shutdownOptions = SettingsManager.shared.shutdownOptions
             if shutdownOptions.contains(.afterAppExit) ||  shutdownOptions.contains(.afterMacOSShutdown) {
                 AppState.shared.handleShutdown { success in
-                    print(success ? "Shutdown tasks completed successfully." : "Shutdown tasks finished with errors.")
+                    LoggerHelper.info(success ? "Shutdown tasks completed successfully." : "Shutdown tasks finished with errors.")
                     NSApplication.shared.reply(toApplicationShouldTerminate: true)
                 }
                 return .terminateLater  // Wait for async completion
@@ -63,14 +63,16 @@ class AppLifecycleObserver: ObservableObject {
             workspaceNC.addObserver(forName: NSWorkspace.willSleepNotification, object: nil, queue: .main) { _ in
                 self.systemStatus = .aboutToSleep
                 UserDefaults.standard.set(Date(), forKey: self.lastSleepDateKey)
-                print("System will sleep")
-                AppState.shared.handleSleep { success in
-                    if success {
-                        print("Shutdown tasks completed successfully.")
-                    } else {
-                        print("Shutdown tasks finished with errors.")
+                LoggerHelper.info("System gonna sleep")
+                if SettingsManager.shared.autoStartEnabled {
+                    let shutdownOptions = SettingsManager.shared.shutdownOptions
+                    if shutdownOptions.contains(.afterMacOSSleep) {
+                        AppState.shared.handleSleep { success in
+                            LoggerHelper.info(success ? "Shutdown tasks completed successfully." : "Shutdown tasks finished with errors.")
+                            NSApplication.shared.reply(toApplicationShouldTerminate: true)
+                        }
+                        NSApplication.shared.reply(toApplicationShouldTerminate: true)
                     }
-                    NSApplication.shared.reply(toApplicationShouldTerminate: true)
                 }
             },
 
@@ -99,7 +101,7 @@ class AppLifecycleObserver: ObservableObject {
     private func handleFirstLaunch() {
         if isFirstLaunch {
             systemStatus = .firstLaunch
-            print("First launch detected")
+            LoggerHelper.info("First launch detected")
             UserDefaults.standard.set(true, forKey: hasLaunchedBeforeKey)
             AppState.shared.handleFirstLaunch()
         }
@@ -111,7 +113,7 @@ class AppLifecycleObserver: ObservableObject {
         
         if let lastSleepDate = UserDefaults.standard.object(forKey: lastSleepDateKey) as? Date {
             let sleepDuration = Date().timeIntervalSince(lastSleepDate)
-            print("System slept for \(sleepDuration) seconds")
+            LoggerHelper.info("System slept for \(sleepDuration) seconds")
         }
 
         AppState.shared.handleWake()

@@ -56,16 +56,13 @@ struct yaControlApp: App {
                         
                     } catch {
                         await MainActor.run {
-                            // Update shared state on main thread
-                            // AppState.shared.errorMessage = error.localizedDescription
-                            print("Auto-start failed: \(error.localizedDescription)")
+                            LoggerHelper.error("Auto-start failed: \(error.localizedDescription)")
                         }
                     }
                 }
             }
-            
             else {
-                print("No VMs selected for auto-start on app launch")
+                LoggerHelper.info("No VMs selected for auto-start on app launch")
             }
             AppState.shared.checkNumRunningVMs()
         }

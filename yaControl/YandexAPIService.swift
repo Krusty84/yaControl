@@ -159,7 +159,11 @@ class YandexAPIService:ObservableObject {
                                     let addresses = instance.networkInterfaces.compactMap {
                                         $0.primaryV4Address.oneToOneNat?.address
                                     }
-                                    self.lastUpdateTime = Date ()
+                                  //  self.lastUpdateTime = Date ()
+                                    
+                                    DispatchQueue.main.async {
+                                        self.lastUpdateTime = Date()
+                                    }
                                     
                                     return VMTableData(
                                         id: instance.id,
@@ -225,7 +229,12 @@ class YandexAPIService:ObservableObject {
                             innerGroup.addTask {
                                 // Step 3: Get Serverless Functions for each Folder
                                 let functions = try await self.getSLFs(iamToken: iamToken, folderId: folder.id)
-                                self.lastUpdateTime = Date ()
+                                
+                                //self.lastUpdateTime = Date ()
+                                
+                                DispatchQueue.main.async {
+                                    self.lastUpdateTime = Date ()
+                                       }
                                 
                                 return functions.map { function in
                                     ServerLessFunctionTableData(
@@ -294,7 +303,11 @@ class YandexAPIService:ObservableObject {
                                             let bucketInfo = try await self.getBucketInfo(iamToken: iamToken, bucketName: bucket.name)
                                             
                                             // Update last update time
-                                            self.lastUpdateTime = Date ()
+                                            //self.lastUpdateTime = Date ()
+                                            
+                                            DispatchQueue.main.async {
+                                                self.lastUpdateTime = Date ()
+                                                   }
                                             
                                             // Create BucketTableData
                                             return BucketTableData(
@@ -414,7 +427,8 @@ class YandexAPIService:ObservableObject {
             }
         } catch {
             if let decodingError = error as? DecodingError {
-                debugPrint("Decoding Error:", decodingError)
+                //debugPrint("Decoding Error:", decodingError)
+                LoggerHelper.error("Decoding Error: \(decodingError)")
             }
             throw VMInstanceError.decodingError
         }
@@ -474,7 +488,8 @@ class YandexAPIService:ObservableObject {
             }
         } catch {
             if let decodingError = error as? DecodingError {
-                debugPrint("Decoding Error:", decodingError)
+                //debugPrint("Decoding Error:", decodingError)
+                LoggerHelper.error("Decoding Error: \(decodingError)")
             }
             throw ServerlessFunctionError.decodingError
         }
@@ -534,7 +549,8 @@ class YandexAPIService:ObservableObject {
             }
         } catch {
             if let decodingError = error as? DecodingError {
-                debugPrint("Decoding Error:", decodingError)
+                //debugPrint("Decoding Error:", decodingError)
+                LoggerHelper.error("Decoding Error: \(decodingError)")
             }
             throw BucketError.decodingError
         }
@@ -570,7 +586,8 @@ class YandexAPIService:ObservableObject {
             
             return try JSONDecoder().decode(BucketInfo.self, from: data)
         } catch {
-            debugPrint("Decoding Error:", error)
+            //debugPrint("Decoding Error:", error)
+            LoggerHelper.error("Decoding Error: \(error)")
             throw BucketInfoError.decodingError(error)
         }
     }
@@ -623,7 +640,9 @@ class YandexAPIService:ObservableObject {
             }
         } catch {
             if let decodingError = error as? DecodingError {
-                debugPrint("Decoding Error:", decodingError)
+                //debugPrint("Decoding Error:", decodingError)
+                LoggerHelper.error("Decoding Error: \(decodingError)")
+                
             }
             throw BillingError.decodingError
         }

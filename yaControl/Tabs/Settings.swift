@@ -21,6 +21,7 @@ struct SettingsTabContent: View {
     @State private var errorMessage: String? = nil
     @State private var selectedTab: Int = 0
     @State private var autoStartVM: Bool = false
+    @State private var appLogging: Bool = false
     @State private var startOptions: [StartOption] = []
     @State private var shutdownOptions: [ShutdownOption] = []
 
@@ -68,6 +69,7 @@ struct SettingsTabContent: View {
             oAuthKey = SettingsManager.shared.oAuthKey
             generalUsername4VMs = SettingsManager.shared.generalUsername4VMs
             autoStartVM = SettingsManager.shared.autoStartEnabled
+            appLogging = SettingsManager.shared.appLoggingEnabled
             startOptions = SettingsManager.shared.startOptions
             shutdownOptions = SettingsManager.shared.shutdownOptions
             billingThreshold = SettingsManager.shared.billingThreshold
@@ -79,11 +81,19 @@ struct SettingsTabContent: View {
         ScrollView {
             VStack(spacing: 10) {
                 Section {
-                    LaunchAtLogin.Toggle()
-                        .toggleStyle(.switch)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .help("Launch this app automatically when you log in")
-                        .padding(.horizontal, 8)
+                    HStack(spacing: 20) {  // Adjust spacing as needed
+                        LaunchAtLogin.Toggle()
+                            .toggleStyle(.switch)
+                            .help("Launch this app automatically when you log in")
+                        
+                        Toggle("Application Logging", isOn: $appLogging)
+                            .toggleStyle(.switch)
+                            .onChange(of: appLogging) { SettingsManager.shared.appLoggingEnabled = $0 }
+                            .help("Enable/disable application logging")
+                        
+                        Spacer() // Pushes content to the left
+                    }
+                    .padding(.horizontal, 8)
                 } header: {
                     SectionHeader(title: "Application Preferences", systemImage: "gearshape.fill")
                 }
@@ -194,7 +204,7 @@ struct SettingsTabContent: View {
                                             }
                                        ))
                                 .toggleStyle(.checkbox)
-                                .disabled(!autoStartVM)
+                                .disabled(option == .afterMacOSShutdown)
                             }
                         }
                         .padding(.horizontal, 8)

@@ -141,11 +141,6 @@ struct BucketTabContent: View {
                     }.width(min: 80, ideal: 80,max:150)
                 }
                 .padding(.vertical, 6)
-//                .onChange(of: selectedBucket) { oldSelection, newSelection in
-//                    if let selectedBucketId = newSelection, let selectedBucket = filteredBuckets.first(where: { $0.id == selectedBucketId }) {
-//                        print("Selected Bucket ID: \(selectedBucket.id)")
-//                    }
-//                }
             }
             StatusPanel(
                 lastUpdateTime: yandexApi.lastUpdateTime,
@@ -196,8 +191,8 @@ struct BucketTabContent: View {
                 // 4. Handle errors
                 await MainActor.run {
                     self.isLoading = false
-                    print(error.localizedDescription)
                     self.errorMessage = error.localizedDescription
+                    LoggerHelper.error("Error fetching Cloud Storage: \(error.localizedDescription)")
                 }
             }
         }

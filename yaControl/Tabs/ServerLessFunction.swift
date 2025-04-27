@@ -163,11 +163,6 @@ struct ServerLessFunctionTabContent: View {
                     }.width(min: 150,max:150)
                 }
                 .padding(.vertical, 6)
-//                .onChange(of: selectedSlf) { oldSelection, newSelection in
-//                    if let selectedSLFId = newSelection, let selectedSLF = filteredSLFs.first(where: { $0.id == selectedSLFId }) {
-//                        print("Selected SLF ID: \(selectedSLF.id)")
-//                    }
-//                }
             }
             StatusPanel(
                 lastUpdateTime: yandexApi.lastUpdateTime,
@@ -219,8 +214,8 @@ struct ServerLessFunctionTabContent: View {
                 // 5. Handle errors
                 await MainActor.run {
                     self.isLoading = false
-                    print(error.localizedDescription)
                     self.errorMessage = error.localizedDescription
+                    LoggerHelper.error("Error fetching Serverless Functions: \(error.localizedDescription)")
                 }
             }
         }

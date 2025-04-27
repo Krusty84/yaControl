@@ -33,7 +33,6 @@ struct CloudComputingTabContent: View {
     @State private var isPolling = false
     @State private var pollingTask: Task<Void, Never>?
     @State private var currentlyProcessingVMID: String? = nil
-    
     @State private var activePollingTasks: [String: Task<Void, Never>] = [:] // VM ID -> Task
     @State private var processingStates: [String: String] = [:] // VM ID -> Status
     //
@@ -54,10 +53,7 @@ struct CloudComputingTabContent: View {
     var runningVMs: Int {
         return vmTableData.filter { $0.status == "RUNNING" }.count
     }
-    @State private var previousRunningVMs: Int = 0
-    // 0 - stopping, 1 - running
-    @State private var proccessingVMType: Int = 0
-    
+
     var body: some View {
         VStack(spacing: 0) {
             // Search Bar
@@ -81,24 +77,7 @@ struct CloudComputingTabContent: View {
                 .padding(.horizontal)
                 Spacer()
                 Button(action: {
-                    if(proccessingVMType == 0 && runningVMs == previousRunningVMs){
-                        fetchVMs()
-                    } else if(proccessingVMType == 0 && runningVMs < previousRunningVMs){
-                        fetchVMs()
-                        //helpers.processingVMName.removeAll()
-                    } else if (proccessingVMType == 1 && runningVMs == previousRunningVMs){
-                        fetchVMs()
-                    } else if (proccessingVMType == 1 && runningVMs > previousRunningVMs){
-                        fetchVMs()
-                        //helpers.processingVMName.removeAll()
-                    } else {
-                        fetchVMs()
-                    }
-                    if (vmTableData.filter { $0.status == "RUNNING" }.count == 0){
-                        appState.isVirtualMachineRunning = false
-                    } else {
-                        appState.isVirtualMachineRunning = true
-                    }
+                    fetchVMs()
                 }) {
                     Image(systemName: "arrow.clockwise")
                 }
@@ -193,20 +172,10 @@ struct CloudComputingTabContent: View {
                         //let isProcessing = helpers.processingVMName.contains(vm.name)
                         Button(action: {
                             // Store the VM we're processing
-                            currentlyProcessingVMID = vm.id
+                            //currentlyProcessingVMID = vm.id
                             guard processingStates[vm.id] == nil else { return } // Prevent duplicate clicks
-                            // Determine action type (start or stop)
-                            if vm.status == "RUNNING" {
-                                previousRunningVMs = runningVMs
-                                proccessingVMType = 0
-                            } else {
-                                previousRunningVMs = runningVMs
-                                proccessingVMType = 1
-                            }
-                            
                             // Start the initial action
                             helpers.startStopVM(iamToken: iamToken, for: vm)
-                            
                             // Start polling for status updates
                             startPolling(for: vm.id)
                         }) {
@@ -298,11 +267,6 @@ struct CloudComputingTabContent: View {
                     }.width(min: 120, max:120)
                 }
                 .padding(.vertical, 6)
-//                .onChange(of: selectedVM) { oldSelection, newSelection in
-//                    if let selectedVMId = newSelection, let selectedVM = filteredVMs.first(where: { $0.id == selectedVMId }) {
-//                        print("Selected VM ID: \(selectedVM.id)")
-//                    }
-//                }
             }
             
             StatusPanel(
@@ -351,17 +315,21 @@ struct CloudComputingTabContent: View {
                 // Step 2: Get VMs using the IAM Token
                 let allVMs = try await YandexAPIService.shared.getVMs(iamToken: authResponse.iamToken)
                 let billings = try await YandexAPIService.shared.getCosts(iamToken: iamToken)
+                
                 // Update UI on main thread
                 await MainActor.run {
                     vmTableData = allVMs
                     self.sortTableDataByStatus()
-                    //
                     self.billingData = billings
                     if let firstBilling = billings.first {
                         self.currentBalance = firstBilling.balance
                         self.currency = firstBilling.currency
                         self.billingUrl = firstBilling.billingUrl
                     }
+                    
+                    // Update VM running state
+                    appState.isVirtualMachineRunning = !vmTableData.filter { $0.status == "RUNNING" }.isEmpty
+                    
                     isLoading = false
                 }
                 
@@ -370,7 +338,7 @@ struct CloudComputingTabContent: View {
                 await MainActor.run {
                     isLoading = false
                     errorMessage = error.localizedDescription
-                    print("Error fetching VMs: \(error.localizedDescription)")
+                    LoggerHelper.error("Error fetching VMs: \(error.localizedDescription)")
                 }
             }
         }
@@ -383,7 +351,8 @@ struct CloudComputingTabContent: View {
         // Create new task
         let task = Task {
             // Set initial processing state
-            await setProcessingState(for: vmID, status: nil)
+            //await setProcessingState(for: vmID, status: nil)
+            setProcessingState(for: vmID, status: nil)
             
             var retryCount = 0
             let maxRetries = 20
@@ -401,11 +370,13 @@ struct CloudComputingTabContent: View {
                     }
                     
                     // Update UI immediately
-                    await updateVMInTable(updatedVM)
+                    //await updateVMInTable(updatedVM)
+                     updateVMInTable(updatedVM)
                     
                     // Check completion
                     if await isOperationComplete(for: vmID, currentStatus: updatedVM.status) {
-                        await cleanupPolling(for: vmID)
+                        //await cleanupPolling(for: vmID)
+                         cleanupPolling(for: vmID)
                         notifyCompletion(for: updatedVM)
                         return
                     }
@@ -419,7 +390,8 @@ struct CloudComputingTabContent: View {
             }
             
             // Timeout handling
-            await cleanupPolling(for: vmID)
+            //await cleanupPolling(for: vmID)
+             cleanupPolling(for: vmID)
             notifyTimeout(for: vmID)
         }
         
@@ -445,7 +417,7 @@ struct CloudComputingTabContent: View {
         
         let runningCount = vmTableData.filter { $0.status == "RUNNING" }.count
         appState.isVirtualMachineRunning = runningCount > 0
-        print("Updated running state: \(appState.isVirtualMachineRunning ? "RUNNING" : "STOPPED")")
+        LoggerHelper.info("Updated running state: \(appState.isVirtualMachineRunning ? "RUNNING" : "STOPPED")")
         
     }
     
@@ -507,7 +479,7 @@ struct CloudComputingTabContent: View {
         // Check current notification settings first
         center.getNotificationSettings { settings in
             guard settings.authorizationStatus == .authorized else {
-                print("Notifications not authorized")
+                LoggerHelper.error("Notifications not authorized")
                 return
             }
             
@@ -526,9 +498,7 @@ struct CloudComputingTabContent: View {
             
             center.add(request) { error in
                 if let error = error {
-                    print("Failed to show notification: \(error.localizedDescription)")
-                } else {
-                    print("Notification shown successfully")
+                    LoggerHelper.error("Failed to show notification: \(error.localizedDescription)")
                 }
             }
         }

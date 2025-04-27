@@ -39,8 +39,6 @@ class Helpers:ObservableObject {
     }
     
     func convertGMTToLocalTime(utcDateString: String) -> String {
-        print("Input Date: " + utcDateString)
-        
         // Define possible date formats
         let dateFormats = [
             "yyyy-MM-dd'T'HH:mm:ss.SSSZ", // With milliseconds
@@ -66,7 +64,7 @@ class Helpers:ObservableObject {
         }
         
         // If none of the formats worked
-        print("Failed to parse the date string")
+        LoggerHelper.error("Failed to parse the date string")
         return ""
     }
     
@@ -77,13 +75,10 @@ class Helpers:ObservableObject {
             do {
                 if vm.status == "RUNNING" {
                     try await YandexAPIService.shared.stopVM(iamToken: iamToken, vmId: vm.id)
-                    print("VM stopped successfully")
+                    LoggerHelper.info("VM stopped successfully")
                 } else if vm.status == "STOPPED"{
                     try await YandexAPIService.shared.startVM(iamToken: iamToken, vmId: vm.id)
-                    await MainActor.run {
-                        self.appState.isVirtualMachineRunning = true
-                    }
-                    print("VM started successfully")
+                    LoggerHelper.info("VM started successfully")
                 }
                 
                 // Refresh VM list after operation completes
@@ -93,7 +88,7 @@ class Helpers:ObservableObject {
                 
             } catch {
                 await MainActor.run {
-                    print("Failed to \(vm.status == "RUNNING" ? "stop" : "start") VM: \(error.localizedDescription)")
+                    LoggerHelper.error("Failed to \(vm.status == "RUNNING" ? "stop" : "start") VM: \(error.localizedDescription)")
                 }
             }
             
@@ -115,7 +110,7 @@ class Helpers:ObservableObject {
                         for vm in runningVMs {
                             group.addTask {
                                 try await YandexAPIService.shared.stopVM(iamToken: iamToken, vmId: vm.id)
-                                print("VM stopped successfully: \(vm.name)")
+                                LoggerHelper.info("VM stopped successfully: \(vm.name)")
                             }
                         }
                         // Wait for all tasks to complete
@@ -127,7 +122,7 @@ class Helpers:ObservableObject {
                         for vmId in vmIds {
                             group.addTask {
                                 try await YandexAPIService.shared.stopVM(iamToken: iamToken, vmId: vmId)
-                                print("VM stopped successfully: \(vmId)")
+                                LoggerHelper.info("VM stopped successfully: \(vmId)")
                             }
                         }
                         // Wait for all tasks to complete
@@ -143,7 +138,7 @@ class Helpers:ObservableObject {
                 
             } catch {
                 await MainActor.run {
-                    print("Error stopping VMs: \(error.localizedDescription)")
+                    LoggerHelper.error("Error stopping VMs: \(error.localizedDescription)")
                     //self.processingVMName = nil
                     //self.processingVMName = ""
                 }
@@ -156,7 +151,7 @@ class Helpers:ObservableObject {
         let vmIdsToStart = vmIds ?? SettingsManager.shared.getAllAutostartVMs()
         // 2. Early return if no VMs to start
         guard !vmIdsToStart.isEmpty else {
-            print("No VMs marked for auto-start")
+            LoggerHelper.info("No VMs marked for auto-start")
             return
         }
         
@@ -166,9 +161,9 @@ class Helpers:ObservableObject {
                 group.addTask {
                     do {
                         try await YandexAPIService.shared.startVM(iamToken: iamToken, vmId: vmId)
-                        print("VM started successfully: \(vmId)")
+                        LoggerHelper.info("VM started successfully: \(vmId)")
                     } catch {
-                        print("Failed to start VM \(vmId): \(error.localizedDescription)")
+                        LoggerHelper.error("Failed to start VM \(vmId): \(error.localizedDescription)")
                     }
                 }
             }
@@ -200,7 +195,7 @@ class Helpers:ObservableObject {
             // Open it in Remote Desktop
             NSWorkspace.shared.open(fileURL)
         } catch {
-            print("❌ Could not write RDP file:", error)
+            LoggerHelper.error("Could not write RDP file: \(error)")
         }
     }
 
@@ -228,10 +223,13 @@ class Helpers:ObservableObject {
         monitor.pathUpdateHandler = { path in
             if path.status == .satisfied {
                 // Internet connection is available
+                LoggerHelper.info("Internet access is available")
                 DispatchQueue.main.async {
                     completion() // Call the completion handler
                 }
                 monitor.cancel() // Stop monitoring once the connection is available
+            } else{
+                LoggerHelper.error("The Internet access does not work")
             }
         }
 

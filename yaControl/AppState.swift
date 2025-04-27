@@ -41,36 +41,6 @@ class AppState: ObservableObject {
                 guard !isLoading else { return }
                 isLoading = true
                 errorMessage = nil
-//                YandexAPIService.shared.checkOauthKey(yandexPassportOauthToken: SettingsManager.shared.oAuthKey) { [weak self] result in
-//                    DispatchQueue.main.async {
-//                        guard let self = self else { return }
-//                        switch result {
-//                        case .success(let response):
-//                            let iamToken = response.iamToken
-//                            YandexAPIService.shared.getVMs(iamToken: iamToken) { [weak self] result in
-//                                DispatchQueue.main.async {
-//                                    guard let self = self else { return }
-//                                    self.isLoading = false
-//                                    switch result {
-//                                    case .success(let allVMs):
-//                                        self.vmTableData = allVMs
-//                                        self.updateAppState(with: allVMs)
-//                                        let runningVMIds = allVMs.filter { $0.status == "RUNNING" }.map { $0.id }
-//                                        completion?(runningVMIds)
-//                                    case .failure(let error):
-//                                        self.errorMessage = error.localizedDescription
-//                                        completion?([])
-//                                    }
-//                                }
-//                            }
-//                        case .failure(let error):
-//                            self.isLoading = false
-//                            print(error.localizedDescription)
-//                            self.errorMessage = error.localizedDescription
-//                            completion?([])
-//                        }
-//                    }
-//                }
         Task { [weak self] in
             guard let self else { return }
             
@@ -118,7 +88,7 @@ class AppState: ObservableObject {
     
     //MARK: - Handlers for AppLifecycleObserver catcher
     func handleFirstLaunch(){
-        print("Start application")
+        LoggerHelper.info("Start application")
     }
     
     func handleShutdown(completion: @escaping (Bool) -> Void) {
@@ -140,15 +110,15 @@ class AppState: ObservableObject {
                 let response = try await YandexAPIService.shared.checkOauthKey(
                     yandexPassportOauthToken: SettingsManager.shared.oAuthKey
                 )
-                print("IAM token acquired successfully")
+                LoggerHelper.info("IAM token acquired successfully")
 
                 // 2. Get running VMs
                 let allVMs = try await YandexAPIService.shared.getVMs(iamToken: response.iamToken)
                 let runningVMIds = allVMs.filter { $0.status == "RUNNING" }.map { $0.id }
-                print("Running VM IDs: \(runningVMIds)")
+                LoggerHelper.info("Running VM IDs: \(runningVMIds)")
 
                 guard !runningVMIds.isEmpty else {
-                    print("No running VMs found")
+                    LoggerHelper.info("No running VMs found")
                     await MainActor.run {
                         self.isLoading = false
                     }
@@ -164,7 +134,7 @@ class AppState: ObservableObject {
                                 iamToken: response.iamToken,
                                 vmId: vmId
                             )
-                            print("Successfully stopped VM: \(vmId)")
+                            LoggerHelper.info("Successfully stopped VM: \(vmId)")
                         }
                     }
 
@@ -183,7 +153,7 @@ class AppState: ObservableObject {
                 await MainActor.run {
                     self.isLoading = false
                     self.errorMessage = error.localizedDescription
-                    print("Operation failed: \(error.localizedDescription)")
+                    LoggerHelper.error("Operation failed: \(error.localizedDescription)")
                 }
                 completion(false)
             }
@@ -210,15 +180,15 @@ class AppState: ObservableObject {
                 let response = try await YandexAPIService.shared.checkOauthKey(
                     yandexPassportOauthToken: SettingsManager.shared.oAuthKey
                 )
-                print("IAM token acquired successfully")
+                LoggerHelper.info("IAM token acquired successfully")
                 
                 // 2. Get running VMs
                 let allVMs = try await YandexAPIService.shared.getVMs(iamToken: response.iamToken)
                 let runningVMIds = allVMs.filter { $0.status == "RUNNING" }.map { $0.id }
-                print("Running VM IDs: \(runningVMIds)")
-
+                LoggerHelper.info("Running VM IDs: \(runningVMIds)")
+                
                 guard !runningVMIds.isEmpty else {
-                    print("No running VMs found")
+                    LoggerHelper.info("No running VMs found")
                     await MainActor.run {
                         self.isLoading = false
                     }
@@ -237,9 +207,9 @@ class AppState: ObservableObject {
                                     iamToken: response.iamToken,
                                     vmId: vmId
                                 )
-                                print("Successfully stopped VM: \(vmId)")
+                                LoggerHelper.info("Successfully stopped VM: \(vmId)")
                             } catch {
-                                print("Failed to stop VM \(vmId): \(error.localizedDescription)")
+                                LoggerHelper.error("Failed to stop VM \(vmId): \(error.localizedDescription)")
                                 await MainActor.run {
                                     stopErrors.append(error)
                                 }

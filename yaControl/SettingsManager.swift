@@ -10,18 +10,23 @@ import Foundation
 class SettingsManager {
     static let shared = SettingsManager()
     private let defaults = UserDefaults.standard
-
     // Keys
     private let oAuthKey_ = "com.krusty84.yaControl.settings.oAuthKey"
     private let billingThresholdKey = "com.krusty84.yaControl.settings.billingThreshold"
     private let billingDefaultThreshold = 50.0
     private let autoStartEnabledKey = "com.krusty84.yaControl.settings.autoStartEnabled"
+    private let appLoggingEnabledKey = "com.krusty84.yaControl.settings.appLoggingEnabled"
     private let startOptionsKey = "com.krusty84.yaControl.settings.startOptions"
     private let shutdownOptionsKey = "com.krusty84.yaControl.settings.shutdownOptions"
     private let autostartVMIdsKey = "com.krusty84.yaControl.settings.autostart_vm_ids"
     private let generalUsername4VMs_ = "com.krusty84.yaControl.settings.generalUsername4VMs"
 
     // General
+    var appLoggingEnabled: Bool {
+        get { defaults.bool(forKey: appLoggingEnabledKey) }
+        set { defaults.set(newValue, forKey: appLoggingEnabledKey) }
+    }
+    
     var oAuthKey: String {
         get { defaults.string(forKey: oAuthKey_) ?? "" }
         set { defaults.set(newValue, forKey: oAuthKey_) }
