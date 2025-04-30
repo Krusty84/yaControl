@@ -43,6 +43,8 @@ struct SettingsTabContent: View {
         case afterMacOSShutdown = "After macOS shutdown"
         case afterMacOSSleep    = "After macOS sleep"
     }
+    
+    @State private var isHovering = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -121,6 +123,14 @@ struct SettingsTabContent: View {
                         Link("Get OAuth Key", destination: URL(string: APIConfig.yaGetOAuthKey)!)
                             .font(.subheadline)
                             .foregroundColor(.accentColor)
+                            .onHover { hovering in
+                                isHovering = hovering
+                                if hovering {
+                                    NSCursor.pointingHand.push()
+                                } else {
+                                    NSCursor.pop()
+                                }
+                            }
                     }
                     .padding(.bottom, 8)
                 }
@@ -143,6 +153,14 @@ struct SettingsTabContent: View {
                         Link("Get Yandex Cloud CLI", destination: URL(string: APIConfig.yaGetYCCLI)!)
                             .font(.subheadline)
                             .foregroundColor(.accentColor)
+                            .onHover { hovering in
+                                isHovering = hovering
+                                if hovering {
+                                    NSCursor.pointingHand.push()
+                                } else {
+                                    NSCursor.pop()
+                                }
+                            }
                     }
                     .padding(.bottom, 8)
                 }

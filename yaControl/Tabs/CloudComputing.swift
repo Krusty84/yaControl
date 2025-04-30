@@ -171,12 +171,8 @@ struct CloudComputingTabContent: View {
                         // Determine if this VM is currently being processed
                         //let isProcessing = helpers.processingVMName.contains(vm.name)
                         Button(action: {
-                            // Store the VM we're processing
-                            //currentlyProcessingVMID = vm.id
                             guard processingStates[vm.id] == nil else { return } // Prevent duplicate clicks
-                            // Start the initial action
                             helpers.startStopVM(iamToken: iamToken, for: vm)
-                            // Start polling for status updates
                             startPolling(for: vm.id)
                         }) {
                             Image(systemName: processingStates[vm.id] == vm.id ? "arrow.triangle.2.circlepath" : {
@@ -302,17 +298,14 @@ struct CloudComputingTabContent: View {
         
         Task {
             do {
-                // Step 1: Get IAM Token
                 let authResponse = try await YandexAPIService.shared.checkOauthKey(
                     yandexPassportOauthToken: SettingsManager.shared.oAuthKey
                 )
                 
-                // Store the IAM token
                 await MainActor.run {
                     iamToken = authResponse.iamToken
                 }
                 
-                // Step 2: Get VMs using the IAM Token
                 let allVMs = try await YandexAPIService.shared.getVMs(iamToken: authResponse.iamToken)
                 let billings = try await YandexAPIService.shared.getCosts(iamToken: iamToken)
                 
@@ -351,7 +344,6 @@ struct CloudComputingTabContent: View {
         // Create new task
         let task = Task {
             // Set initial processing state
-            //await setProcessingState(for: vmID, status: nil)
             setProcessingState(for: vmID, status: nil)
             
             var retryCount = 0
@@ -370,13 +362,11 @@ struct CloudComputingTabContent: View {
                     }
                     
                     // Update UI immediately
-                    //await updateVMInTable(updatedVM)
                      updateVMInTable(updatedVM)
                     
                     // Check completion
                     if await isOperationComplete(for: vmID, currentStatus: updatedVM.status) {
-                        //await cleanupPolling(for: vmID)
-                         cleanupPolling(for: vmID)
+                        cleanupPolling(for: vmID)
                         notifyCompletion(for: updatedVM)
                         return
                     }
@@ -390,8 +380,7 @@ struct CloudComputingTabContent: View {
             }
             
             // Timeout handling
-            //await cleanupPolling(for: vmID)
-             cleanupPolling(for: vmID)
+            cleanupPolling(for: vmID)
             notifyTimeout(for: vmID)
         }
         
@@ -399,7 +388,6 @@ struct CloudComputingTabContent: View {
         activePollingTasks[vmID] = task
     }
     
-    // 3. Helper functions
     @MainActor
     private func setProcessingState(for vmID: String, status: String?) {
         if let status = status {

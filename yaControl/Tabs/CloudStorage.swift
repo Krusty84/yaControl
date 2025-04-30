@@ -157,16 +157,13 @@ struct BucketTabContent: View {
     private func fetchBuckets() {
         isLoading = true
         errorMessage = nil
-        // Step 1: Get IAM Token
-                
+        
         Task {
             do {
-                // 1. Authenticate and get IAM token
                 let authResponse = try await YandexAPIService.shared.checkOauthKey(
                     yandexPassportOauthToken: SettingsManager.shared.oAuthKey
                 )
                 
-                // 2. Store IAM token and fetch buckets
                 await MainActor.run {
                     self.iamToken = authResponse.iamToken
                 }
@@ -175,7 +172,7 @@ struct BucketTabContent: View {
                     iamToken: authResponse.iamToken
                 )
                 let billings = try await YandexAPIService.shared.getCosts(iamToken: iamToken)
-                // 3. Update UI with results
+                // Update UI with results
                 await MainActor.run {
                     self.bucketTableData = allBuckets
                     self.billingData = billings
@@ -188,7 +185,7 @@ struct BucketTabContent: View {
                 }
                 
             } catch {
-                // 4. Handle errors
+                // Handle errors
                 await MainActor.run {
                     self.isLoading = false
                     self.errorMessage = error.localizedDescription

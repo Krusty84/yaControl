@@ -137,9 +137,7 @@ struct ServerLessFunctionTabContent: View {
                                        pasteboard.setString(slf.httpInvokeUrl, forType: .string)
                                    }
                                 Button(action: {
-                                    //guard let ipAddress = vm.addresses.first else { return }
-
-                                    // 1. Build the SSH command
+                                    // 1. Build the yc cli command
                                     let ycCommand = "yc serverless function invoke \(slf.id)"
 
                                     // 2. Copy to clipboard
@@ -195,26 +193,22 @@ struct ServerLessFunctionTabContent: View {
     private func fetchServerLessFunctions() {
         isLoading = true
         errorMessage = nil
-        // Step 1: Get IAM Token
         
         Task {
             do {
-                // 1. Authenticate and get IAM token
                 let authResponse = try await YandexAPIService.shared.checkOauthKey(
                     yandexPassportOauthToken: SettingsManager.shared.oAuthKey
                 )
                 
-                // 2. Store IAM token
                 await MainActor.run {
                     self.iamToken = authResponse.iamToken
                 }
                 
-                // 3. Fetch serverless functions
                 let allSLFs = try await YandexAPIService.shared.getServerLessFunctions(
                     iamToken: authResponse.iamToken
                 )
                 let billings = try await YandexAPIService.shared.getCosts(iamToken: iamToken)
-                // 4. Update UI state
+                // Update UI state
                 await MainActor.run {
                     self.slfTableData = allSLFs
                     self.billingData = billings
@@ -227,7 +221,7 @@ struct ServerLessFunctionTabContent: View {
                 }
                 
             } catch {
-                // 5. Handle errors
+                // Handle errors
                 await MainActor.run {
                     self.isLoading = false
                     self.errorMessage = error.localizedDescription
