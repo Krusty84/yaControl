@@ -16,12 +16,15 @@ struct SettingsTabContent: View {
     @AppStorage("com.krusty84.yaControl.settings.generalUsername4VMs")
     private var generalUsername4VMs: String = SettingsManager.shared.generalUsername4VMs
 
+    @State private var appLogging: Bool = false
+    
+    @State private var ycCLIInstalled: Bool = false
+    
     // VM Management State
     @State private var responseCode: Int? = nil
     @State private var errorMessage: String? = nil
     @State private var selectedTab: Int = 0
     @State private var autoStartVM: Bool = false
-    @State private var appLogging: Bool = false
     @State private var startOptions: [StartOption] = []
     @State private var shutdownOptions: [ShutdownOption] = []
 
@@ -70,6 +73,7 @@ struct SettingsTabContent: View {
             generalUsername4VMs = SettingsManager.shared.generalUsername4VMs
             autoStartVM = SettingsManager.shared.autoStartEnabled
             appLogging = SettingsManager.shared.appLoggingEnabled
+            ycCLIInstalled = SettingsManager.shared.ycCLIInstalled
             startOptions = SettingsManager.shared.startOptions
             shutdownOptions = SettingsManager.shared.shutdownOptions
             billingThreshold = SettingsManager.shared.billingThreshold
@@ -122,16 +126,30 @@ struct SettingsTabContent: View {
                 }
 
                 Section {
-                    TextField("General VM's Username", text: $generalUsername4VMs)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .help("Username for managing your virtual machines")
-                        .padding(.horizontal, 8)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Toggle("Installed", isOn: $ycCLIInstalled)
+                            .toggleStyle(.switch)
+                            .onChange(of: ycCLIInstalled) { SettingsManager.shared.ycCLIInstalled = $0 }
+                            .help("Enable/disable application logging")
+                            // make the toggle fill its container, and align its label to the left
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    .padding(.horizontal, 8)
                 } header: {
-                    SectionHeader(title: "General VM's Username", systemImage: "person.fill")
+                    HStack {
+                        Label("Yandex Cloud CLI", systemImage: "terminal.fill")
+                            .font(.headline)
+                        Spacer()
+                        Link("Get Yandex Cloud CLI", destination: URL(string: APIConfig.yaGetYCCLI)!)
+                            .font(.subheadline)
+                            .foregroundColor(.accentColor)
+                    }
+                    .padding(.bottom, 8)
                 }
             }
             .padding(20)
         }
+ 
     }
 
     // MARK: – VM Management Tab
@@ -213,7 +231,17 @@ struct SettingsTabContent: View {
                 }
                 .padding(.horizontal, 8)
 
-                Spacer()
+                Divider()
+                
+                Section {
+                    TextField("General VM's Username", text: $generalUsername4VMs)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .help("Username for managing your virtual machines")
+                        .padding(.horizontal, 8)
+                } header: {
+                    SectionHeader(title: "General VM's Username", systemImage: "person.fill")
+                }
+                //Spacer()
             }
             .padding(10)
         }

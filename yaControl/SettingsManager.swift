@@ -16,6 +16,7 @@ class SettingsManager {
     private let billingDefaultThreshold = 50.0
     private let autoStartEnabledKey = "com.krusty84.yaControl.settings.autoStartEnabled"
     private let appLoggingEnabledKey = "com.krusty84.yaControl.settings.appLoggingEnabled"
+    private let ycCLIInstalledKey = "com.krusty84.yaControl.settings.ycCLIInstalled"
     private let startOptionsKey = "com.krusty84.yaControl.settings.startOptions"
     private let shutdownOptionsKey = "com.krusty84.yaControl.settings.shutdownOptions"
     private let autostartVMIdsKey = "com.krusty84.yaControl.settings.autostart_vm_ids"
@@ -25,6 +26,11 @@ class SettingsManager {
     var appLoggingEnabled: Bool {
         get { defaults.bool(forKey: appLoggingEnabledKey) }
         set { defaults.set(newValue, forKey: appLoggingEnabledKey) }
+    }
+    
+    var ycCLIInstalled: Bool {
+        get { defaults.bool(forKey: ycCLIInstalledKey) }
+        set { defaults.set(newValue, forKey: ycCLIInstalledKey) }
     }
     
     var oAuthKey: String {

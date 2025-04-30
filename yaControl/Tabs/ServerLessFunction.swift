@@ -136,6 +136,22 @@ struct ServerLessFunctionTabContent: View {
                                        pasteboard.clearContents()
                                        pasteboard.setString(slf.httpInvokeUrl, forType: .string)
                                    }
+                                Button(action: {
+                                    //guard let ipAddress = vm.addresses.first else { return }
+
+                                    // 1. Build the SSH command
+                                    let ycCommand = "yc serverless function invoke \(slf.id)"
+
+                                    // 2. Copy to clipboard
+                                    let pb = NSPasteboard.general
+                                    pb.clearContents()
+                                    pb.setString(ycCommand, forType: .string)
+
+                                    helpers.openTerminal()
+                                }) {
+                                    Text("Call via CLI Yandex Cloud")
+                                }
+                                .disabled(!SettingsManager.shared.ycCLIInstalled)
                                }
                     }.width(min: 200,max:200)
                     
