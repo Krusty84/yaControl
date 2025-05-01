@@ -236,11 +236,37 @@ class AppState: ObservableObject {
     }
         
     func handleWake() {
-            print("Handling system wake")
-            // Add your wake logic here:
-            // - Resume operations
-            // - Restore connections
-            // - Check system state
-            //checkNumRunningVMs() // You already have this method
+        let autoStartEnabled = SettingsManager.shared.autoStartEnabled
+        let startOptions = SettingsManager.shared.startOptions
+        let oAuthKey = SettingsManager.shared.oAuthKey
+        let vmsToStart = SettingsManager.shared.getAllAutostartVMs()
+        
+        Helpers.checkInternetConnection {
+            if autoStartEnabled && startOptions.contains(.afterWakeup) && !vmsToStart.isEmpty {
+                Task {
+                    do {
+                        // 1. Get IAM token
+                        let authResponse = try await YandexAPIService.shared.checkOauthKey(
+                            yandexPassportOauthToken: oAuthKey
+                        )
+                        
+                        // 2. Start all marked VMs
+                        await Helpers.shared.startAllMarkedVMs(
+                            iamToken: authResponse.iamToken,
+                            vmIds: vmsToStart
+                        )
+                        
+                    } catch {
+                        await MainActor.run {
+                            LoggerHelper.error("Auto-start failed: \(error.localizedDescription)")
+                        }
+                    }
+                }
+            }
+            else {
+                LoggerHelper.info("No VMs selected for auto-start on app launch")
+            }
+            AppState.shared.checkNumRunningVMs()
+        }
         }
 }

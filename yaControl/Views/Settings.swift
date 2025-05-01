@@ -210,7 +210,7 @@ struct SettingsTabContent: View {
                                             }
                                        ))
                                 .toggleStyle(.checkbox)
-                                .disabled(!autoStartVM)
+                                .disabled(!autoStartVM || option == .afterMacOSStarted)
                             }
                         }
                         .padding(.horizontal, 8)
