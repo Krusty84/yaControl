@@ -9,7 +9,7 @@ import SwiftUI
 import AppKit
 import UserNotifications
 
-struct CloudComputingTabContent: View {
+struct CloudComputingTabContentOLD: View {
     @ObservedObject var yandexApi = YandexAPIService.shared
     @ObservedObject var helpers = Helpers.shared
     @StateObject var appState = AppState.shared
@@ -174,7 +174,8 @@ struct CloudComputingTabContent: View {
                             guard processingStates[vm.id] == nil else { return } // Prevent duplicate clicks
                             helpers.startStopVM(iamToken: iamToken, for: vm)
                             startPolling(for: vm.id)
-                        }) {
+                        })
+                        {
                             Image(systemName: processingStates[vm.id] == vm.id ? "arrow.triangle.2.circlepath" : {
                                 switch vm.status {
                                     case "RUNNING": "stop.fill"

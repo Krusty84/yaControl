@@ -9,7 +9,6 @@ import Foundation
 
 class YandexAPIService:ObservableObject {
     static let shared = YandexAPIService() // Singleton for reusability
-    //@Published var lastUpdateTime: String = ""
     @Published var lastUpdateTime = Date ()
     private init() {}
     

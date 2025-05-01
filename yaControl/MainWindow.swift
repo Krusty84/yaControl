@@ -12,7 +12,7 @@ struct MainWindow: View {
    // @EnvironmentObject var propagationModel: PropagationModel
     var body: some View {
         GoodProperTabsView(content: [
-                (title: "Computing", icon: "system:desktopcomputer", view: AnyView(CloudComputingTabContent())),
+                (title: "Computing", icon: "system:desktopcomputer", view: AnyView(CloudComputingTabContent().environmentObject(AppState.shared))),
                 (title: "Function", icon: "system:function", view: AnyView(ServerLessFunctionTabContent())),
                 (title: "Storage", icon: "system:archivebox", view: AnyView(BucketTabContent())),
                 //TODO: for future, maybe, for that is need to add gRPC support
