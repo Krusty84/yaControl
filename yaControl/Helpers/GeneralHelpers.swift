@@ -162,6 +162,7 @@ class Helpers:ObservableObject {
                     do {
                         try await YandexAPIService.shared.startVM(iamToken: iamToken, vmId: vmId)
                         LoggerHelper.info("VM started successfully: \(vmId)")
+                        await self.pollVMStatus(iamToken: iamToken, vmId: vmId)
                     } catch {
                         LoggerHelper.error("Failed to start VM \(vmId): \(error.localizedDescription)")
                     }
@@ -174,6 +175,84 @@ class Helpers:ObservableObject {
 //            self.fetchVMs() // Assuming you have a refresh function
 //        }
     }
+    
+    
+    private func pollVMStatus(iamToken: String, vmId: String) async {
+        // 1. Fetch initial state
+        var initialIsRunning = false
+        do {
+            let allVMs = try await YandexAPIService.shared.getVMs(iamToken: iamToken)
+            if let vm = allVMs.first(where: { $0.id == vmId }) {
+                initialIsRunning = (vm.status == "RUNNING")
+            }
+            // update global flag
+            await MainActor.run {
+                AppState.shared.isVirtualMachineRunning = allVMs.contains { $0.status == "RUNNING" }
+            }
+        } catch {
+            // assume stopped if fetch failed
+            await MainActor.run {
+                AppState.shared.isVirtualMachineRunning = false
+            }
+        }
+
+        let maxRetries = 20
+        let interval: UInt64 = 3_000_000_000  // 3 seconds
+        var retry = 0
+
+        while retry < maxRetries {
+            try? await Task.sleep(nanoseconds: interval)
+            retry += 1
+
+            do {
+                let allVMs = try await YandexAPIService.shared.getVMs(iamToken: iamToken)
+                // update global flag each poll
+                await MainActor.run {
+                    AppState.shared.isVirtualMachineRunning = allVMs.contains { $0.status == "RUNNING" }
+                }
+
+                guard let vm = allVMs.first(where: { $0.id == vmId }) else { continue }
+
+                let status = vm.status
+                let timeStamp = Date().formatted(.dateTime.hour().minute().second())
+                let name = vm.name
+
+                if !initialIsRunning && status == "RUNNING" {
+                    NotificationManager.shared.postNotification(
+                        title: "yaControl",
+                        body: "VM: \(name) has started. [\(timeStamp)]"
+                    )
+                    return
+                }
+                if initialIsRunning && status == "STOPPED" {
+                    NotificationManager.shared.postNotification(
+                        title: "yaControl",
+                        body: "VM: \(name) has stopped. [\(timeStamp)]"
+                    )
+                    return
+                }
+                if ["ERROR", "CRASHED"].contains(status) {
+                    NotificationManager.shared.postNotification(
+                        title: "yaControl",
+                        body: "VM: \(name) error: \(status). [\(timeStamp)]"
+                    )
+                    return
+                }
+            } catch {
+                // ignore and retry
+            }
+        }
+
+        // Timeout case
+        let timeStamp = Date().formatted(.dateTime.hour().minute().second())
+        NotificationManager.shared.postNotification(
+            title: "yaControl",
+            body: "VM: Timeout: couldn’t verify status for ID \(vmId). [\(timeStamp)]"
+        )
+    }
+
+    
+    
     
     func openTerminal() {
         if let url = URL(string: "file:///System/Applications/Utilities/Terminal.app") {

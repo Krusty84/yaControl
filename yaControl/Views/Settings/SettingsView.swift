@@ -97,12 +97,17 @@ struct SettingsTabContent: View {
                             .onChange(of: appLogging) { SettingsManager.shared.appLoggingEnabled = $0 }
                             .help("Enable/disable application logging")
                         
+                        // ← Your notification toggle goes here
+                        NotificationToggleView()
+                            .help("Request permission for user notifications")
+                        
                         Spacer() // Pushes content to the left
                     }
                     .padding(.horizontal, 8)
                 } header: {
                     SectionHeader(title: "Application Preferences", systemImage: "gearshape.fill")
                 }
+
 
                 Divider()
 

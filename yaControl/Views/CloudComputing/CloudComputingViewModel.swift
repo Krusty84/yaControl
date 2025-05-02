@@ -84,7 +84,7 @@ class CloudComputingViewModel: ObservableObject {
         guard processingStates[vm.id] != true else { return }
         // Start or stop via helper
         helpers.startStopVM(iamToken: iamToken, for: vm)
-        startPolling(for: vm.id)
+        pollVMStatus(for: vm.id)
     }
 
     func stopAllAndPoll() {
@@ -96,13 +96,14 @@ class CloudComputingViewModel: ObservableObject {
 
         // 3) Start polling on just those
         for vm in runningList {
-            startPolling(for: vm.id)
+            pollVMStatus(for: vm.id)
         }
     }
 
     // MARK: - Polling
-    func startPolling(for vmID: String) {
-        // Cancel existing
+    
+    func pollVMStatus(for vmID: String) {
+        let initialIsRunning = vmTableData.first { $0.id == vmID }?.status == "RUNNING"
         processingStates[vmID] = true
 
         Task {
@@ -113,28 +114,63 @@ class CloudComputingViewModel: ObservableObject {
             while retry < maxRetries {
                 try? await Task.sleep(nanoseconds: interval)
                 do {
-                    let updated = try await api.getVMs(iamToken: iamToken)
-                    if let newVM = updated.first(where: { $0.id == vmID }) {
+                    let updatedVMs = try await api.getVMs(iamToken: iamToken)
+                    if let newVM = updatedVMs.first(where: { $0.id == vmID }) {
                         await MainActor.run {
                             if let idx = vmTableData.firstIndex(where: { $0.id == vmID }) {
                                 vmTableData[idx] = newVM
                             }
                             AppState.shared.isVirtualMachineRunning = runningVMs > 0
                         }
-                        // Check completion
-                        let originalStopped = newVM.status == "RUNNING"
-                        if originalStopped != (vmTableData.first { $0.id == vmID }?.status == "RUNNING") {
+
+                        // format current time
+                        let timeStamp = Date()
+                            .formatted(.dateTime.hour().minute().second())
+                        let name = newVM.name
+
+                        // Detect transitions
+                        if !initialIsRunning && newVM.status == "RUNNING" {
+                            NotificationManager.shared.postNotification(
+                                title: "yaControl",
+                                body: "VM: \(name) has started. [\(timeStamp)]"
+                            )
                             break
                         }
-                        if ["ERROR","CRASHED"].contains(newVM.status) { break }
+                        if initialIsRunning && newVM.status == "STOPPED" {
+                            NotificationManager.shared.postNotification(
+                                title: "yaControl",
+                                body: "VM: \(name) has stopped. [\(timeStamp)]"
+                            )
+                            break
+                        }
+                        if ["ERROR", "CRASHED"].contains(newVM.status) {
+                            NotificationManager.shared.postNotification(
+                                title: "yaControl",
+                                body: "VM: \(name) error: \(newVM.status). [\(timeStamp)]"
+                            )
+                            break
+                        }
                     }
                 } catch {
-                    // ignore error and retry
+                    // ignore and retry
                 }
                 retry += 1
             }
-            // Done
+
+            // timeout case
+            if retry >= maxRetries,
+               let vm = vmTableData.first(where: { $0.id == vmID }) {
+                let timeStamp = Date()
+                    .formatted(.dateTime.hour().minute().second())
+                NotificationManager.shared.postNotification(
+                    title: "yaControl",
+                    body: "VM: Timeout: couldn’t verify status for \(vm.name). [\(timeStamp)]"
+                )
+            }
+
             processingStates[vmID] = false
         }
     }
+
+
 }
