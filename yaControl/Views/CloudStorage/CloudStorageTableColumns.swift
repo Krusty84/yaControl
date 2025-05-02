@@ -18,12 +18,14 @@ struct BucketNameColumn: View {
                 Text(bucket.name)
                     .foregroundColor(.blue)
                     .underline()
-                    .fixedSize(horizontal: false, vertical: true)
+                    .lineLimit(nil)                  // allow unlimited lines
+                    .multilineTextAlignment(.leading)
+                    .help(bucket.name)               // tooltip
             }
             .buttonStyle(PlainButtonStyle())
             .onHover { hovering in
                 if hovering { NSCursor.pointingHand.push() }
-                else      { NSCursor.pop() }
+                else       { NSCursor.pop() }
             }
             .contextMenu {
                 Button("Copy name & ID") {
@@ -34,9 +36,13 @@ struct BucketNameColumn: View {
             }
         } else {
             Text(bucket.name)
+                .lineLimit(nil)                      // allow wrapping here too
+                .multilineTextAlignment(.leading)
+                .help(bucket.name)                   // tooltip for plain text
         }
     }
 }
+
 
 // 2. Folder column: link + hover
 struct BucketFolderColumn: View {

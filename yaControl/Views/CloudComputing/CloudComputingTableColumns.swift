@@ -32,10 +32,15 @@ struct VMNameColumn: View {
                 Text(vm.name)
                     .foregroundColor(.blue)
                     .underline()
-                    .fixedSize(horizontal: false, vertical: true)
+                    .lineLimit(nil)
+                    .multilineTextAlignment(.leading)
+                    .help(vm.name)                      // <-- tooltip here
             }
             .buttonStyle(PlainButtonStyle())
-            .onHover { h in if h { NSCursor.pointingHand.push() } else { NSCursor.pop() } }
+            .onHover { hover in
+                if hover { NSCursor.pointingHand.push() }
+                else   { NSCursor.pop() }
+            }
             .contextMenu {
                 Button("Copy name & ID") {
                     let s = "\(vm.name) (\(vm.id))"
@@ -45,9 +50,14 @@ struct VMNameColumn: View {
             }
         } else {
             Text(vm.name)
+                .lineLimit(nil)
+                .multilineTextAlignment(.leading)
+                .help(vm.name)                      // <-- tooltip here too
         }
     }
 }
+
+
 
 struct VMStatusColumn: View {
     let vm: VMTableData

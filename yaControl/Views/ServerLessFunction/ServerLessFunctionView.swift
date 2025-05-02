@@ -15,31 +15,28 @@ struct ServerLessFunctionTabContent: View {
         VStack(spacing: 0) {
             // Top stats and refresh
             HStack {
-                Text("Total: \(vm.totalSLFs)")
-                    .bold()
+                Text("Total SLF's: \(vm.totalSLFs)")
+                    .font(.subheadline).bold()
                 Text("Active: \(vm.activeSLFs)")
-                    .bold()
+                    .font(.subheadline).bold()
                 Spacer()
                 Button { Task { await vm.fetchServerLessFunctions() } }
                 label: { Image(systemName: "arrow.clockwise") }
                 .buttonStyle(PlainButtonStyle())
-                .help("Refresh")
+                .help("Refresh SLF's")
             }
-            .padding()
-
-            // Search field
-            .searchable(text: $vm.searchText, prompt: "Search SLFs")
+            .padding(.horizontal)
+            .padding(.vertical, 6)
+            .searchable(text: $vm.searchText, prompt: "Search SLF's")
 
             // Main content
             if vm.isLoading {
                 ProgressView("Loading…")
                     .padding()
             } else if let err = vm.errorMessage {
-                Text("Error: \(err)")
-                    .foregroundColor(.red)
-                    .padding()
+                ErrorView(error: err)
             } else if vm.filteredSLFs.isEmpty {
-                Text("No SLFs found")
+                Text("No SLF's found")
                     .padding()
             } else {
                 Table(vm.filteredSLFs, selection: $selectedSlf) {

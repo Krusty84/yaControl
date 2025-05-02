@@ -18,12 +18,14 @@ struct SLFNameColumn: View {
                 Text(slf.name)
                     .foregroundColor(.blue)
                     .underline()
-                    .fixedSize(horizontal: false, vertical: true)
+                    .lineLimit(nil)                      // allow unlimited lines
+                    .multilineTextAlignment(.leading)    // left-align wrapped text
+                    .help(slf.name)                      // tooltip showing name
             }
             .buttonStyle(PlainButtonStyle())
             .onHover { hovering in
                 if hovering { NSCursor.pointingHand.push() }
-                else      { NSCursor.pop() }
+                else       { NSCursor.pop() }
             }
             .contextMenu {
                 Button("Copy name & ID") {
@@ -34,9 +36,13 @@ struct SLFNameColumn: View {
             }
         } else {
             Text(slf.name)
+                .lineLimit(nil)                      // allow wrapping here too
+                .multilineTextAlignment(.leading)
+                .help(slf.name)                      // tooltip for plain text
         }
     }
 }
+
 
 
 // 2. Status column: colored icon

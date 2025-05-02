@@ -28,17 +28,13 @@ struct BucketTabContent: View {
             }
             .padding(.horizontal)
             .padding(.vertical, 6)
-            
-            // Search
             .searchable(text: $vm.searchText, prompt: "Search buckets")
 
             // Content
             if vm.isLoading {
                 ProgressView("Loading…").padding()
             } else if let err = vm.errorMessage {
-                Text("Error: \(err)")
-                    .foregroundColor(.red)
-                    .padding()
+                ErrorView(error: err)
             } else if vm.filteredBuckets.isEmpty {
                 Text("No buckets found").padding()
             } else {

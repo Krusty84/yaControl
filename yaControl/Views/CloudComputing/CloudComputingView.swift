@@ -15,7 +15,7 @@ struct CloudComputingTabContent: View {
       var body: some View {
           VStack(spacing: 0) {
               HStack {
-                  Text("Total VMs: \(vm.totalVMs)")
+                  Text("Total VM's: \(vm.totalVMs)")
                       .font(.subheadline).bold()
                   Text("Running: \(vm.runningVMs)")
                       .font(.subheadline).bold()
@@ -26,7 +26,7 @@ struct CloudComputingTabContent: View {
                       Image(systemName: "arrow.clockwise")
                   }
                   .buttonStyle(PlainButtonStyle())
-                  .help("Refresh VMs")
+                  .help("Refresh VM's")
                   //
                   Button {
                       vm.stopAllAndPoll()
@@ -38,9 +38,9 @@ struct CloudComputingTabContent: View {
                               .foregroundColor(.red)
                       }
                       .padding(.horizontal, 10)
-                      .padding(.vertical, 5)
+                      //.padding(.vertical, 5)
                       .background(Color.red.opacity(0.2))
-                      .cornerRadius(5)
+                      .cornerRadius(2)
                   }
                   .disabled(vm.runningVMs == 0)
                   .help("Stop all running VMs")    // ← updated help
@@ -54,9 +54,7 @@ struct CloudComputingTabContent: View {
                   ProgressView("Loading…")
                       .padding()
               } else if let err = vm.errorMessage {
-                  Text("Error: \(err)")
-                      .foregroundColor(.red)
-                      .padding()
+                  ErrorView(error: err)
               } else if vm.filteredVMs.isEmpty {
                   Text("No VMs found")
                       .padding()
@@ -72,7 +70,7 @@ struct CloudComputingTabContent: View {
                       .width(min: 20, max: 20)
 
                       TableColumn("Name") { VMNameColumn(vm: $0) }
-                          .width(min: 150, max: 200)
+                          .width(min: 150, max: 150)
 
                       TableColumn("Status") { item in
                           let processing = vm.processingStates[item.id] == true
