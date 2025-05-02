@@ -18,16 +18,12 @@ struct AboutTabContent: View {
                 .cornerRadius(10)
 
             // Description
-            Text("WavesVista")
+            Text("yaControl")
                 .font(.title2)
                 .fontWeight(.semibold)
 
             VStack(spacing: 4) {
-                Text("This simple application will help you quickly learn about the state of the ionosphere.")
-                    .font(.body)
-                    .multilineTextAlignment(.center)
-
-                Text("Its suitability for long-distance QSOs. 73! de UB3ARM")
+                Text("This tool helps you manage your Yandex Cloud services from one place.\nYou can start or stop virtual machines, view storage buckets or serverless functions—all from one place.\nIt also supports automatic VM start/stop based on macOS conditions, like when your Mac goes to sleep or wakes up.")
                     .font(.body)
                     .multilineTextAlignment(.center)
             }
@@ -43,6 +39,10 @@ struct AboutTabContent: View {
                         Text("License: MIT")
                         Text("Author: Alexey Sedoykin")
                         Text("Contact: www.linkedin.com/in/sedoykin")
+                            .onHover { hovering in
+                                if hovering { NSCursor.pointingHand.push() }
+                                else       { NSCursor.pop() }
+                            }
                     }
                     .font(.body)
                     .frame(maxWidth: .infinity, alignment: .leading)
