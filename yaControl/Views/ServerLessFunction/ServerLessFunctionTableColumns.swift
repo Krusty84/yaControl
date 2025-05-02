@@ -16,6 +16,7 @@ struct SLFNameColumn: View {
         if let url = slf.slfUrl {
             Link(destination: url) {
                 Text(slf.name)
+                    .foregroundColor(.blue)
                     .underline()
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -85,6 +86,7 @@ struct SLFFolderColumn: View {
         if let url = slf.folderUrl {
             Link(destination: url) {
                 Text(slf.folderName)
+                    .foregroundColor(.blue)
                     .underline()
                     .fixedSize(horizontal: false, vertical: true)
             }

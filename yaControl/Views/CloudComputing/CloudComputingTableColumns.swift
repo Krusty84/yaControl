@@ -30,6 +30,7 @@ struct VMNameColumn: View {
         if let url = vm.vmUrl {
             Link(destination: url) {
                 Text(vm.name)
+                    .foregroundColor(.blue)
                     .underline()
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -124,6 +125,7 @@ struct VMFolderColumn: View {
         if let url = vm.folderUrl {
             Link(destination: url) {
                 Text(vm.folderName)
+                    .foregroundColor(.blue)
                     .underline()
                     .fixedSize(horizontal: false, vertical: true)
             }

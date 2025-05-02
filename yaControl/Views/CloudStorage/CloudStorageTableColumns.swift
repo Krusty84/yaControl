@@ -16,6 +16,7 @@ struct BucketNameColumn: View {
         if let url = bucket.bucketUrl {
             Link(destination: url) {
                 Text(bucket.name)
+                    .foregroundColor(.blue)
                     .underline()
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -45,6 +46,7 @@ struct BucketFolderColumn: View {
         if let url = bucket.folderUrl {
             Link(destination: url) {
                 Text(bucket.folderName)
+                    .foregroundColor(.blue)
                     .underline()
                     .fixedSize(horizontal: false, vertical: true)
             }
