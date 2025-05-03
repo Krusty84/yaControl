@@ -15,10 +15,11 @@ About 90% of the code was written with the help of [DeepSeek](https://www.deepse
 
 ## Features
 #### Release 1.0.0:
-After the first launch, start with the setup. After that, I hope everything is clear and doesn't need further explanation — just follow the screenshots.
+After the first launch, start with the setup. After that, I hope everything is clear and doesn't need further explanation — just follow the screenshots. <br />
+
+
 
 <img width="800" alt="image" src="https://github.com/user-attachments/assets/1df91a57-8eac-42b4-a405-eb8bf925760e" /> <br />
-
 
 <img width="800" alt="image" src="https://github.com/user-attachments/assets/12a0f86a-445e-48db-acde-9ea65d4e9dc0" /> <br />
  
