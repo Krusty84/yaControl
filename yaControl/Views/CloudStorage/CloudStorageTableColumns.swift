@@ -22,7 +22,7 @@ struct BucketNameColumn: View {
                     .multilineTextAlignment(.leading)
                     .help(bucket.name)               // tooltip
             }
-            .buttonStyle(PlainButtonStyle())
+            .buttonStyle(.plain)
             .onHover { hovering in
                 if hovering { NSCursor.pointingHand.push() }
                 else       { NSCursor.pop() }
@@ -56,7 +56,7 @@ struct BucketFolderColumn: View {
                     .underline()
                     .fixedSize(horizontal: false, vertical: true)
             }
-            .buttonStyle(PlainButtonStyle())
+            .buttonStyle(.plain)
             .onHover { hovering in
                 if hovering { NSCursor.pointingHand.push() }
                 else      { NSCursor.pop() }

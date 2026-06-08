@@ -6,37 +6,46 @@
 //
 
 import SwiftUI
-import Combine
+import Observation
 
+@Observable
 @MainActor
-class ServerLessFunctionViewModel: ObservableObject {
-    // Published properties replace your @State vars
-    @Published var slfTableData: [ServerLessFunctionTableData] = []
-    @Published var isLoading = false
-    @Published var errorMessage: String? = nil
-    @Published var searchText = ""
-    @Published var lastUpdateTime = Date()
-    @Published var billingData: [BillingTableData] = []
-    @Published var currentBalance = ""
-    @Published var currency = ""
-    @Published var billingUrl: URL? = nil
+final class ServerlessFunctionModel {
+    var slfTableData: [ServerLessFunctionTableData] = []
+    var isLoading = false
+    var error: Error?
+    var searchText = ""
+    var lastUpdateTime = Date()
+    var billingData: [BillingTableData] = []
+    var currentBalance = ""
+    var currency = ""
+    var billingUrl: URL? = nil
 
     private let api = YandexAPIService.shared
     private var iamToken = ""
+    private var hasLoaded = false
 
     // Computed helpers
     var filteredSLFs: [ServerLessFunctionTableData] {
         guard !searchText.isEmpty else { return slfTableData }
-        return slfTableData.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
+        return slfTableData.filter { $0.name.localizedStandardContains(searchText) }
     }
 
     var totalSLFs: Int { slfTableData.count }
     var activeSLFs: Int { slfTableData.filter { $0.status == "ACTIVE" }.count }
+    var showError: Bool { error != nil }
+    var errorMessage: String? { error?.localizedDescription }
 
     // Public method to load data
+    func loadIfNeeded() async {
+        guard !hasLoaded else { return }
+        hasLoaded = true
+        await fetchServerLessFunctions()
+    }
+
     func fetchServerLessFunctions() async {
         isLoading = true
-        errorMessage = nil
+        error = nil
 
         do {
             // 1. Get IAM token
@@ -63,7 +72,7 @@ class ServerLessFunctionViewModel: ObservableObject {
             isLoading = false
 
         } catch {
-            errorMessage = error.localizedDescription
+            self.error = error
             isLoading = false
             LoggerHelper.error("Fetch SLFs failed: \(error.localizedDescription)")
         }

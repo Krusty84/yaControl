@@ -6,36 +6,47 @@
 //
 
 import SwiftUI
+import Observation
 
+@Observable
 @MainActor
-class CloudStorageViewModel: ObservableObject {
-    // MARK: – Published state
-    @Published var bucketTableData: [BucketTableData] = []
-    @Published var billingData: [BillingTableData] = []
-    @Published var isLoading = false
-    @Published var errorMessage: String? = nil
-    @Published var searchText = ""
-    @Published var currentBalance = ""
-    @Published var currency = ""
-    @Published var billingUrl: URL? = nil
-    @Published var lastUpdateTime = Date()
+final class CloudStorageModel {
+    // MARK: – State
+    var bucketTableData: [BucketTableData] = []
+    var billingData: [BillingTableData] = []
+    var isLoading = false
+    var error: Error?
+    var searchText = ""
+    var currentBalance = ""
+    var currency = ""
+    var billingUrl: URL? = nil
+    var lastUpdateTime = Date()
     
     private let api = YandexAPIService.shared
     private var iamToken = ""
+    private var hasLoaded = false
     
     // MARK: – Computed helpers
     var filteredBuckets: [BucketTableData] {
         guard !searchText.isEmpty else { return bucketTableData }
         return bucketTableData.filter {
-            $0.name.localizedCaseInsensitiveContains(searchText)
+            $0.name.localizedStandardContains(searchText)
         }
     }
     var totalBuckets: Int { bucketTableData.count }
+    var showError: Bool { error != nil }
+    var errorMessage: String? { error?.localizedDescription }
     
     // MARK: – Data loading
+    func loadIfNeeded() async {
+        guard !hasLoaded else { return }
+        hasLoaded = true
+        await fetchBuckets()
+    }
+
     func fetchBuckets() async {
         isLoading = true
-        errorMessage = nil
+        error = nil
         
         do {
             // 1. Authenticate
@@ -62,7 +73,7 @@ class CloudStorageViewModel: ObservableObject {
             isLoading = false
             
         } catch {
-            errorMessage = error.localizedDescription
+            self.error = error
             isLoading = false
             LoggerHelper.error("Error fetching buckets: \(error.localizedDescription)")
         }

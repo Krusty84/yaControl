@@ -22,7 +22,7 @@ struct SLFNameColumn: View {
                     .multilineTextAlignment(.leading)    // left-align wrapped text
                     .help(slf.name)                      // tooltip showing name
             }
-            .buttonStyle(PlainButtonStyle())
+            .buttonStyle(.plain)
             .onHover { hovering in
                 if hovering { NSCursor.pointingHand.push() }
                 else       { NSCursor.pop() }
@@ -95,7 +95,7 @@ struct SLFFolderColumn: View {
                     .underline()
                     .fixedSize(horizontal: false, vertical: true)
             }
-            .buttonStyle(PlainButtonStyle())
+            .buttonStyle(.plain)
             .onHover { hovering in
                 if hovering { NSCursor.pointingHand.push() }
                 else      { NSCursor.pop() }

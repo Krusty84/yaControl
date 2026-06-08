@@ -19,9 +19,7 @@ struct MainWindow: View {
                 //(title: "Billing", icon: "system:creditcard", view: AnyView(BillingTabContent())),
                 (title: "Settings", icon: "system:gear", view: AnyView(SettingsTabContent())),
                 (title: "About", icon: "system:info", view: AnyView(AboutTabContent()))
-                ]).onAppear {
-                    //Stubs for something in future
-                }
-                .frame(width: 800, height: 400)
+                ])
+                .frame(minWidth: 800, idealWidth: 900, minHeight: 420, idealHeight: 520)
     }
 }

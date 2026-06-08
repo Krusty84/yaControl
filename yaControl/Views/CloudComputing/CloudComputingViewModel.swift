@@ -6,39 +6,49 @@
 //
 
 import SwiftUI
-import UserNotifications
+import Observation
 
+@Observable
 @MainActor
-class CloudComputingViewModel: ObservableObject {
-    // MARK: - Published state
-    @Published var vmTableData: [VMTableData] = []
-    @Published var billingData: [BillingTableData] = []
-    @Published var isLoading = false
-    @Published var errorMessage: String? = nil
-    @Published var searchText = ""
-    @Published var currentBalance = ""
-    @Published var currency = ""
-    @Published var billingUrl: URL? = nil
-    @Published var lastUpdateTime = Date()
-    @Published var processingStates: [String: Bool] = [:]   // VM ID -> isProcessing
+final class CloudComputingModel {
+    // MARK: - State
+    var vmTableData: [VMTableData] = []
+    var billingData: [BillingTableData] = []
+    var isLoading = false
+    var error: Error?
+    var searchText = ""
+    var currentBalance = ""
+    var currency = ""
+    var billingUrl: URL? = nil
+    var lastUpdateTime = Date()
+    var processingStates: [String: Bool] = [:]   // VM ID -> isProcessing
 
     private let api = YandexAPIService.shared
     private let powerService = VMPowerService.shared
     private let pollingService = VMPollingService.shared
     private var iamToken = ""
+    private var hasLoaded = false
 
     // MARK: - Computed helpers
     var filteredVMs: [VMTableData] {
         guard !searchText.isEmpty else { return vmTableData }
-        return vmTableData.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
+        return vmTableData.filter { $0.name.localizedStandardContains(searchText) }
     }
     var totalVMs: Int { vmTableData.count }
     var runningVMs: Int { vmTableData.filter { $0.status.isRunning }.count }
+    var showError: Bool { error != nil }
+    var errorMessage: String? { error?.localizedDescription }
 
     // MARK: - Actions
+    func loadIfNeeded() async {
+        guard !hasLoaded else { return }
+        hasLoaded = true
+        await fetchVMs()
+    }
+
     func fetchVMs() async {
         isLoading = true
-        errorMessage = nil
+        error = nil
 
         do {
             // Authenticate
@@ -68,7 +78,7 @@ class CloudComputingViewModel: ObservableObject {
             AppState.shared.isVirtualMachineRunning = runningVMs > 0
 
         } catch {
-            errorMessage = error.localizedDescription
+            self.error = error
             isLoading = false
             LoggerHelper.error("Error fetching VMs: \(error.localizedDescription)")
         }

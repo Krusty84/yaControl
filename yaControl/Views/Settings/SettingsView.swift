@@ -21,7 +21,7 @@ struct SettingsTabContent: View {
     // VM Management State
     @State private var responseCode: Int? = nil
     @State private var errorMessage: String? = nil
-    @State private var selectedTab: Int = 0
+    @State private var selectedTab: SettingsTab = .general
     @State private var autoStartVM: Bool = false
     @State private var startOptions: [StartOption] = []
     @State private var shutdownOptions: [ShutdownOption] = []
@@ -32,12 +32,26 @@ struct SettingsTabContent: View {
 
     @State private var isHovering = false
 
+    private enum SettingsTab: Hashable {
+        case general
+        case virtualMachineManagement
+        case billingManagement
+    }
+
+    private var trimmedOAuthKey: String {
+        oAuthKey.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private var isOAuthTokenEmpty: Bool {
+        trimmedOAuthKey.isEmpty
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             Picker("", selection: $selectedTab) {
-                Text("General").tag(0)
-                Text("Virtual Machine Management").tag(1)
-                Text("Billing Management").tag(2)
+                Text("General").tag(SettingsTab.general)
+                Text("Virtual Machine Management").tag(SettingsTab.virtualMachineManagement)
+                Text("Billing Management").tag(SettingsTab.billingManagement)
             }
             .pickerStyle(.segmented)
             .padding(.horizontal, 20)
@@ -47,10 +61,9 @@ struct SettingsTabContent: View {
 
             Group {
                 switch selectedTab {
-                case 0: generalSettingsTab
-                case 1: vmManagementTab
-                case 2: billingManagementTab
-                default: EmptyView()
+                case .general: generalSettingsTab
+                case .virtualMachineManagement: vmManagementTab
+                case .billingManagement: billingManagementTab
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -80,7 +93,9 @@ struct SettingsTabContent: View {
                         
                         Toggle("Application Logging", isOn: $appLogging)
                             .toggleStyle(.switch)
-                            .onChange(of: appLogging) { SettingsManager.shared.appLoggingEnabled = $0 }
+                            .onChange(of: appLogging) { _, newValue in
+                                SettingsManager.shared.appLoggingEnabled = newValue
+                            }
                             .help("Enable/disable application logging")
                         
                         // ← Your notification toggle goes here
@@ -98,12 +113,23 @@ struct SettingsTabContent: View {
                 Divider()
 
                 Section {
-                    HStack {
-                        TextField("OAuth Key", text: $oAuthKey)
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
-                        oAuthStatusIndicator
-                        Button("Verify", action: checkOAuthKey)
-                            .frame(minWidth: 60)
+                    VStack(alignment: .leading, spacing: 6) {
+                        HStack {
+                            TextField("OAuth Key", text: $oAuthKey)
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                                .accessibilityLabel("Yandex Cloud OAuth token")
+                                .help("Paste your Yandex Cloud OAuth token, then verify it before saving.")
+                            oAuthStatusIndicator
+                            Button("Verify", action: checkOAuthKey)
+                                .frame(minWidth: 60)
+                                .disabled(isOAuthTokenEmpty)
+                                .help(isOAuthTokenEmpty ? "Enter an OAuth token before verification" : "Verify and save OAuth token")
+                        }
+                        if isOAuthTokenEmpty {
+                            Text("OAuth token is required to verify credentials.")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
                     }
                     .padding(.horizontal, 8)
                 } header: {
@@ -130,7 +156,9 @@ struct SettingsTabContent: View {
                     VStack(alignment: .leading, spacing: 4) {
                         Toggle("Installed", isOn: $ycCLIInstalled)
                             .toggleStyle(.switch)
-                            .onChange(of: ycCLIInstalled) { SettingsManager.shared.ycCLIInstalled = $0 }
+                            .onChange(of: ycCLIInstalled) { _, newValue in
+                                SettingsManager.shared.ycCLIInstalled = newValue
+                            }
                             .help("Enable/disable application logging")
                             // make the toggle fill its container, and align its label to the left
                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -168,7 +196,9 @@ struct SettingsTabContent: View {
                 Section {
                     Toggle("", isOn: $autoStartVM)
                         .toggleStyle(.switch)
-                        .onChange(of: autoStartVM) { SettingsManager.shared.autoStartEnabled = $0 }
+                        .onChange(of: autoStartVM) { _, newValue in
+                            SettingsManager.shared.autoStartEnabled = newValue
+                        }
                         .help("Enable/disable VM power management")
                         .padding(.horizontal, 8)
                 } header: {
@@ -323,7 +353,7 @@ struct SettingsTabContent: View {
     }
 
     private func checkOAuthKey() {
-        let token = oAuthKey.trimmingCharacters(in: .whitespacesAndNewlines)
+        let token = trimmedOAuthKey
 
         guard !token.isEmpty else {
             responseCode = nil

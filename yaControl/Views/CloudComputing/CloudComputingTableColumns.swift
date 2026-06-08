@@ -36,7 +36,7 @@ struct VMNameColumn: View {
                     .multilineTextAlignment(.leading)
                     .help(vm.name)                      // <-- tooltip here
             }
-            .buttonStyle(PlainButtonStyle())
+            .buttonStyle(.plain)
             .onHover { hover in
                 if hover { NSCursor.pointingHand.push() }
                 else   { NSCursor.pop() }
@@ -69,7 +69,7 @@ struct VMStatusColumn: View {
             Image(systemName: isProcessing ? "arrow.triangle.2.circlepath" : statusIcon)
                 .foregroundColor(statusColor)
         }
-        .buttonStyle(PlainButtonStyle())
+        .buttonStyle(.plain)
         .disabled(isProcessing)
     }
 
@@ -141,7 +141,7 @@ struct VMFolderColumn: View {
                     .underline()
                     .fixedSize(horizontal: false, vertical: true)
             }
-            .buttonStyle(PlainButtonStyle())
+            .buttonStyle(.plain)
             .onHover { h in if h { NSCursor.pointingHand.push() } else { NSCursor.pop() } }
         } else {
             Text(vm.folderName)

@@ -24,7 +24,7 @@ struct BillingTabContent: View {
         if searchText.isEmpty {
             return bucketTableData
         } else {
-            return bucketTableData.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
+            return bucketTableData.filter { $0.name.localizedStandardContains(searchText) }
         }
     }
     var sortedBuckets: [BucketTableData] {

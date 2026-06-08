@@ -6,11 +6,9 @@
 //
 
 import SwiftUI
-import AppKit
 
 struct InfoWindow: View {
-    @StateObject private var vm = InfoWindowViewModel()
-    @State private var isHoveringLink = false
+    @State private var model = InfoWindowModel()
 
     var body: some View {
         VStack(spacing: 16) {
@@ -18,17 +16,26 @@ struct InfoWindow: View {
                 .font(.headline)
                 .padding(.top, 8)
 
-            if vm.isLoading {
-                ProgressView()
+            if model.isLoading {
+                ProgressView("Loading…")
                     .frame(maxHeight: .infinity)
-            } else if let error = vm.errorMessage {
-                VStack {
-                    Text("Error: \(error)")
-                        .foregroundColor(.red)
+            } else if let error = model.errorMessage {
+                ContentUnavailableView {
+                    Label("Couldn’t Load Statistics", systemImage: "exclamationmark.triangle")
+                } description: {
+                    Text(error)
+                } actions: {
                     Button("Retry") {
-                        Task { await vm.loadAllData() }
+                        Task { await model.loadAllData() }
                     }
                 }
+                .frame(maxHeight: .infinity)
+            } else if model.hasNoResources {
+                ContentUnavailableView(
+                    "No Resources Found",
+                    systemImage: "tray",
+                    description: Text("Refresh statistics or check your Yandex Cloud credentials.")
+                )
                 .frame(maxHeight: .infinity)
             } else {
                 ScrollView {
@@ -38,11 +45,11 @@ struct InfoWindow: View {
                             title: "Billing Information",
                             icon: "creditcard",
                             stats: [
-                                ("Current Balance", BillingFormattingHelper.balanceAttributedString(amount: vm.currentBalance, currency: vm.currency, warningThreshold:SettingsManager.shared.billingThreshold)),
+                                ("Current Balance", BillingFormattingHelper.balanceAttributedString(amount: model.currentBalance, currency: model.currency, warningThreshold:SettingsManager.shared.billingThreshold)),
                                 ("Details", "View Billing")
     
                             ],
-                            url: vm.billingUrl
+                            url: model.billingUrl
                         )
 
                         Divider()
@@ -52,9 +59,9 @@ struct InfoWindow: View {
                             title: "Virtual Machines",
                             icon: "desktopcomputer",
                             stats: [
-                                ("Total VMs", "\(vm.totalVMsCount)"),
-                                ("Running", "\(vm.runningVMsCount)"),
-                                ("Stopped", "\(vm.totalVMsCount - vm.runningVMsCount)")
+                                ("Total VMs", "\(model.totalVMsCount)"),
+                                ("Running", "\(model.runningVMsCount)"),
+                                ("Stopped", "\(model.totalVMsCount - model.runningVMsCount)")
                             ]
                         )
 
@@ -65,9 +72,9 @@ struct InfoWindow: View {
                             title: "Serverless Functions",
                             icon: "function",
                             stats: [
-                                ("Total Functions", "\(vm.totalSLFsCount)"),
-                                ("Active", "\(vm.activeSLFsCount)"),
-                                ("Inactive", "\(vm.totalSLFsCount - vm.activeSLFsCount)")
+                                ("Total Functions", "\(model.totalSLFsCount)"),
+                                ("Active", "\(model.activeSLFsCount)"),
+                                ("Inactive", "\(model.totalSLFsCount - model.activeSLFsCount)")
                             ]
                         )
 
@@ -78,7 +85,7 @@ struct InfoWindow: View {
                             title: "Storage Buckets",
                             icon: "archivebox",
                             stats: [
-                                ("Total Buckets", "\(vm.totalBucketsCount)")
+                                ("Total Buckets", "\(model.totalBucketsCount)")
                             ]
                         )
                     }
@@ -86,14 +93,14 @@ struct InfoWindow: View {
                 }
             }
 
-            Text("Last updated: \(vm.lastUpdated.formatted(date: .omitted, time: .shortened))")
+            Text("Last updated: \(model.lastUpdated.formatted(date: .omitted, time: .shortened))")
                 .font(.caption)
                 .foregroundColor(.secondary)
                 .padding(.bottom, 8)
         }
         .frame(width: 340, height: 460)
-        .onAppear {
-            Task { await vm.loadAllData() }
+        .task {
+            await model.loadIfNeeded()
         }
     }
 }

@@ -6,27 +6,46 @@
 //
 
 import SwiftUI
+import Observation
 
+@Observable
 @MainActor
-class InfoWindowViewModel: ObservableObject {
-    // MARK: - Published stats
-    @Published var totalVMsCount = 0
-    @Published var runningVMsCount = 0
-    @Published var totalSLFsCount = 0
-    @Published var activeSLFsCount = 0
-    @Published var totalBucketsCount = 0
-    @Published var currentBalance: String = "Loading..."
-    @Published var currency: String = ""
-    @Published var billingUrl: URL? = nil
-    @Published var isLoading = false
-    @Published var errorMessage: String? = nil
-    @Published var lastUpdated = Date()
+final class InfoWindowModel {
+    // MARK: - Stats
+    var totalVMsCount = 0
+    var runningVMsCount = 0
+    var totalSLFsCount = 0
+    var activeSLFsCount = 0
+    var totalBucketsCount = 0
+    var currentBalance: String = "Loading..."
+    var currency: String = ""
+    var billingUrl: URL? = nil
+    var isLoading = false
+    var error: Error?
+    var lastUpdated = Date()
 
     private let api = YandexAPIService.shared
+    private var hasLoaded = false
+
+    var showError: Bool { error != nil }
+    var errorMessage: String? { error?.localizedDescription }
+    var hasNoResources: Bool {
+        totalVMsCount == 0
+            && totalSLFsCount == 0
+            && totalBucketsCount == 0
+            && billingUrl == nil
+            && currentBalance == "Loading..."
+    }
+
+    func loadIfNeeded() async {
+        guard !hasLoaded else { return }
+        hasLoaded = true
+        await loadAllData()
+    }
 
     func loadAllData() async {
         isLoading = true
-        errorMessage = nil
+        error = nil
         do {
             // 1. Authenticate
             let auth = try await api.checkOauthKey(
@@ -62,7 +81,7 @@ class InfoWindowViewModel: ObservableObject {
             lastUpdated = Date()
             isLoading   = false
         } catch {
-            errorMessage = error.localizedDescription
+            self.error = error
             isLoading   = false
         }
     }

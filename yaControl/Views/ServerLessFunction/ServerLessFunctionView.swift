@@ -8,38 +8,53 @@
 import SwiftUI
 
 struct ServerLessFunctionTabContent: View {
-    @StateObject private var vm = ServerLessFunctionViewModel()
+    @State private var model = ServerlessFunctionModel()
     @State private var selectedSlf: ServerLessFunctionTableData.ID? = nil
 
     var body: some View {
         VStack(spacing: 0) {
             // Top stats and refresh
             HStack {
-                Text("Total SLF's: \(vm.totalSLFs)")
+                Text("Total SLF's: \(model.totalSLFs)")
                     .font(.subheadline).bold()
-                Text("Active: \(vm.activeSLFs)")
+                Text("Active: \(model.activeSLFs)")
                     .font(.subheadline).bold()
                 Spacer()
-                Button { Task { await vm.fetchServerLessFunctions() } }
-                label: { Image(systemName: "arrow.clockwise") }
-                .buttonStyle(PlainButtonStyle())
+                Button {
+                    Task { await model.fetchServerLessFunctions() }
+                } label: {
+                    Label("Refresh SLF's", systemImage: "arrow.clockwise")
+                        .labelStyle(.iconOnly)
+                }
+                .buttonStyle(.plain)
                 .help("Refresh SLF's")
             }
             .padding(.horizontal)
             .padding(.vertical, 6)
-            .searchable(text: $vm.searchText, prompt: "Search SLF's")
+            .searchable(text: $model.searchText, prompt: "Search SLF's")
 
             // Main content
-            if vm.isLoading {
+            if model.isLoading {
                 ProgressView("Loading…")
                     .padding()
-            } else if let err = vm.errorMessage {
-                ErrorView(error: err)
-            } else if vm.filteredSLFs.isEmpty {
-                Text("No SLF's found")
-                    .padding()
+            } else if let err = model.errorMessage {
+                ContentUnavailableView {
+                    Label("Couldn’t Load Functions", systemImage: "exclamationmark.triangle")
+                } description: {
+                    Text(err)
+                } actions: {
+                    Button("Retry") {
+                        Task { await model.fetchServerLessFunctions() }
+                    }
+                }
+            } else if model.filteredSLFs.isEmpty {
+                ContentUnavailableView(
+                    "No Serverless Functions Found",
+                    systemImage: "function",
+                    description: Text("Refresh the list or check your Yandex Cloud credentials.")
+                )
             } else {
-                Table(vm.filteredSLFs, selection: $selectedSlf) {
+                Table(model.filteredSLFs, selection: $selectedSlf) {
                     TableColumn("Name") { slf in
                         SLFNameColumn(slf: slf)
                     }
@@ -56,20 +71,20 @@ struct ServerLessFunctionTabContent: View {
                 }
                 .padding(.vertical, 6)
                 .refreshable {
-                    await vm.fetchServerLessFunctions()
+                    await model.fetchServerLessFunctions()
                 }
             }
 
             // Billing / status panel
             StatusPanel(
-                lastUpdateTime: vm.lastUpdateTime,
-                currentBalance: vm.currentBalance,
-                currency: vm.currency,
-                billingUrl: vm.billingUrl
+                lastUpdateTime: model.lastUpdateTime,
+                currentBalance: model.currentBalance,
+                currency: model.currency,
+                billingUrl: model.billingUrl
             )
         }
-        .onAppear {
-            Task { await vm.fetchServerLessFunctions() }
+        .task {
+            await model.loadIfNeeded()
         }
     }
 }

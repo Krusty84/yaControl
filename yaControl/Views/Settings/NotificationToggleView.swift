@@ -15,7 +15,7 @@ struct NotificationToggleView: View {
     var body: some View {
         Toggle("Enable Notifications", isOn: $isOn.animation(.easeInOut(duration: animationDuration)))
             .toggleStyle(.switch)
-            .onChange(of: isOn) { newValue in
+            .onChange(of: isOn) { _, newValue in
                 if newValue {
                     NotificationManager.shared.requestAuthorization()
                     // After the slide-on finishes, slide it back off

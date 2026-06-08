@@ -8,104 +8,125 @@
 import SwiftUI
 
 struct CloudComputingTabContent: View {
-    @StateObject private var vm = CloudComputingViewModel()
-      @EnvironmentObject var appState: AppState
-      @State private var selectedVM: VMTableData.ID? = nil
+    @State private var model = CloudComputingModel()
+    @EnvironmentObject var appState: AppState
+    @State private var selectedVM: VMTableData.ID? = nil
+    @State private var isStopAllConfirmationPresented = false
 
-      var body: some View {
-          VStack(spacing: 0) {
-              HStack {
-                  Text("Total VM's: \(vm.totalVMs)")
-                      .font(.subheadline).bold()
-                  Text("Running: \(vm.runningVMs)")
-                      .font(.subheadline).bold()
-                  Spacer()
-                  Button {
-                      Task { await vm.fetchVMs() }
-                  } label: {
-                      Image(systemName: "arrow.clockwise")
-                  }
-                  .buttonStyle(PlainButtonStyle())
-                  .help("Refresh VM's")
-                  //
-                  Button {
-                      vm.stopAllAndPoll()
-                  } label: {
-                      HStack {
-                          Image(systemName: "stop.fill")
-                              .foregroundColor(.red)
-                          Text("Stop All")
-                              .foregroundColor(.red)
-                      }
-                      .padding(.horizontal, 10)
-                      //.padding(.vertical, 5)
-                      .background(Color.red.opacity(0.2))
-                      .cornerRadius(2)
-                  }
-                  .disabled(vm.runningVMs == 0)
-                  .help("Stop all running VMs")    // ← updated help
-                  .buttonStyle(PlainButtonStyle())
-              }
-              .padding(.horizontal)
-              .padding(.vertical, 6)
-              .searchable(text: $vm.searchText, prompt: "Search VMs")
+    var body: some View {
+        VStack(spacing: 0) {
+            HStack {
+                Text("Total VM's: \(model.totalVMs)")
+                    .font(.subheadline).bold()
+                Text("Running: \(model.runningVMs)")
+                    .font(.subheadline).bold()
+                Spacer()
+                Button {
+                    Task { await model.fetchVMs() }
+                } label: {
+                    Label("Refresh VMs", systemImage: "arrow.clockwise")
+                        .labelStyle(.iconOnly)
+                }
+                .buttonStyle(.plain)
+                .help("Refresh VM's")
 
-              if vm.isLoading {
-                  ProgressView("Loading…")
-                      .padding()
-              } else if let err = vm.errorMessage {
-                  ErrorView(error: err)
-              } else if vm.filteredVMs.isEmpty {
-                  Text("No VMs found")
-                      .padding()
-              } else {
-                  Table(vm.filteredVMs, selection: $selectedVM) {
-                      TableColumn("AS") { item in
-                          VMAutoStartColumn(
-                              vm: item,
-                              isOn: item.isAutoStarted,
-                              onToggle: { vm.setAutoStart(for: item.id, isOn: $0) }
-                          )
-                      }
-                      .width(min: 20, max: 20)
+                Button {
+                    isStopAllConfirmationPresented = true
+                } label: {
+                    Label("Stop All", systemImage: "stop.fill")
+                        .foregroundColor(.red)
+                        .padding(.horizontal, 10)
+                        .background(Color.red.opacity(0.2))
+                        .clipShape(.rect(cornerRadius: 2))
+                }
+                .disabled(model.runningVMs == 0)
+                .help("Stop all running VMs")
+                .buttonStyle(.plain)
+                .confirmationDialog(
+                    "Stop all running VMs?",
+                    isPresented: $isStopAllConfirmationPresented
+                ) {
+                    Button("Stop All", role: .destructive) {
+                        model.stopAllAndPoll()
+                    }
+                    Button("Cancel", role: .cancel) {}
+                } message: {
+                    Text("This will stop all currently running virtual machines visible to yaControl.")
+                }
+            }
+            .padding(.horizontal)
+            .padding(.vertical, 6)
+            .searchable(text: $model.searchText, prompt: "Search VMs")
 
-                      TableColumn("Name") { VMNameColumn(vm: $0) }
-                          .width(min: 150, max: 150)
+            if model.isLoading {
+                ProgressView("Loading…")
+                    .padding()
+            } else if let err = model.errorMessage {
+                ContentUnavailableView {
+                    Label("Couldn’t Load VMs", systemImage: "exclamationmark.triangle")
+                } description: {
+                    Text(err)
+                } actions: {
+                    Button("Retry") {
+                        Task { await model.fetchVMs() }
+                    }
+                }
+            } else if model.filteredVMs.isEmpty {
+                ContentUnavailableView(
+                    "No VMs Found",
+                    systemImage: "desktopcomputer",
+                    description: Text("Refresh the list or check your Yandex Cloud credentials.")
+                )
+            } else {
+                Table(model.filteredVMs, selection: $selectedVM) {
+                    TableColumn("AS") { item in
+                        VMAutoStartColumn(
+                            vm: item,
+                            isOn: item.isAutoStarted,
+                            onToggle: { model.setAutoStart(for: item.id, isOn: $0) }
+                        )
+                    }
+                    .width(min: 20, max: 20)
 
-                      TableColumn("Status") { item in
-                          let processing = vm.processingStates[item.id] == true
-                          VMStatusColumn(
-                              vm: item,
-                              isProcessing: processing,
-                              onAction: { vm.toggleVM(item) }
-                          )
-                      }
-                      .width(min: 40, max: 40)
+                    TableColumn("Name") { VMNameColumn(vm: $0) }
+                        .width(min: 150, max: 150)
 
-                      TableColumn("Created At", value: \.createdAt)
-                          .width(min: 120, max: 120)
-                      TableColumn("Cores", value: \.cores)
-                          .width(min: 40, max: 40)
-                      TableColumn("RAM", value: \.memoryGB)
-                          .width(min: 30, max: 30)
+                    TableColumn("Status") { item in
+                        let processing = model.processingStates[item.id] == true
+                        VMStatusColumn(
+                            vm: item,
+                            isProcessing: processing,
+                            onAction: { model.toggleVM(item) }
+                        )
+                    }
+                    .width(min: 40, max: 40)
 
-                      TableColumn("Public IP") { VMPublicIPColumn(vm: $0) }
-                          .width(min: 120, max: 120)
+                    TableColumn("Created At", value: \.createdAt)
+                        .width(min: 120, max: 120)
+                    TableColumn("Cores", value: \.cores)
+                        .width(min: 40, max: 40)
+                    TableColumn("RAM", value: \.memoryGB)
+                        .width(min: 30, max: 30)
 
-                      TableColumn("Folder") { VMFolderColumn(vm: $0) }
-                          .width(min: 120, max: 120)
-                  }
-                  .padding(.vertical, 6)
-                  .refreshable { await vm.fetchVMs() }
-              }
+                    TableColumn("Public IP") { VMPublicIPColumn(vm: $0) }
+                        .width(min: 120, max: 120)
 
-              StatusPanel(
-                  lastUpdateTime: vm.lastUpdateTime,
-                  currentBalance: vm.currentBalance,
-                  currency: vm.currency,
-                  billingUrl: vm.billingUrl
-              )
-          }
-          .onAppear { Task { await vm.fetchVMs() } }
-      }
-  }
+                    TableColumn("Folder") { VMFolderColumn(vm: $0) }
+                        .width(min: 120, max: 120)
+                }
+                .padding(.vertical, 6)
+                .refreshable { await model.fetchVMs() }
+            }
+
+            StatusPanel(
+                lastUpdateTime: model.lastUpdateTime,
+                currentBalance: model.currentBalance,
+                currency: model.currency,
+                billingUrl: model.billingUrl
+            )
+        }
+        .task {
+            await model.loadIfNeeded()
+        }
+    }
+}

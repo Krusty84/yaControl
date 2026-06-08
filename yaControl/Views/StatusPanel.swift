@@ -46,7 +46,7 @@ struct StatusPanel: View {
                         }
                     }
                 }
-                .buttonStyle(PlainButtonStyle())
+                .buttonStyle(.plain)
             } else {
                 HStack(spacing: 0) {
                     Text("Current Balance: ")
