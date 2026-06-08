@@ -23,7 +23,8 @@ class CloudComputingViewModel: ObservableObject {
     @Published var processingStates: [String: Bool] = [:]   // VM ID -> isProcessing
 
     private let api = YandexAPIService.shared
-    private let helpers = Helpers.shared
+    private let powerService = VMPowerService.shared
+    private let pollingService = VMPollingService.shared
     private var iamToken = ""
 
     // MARK: - Computed helpers
@@ -32,7 +33,7 @@ class CloudComputingViewModel: ObservableObject {
         return vmTableData.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
     }
     var totalVMs: Int { vmTableData.count }
-    var runningVMs: Int { vmTableData.filter { $0.status == "RUNNING" }.count }
+    var runningVMs: Int { vmTableData.filter { $0.status.isRunning }.count }
 
     // MARK: - Actions
     func fetchVMs() async {
@@ -82,95 +83,92 @@ class CloudComputingViewModel: ObservableObject {
 
     func toggleVM(_ vm: VMTableData) {
         guard processingStates[vm.id] != true else { return }
-        // Start or stop via helper
-        helpers.startStopVM(iamToken: iamToken, for: vm)
-        pollVMStatus(for: vm.id)
+        processingStates[vm.id] = true
+
+        Task {
+            do {
+                if vm.status.isRunning {
+                    try await powerService.stopVM(iamToken: iamToken, vmId: vm.id)
+                    LoggerHelper.info("VM stopped successfully")
+                } else if vm.status.isStopped {
+                    try await powerService.startVM(iamToken: iamToken, vmId: vm.id)
+                    LoggerHelper.info("VM started successfully")
+                }
+
+                await pollVMStatus(for: vm.id, initialStatus: vm.status)
+            } catch {
+                LoggerHelper.error(
+                    "Failed to \(vm.status.isRunning ? "stop" : "start") VM: \(error.localizedDescription)"
+                )
+                processingStates[vm.id] = false
+            }
+        }
     }
 
     func stopAllAndPoll() {
         // 1) Filter to just the running VMs
-        let runningList = vmTableData.filter { $0.status == "RUNNING" }
+        let runningList = vmTableData.filter { $0.status.isRunning }
 
-        // 2) Tell the helper to stop _only_ those
-        helpers.stopAllRunningVMs(iamToken: iamToken, vms: runningList)
-
-        // 3) Start polling on just those
-        for vm in runningList {
-            pollVMStatus(for: vm.id)
+        Task {
+            let results = await powerService.stopRunningVMs(iamToken: iamToken, vms: runningList)
+            for result in results where !result.success {
+                LoggerHelper.error("Error stopping VM \(result.vmId): \(result.errorMessage ?? "Unknown error")")
+            }
+            for vm in runningList {
+                processingStates[vm.id] = true
+                await pollVMStatus(for: vm.id, initialStatus: vm.status)
+            }
         }
     }
 
     // MARK: - Polling
     
-    func pollVMStatus(for vmID: String) {
-        let initialIsRunning = vmTableData.first { $0.id == vmID }?.status == "RUNNING"
-        processingStates[vmID] = true
+    private func pollVMStatus(for vmID: String, initialStatus: VMStatus) async {
+        let result = await pollingService.waitForVMTransition(
+            iamToken: iamToken,
+            vmId: vmID,
+            initialStatus: initialStatus,
+            timeout: .seconds(60),
+            interval: .seconds(3)
+        )
+        let timeStamp = Date().formatted(.dateTime.hour().minute().second())
 
-        Task {
-            var retry = 0
-            let maxRetries = 20
-            let interval: UInt64 = 3_000_000_000
-
-            while retry < maxRetries {
-                try? await Task.sleep(nanoseconds: interval)
-                do {
-                    let updatedVMs = try await api.getVMs(iamToken: iamToken)
-                    if let newVM = updatedVMs.first(where: { $0.id == vmID }) {
-                        await MainActor.run {
-                            if let idx = vmTableData.firstIndex(where: { $0.id == vmID }) {
-                                vmTableData[idx] = newVM
-                            }
-                            AppState.shared.isVirtualMachineRunning = runningVMs > 0
-                        }
-
-                        // format current time
-                        let timeStamp = Date()
-                            .formatted(.dateTime.hour().minute().second())
-                        let name = newVM.name
-
-                        // Detect transitions
-                        if !initialIsRunning && newVM.status == "RUNNING" {
-                            NotificationManager.shared.postNotification(
-                                title: "yaControl",
-                                body: "VM: \(name) has started. [\(timeStamp)]"
-                            )
-                            break
-                        }
-                        if initialIsRunning && newVM.status == "STOPPED" {
-                            NotificationManager.shared.postNotification(
-                                title: "yaControl",
-                                body: "VM: \(name) has stopped. [\(timeStamp)]"
-                            )
-                            break
-                        }
-                        if ["ERROR", "CRASHED"].contains(newVM.status) {
-                            NotificationManager.shared.postNotification(
-                                title: "yaControl",
-                                body: "VM: \(name) error: \(newVM.status). [\(timeStamp)]"
-                            )
-                            break
-                        }
-                    }
-                } catch {
-                    // ignore and retry
-                }
-                retry += 1
+        switch result {
+        case .changed(let newVM):
+            if let idx = vmTableData.firstIndex(where: { $0.id == vmID }) {
+                vmTableData[idx] = newVM
             }
+            AppState.shared.isVirtualMachineRunning = runningVMs > 0
 
-            // timeout case
-            if retry >= maxRetries,
-               let vm = vmTableData.first(where: { $0.id == vmID }) {
-                let timeStamp = Date()
-                    .formatted(.dateTime.hour().minute().second())
+            if !initialStatus.isRunning && newVM.status.isRunning {
+                NotificationManager.shared.postNotification(
+                    title: "yaControl",
+                    body: "VM: \(newVM.name) has started. [\(timeStamp)]"
+                )
+            }
+            if initialStatus.isRunning && newVM.status.isStopped {
+                NotificationManager.shared.postNotification(
+                    title: "yaControl",
+                    body: "VM: \(newVM.name) has stopped. [\(timeStamp)]"
+                )
+            }
+            if newVM.status.isFailure {
+                NotificationManager.shared.postNotification(
+                    title: "yaControl",
+                    body: "VM: \(newVM.name) error: \(newVM.statusText). [\(timeStamp)]"
+                )
+            }
+        case .timeout:
+            if let vm = vmTableData.first(where: { $0.id == vmID }) {
                 NotificationManager.shared.postNotification(
                     title: "yaControl",
                     body: "VM: Timeout: couldn’t verify status for \(vm.name). [\(timeStamp)]"
                 )
             }
-
-            processingStates[vmID] = false
+        case .failed(let vmId, let message):
+            LoggerHelper.error("Polling VM \(vmId) failed: \(message)")
         }
+
+        processingStates[vmID] = false
     }
-
-
 }

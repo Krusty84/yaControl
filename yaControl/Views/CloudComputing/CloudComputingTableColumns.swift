@@ -75,21 +75,21 @@ struct VMStatusColumn: View {
 
     private var statusIcon: String {
         switch vm.status {
-            case "RUNNING": "stop.fill"
-            case "STOPPED": "play.fill"
-            case "STARTING", "STOPPING", "PROVISIONING", "RESTARTING","UPDATING": "arrow.triangle.2.circlepath"
-            case "ERROR": "exclamationmark.triangle.fill"
-            case "CRASHED": "exclamationmark.octagon.fill"
+            case .running: "stop.fill"
+            case .stopped: "play.fill"
+            case .starting, .stopping, .provisioning, .restarting, .updating: "arrow.triangle.2.circlepath"
+            case .error: "exclamationmark.triangle.fill"
+            case .crashed: "exclamationmark.octagon.fill"
             default: "questionmark"
         }
     }
 
     private var statusColor: Color {
         switch vm.status {
-            case "RUNNING": .red
-            case "STOPPED": .green
-            case "STARTING", "STOPPING", "PROVISIONING", "RESTARTING","UPDATING":.gray
-            case "ERROR", "CRASHED": .orange
+            case .running: .red
+            case .stopped: .green
+            case .starting, .stopping, .provisioning, .restarting, .updating: .gray
+            case .error, .crashed: .orange
             default: .gray
         }
     }
@@ -112,15 +112,17 @@ struct VMPublicIPColumn: View {
                         let cmd = "ssh -l \(SettingsManager.shared.generalUsername4VMs) \(ipAddress)"
                         NSPasteboard.general.clearContents()
                         NSPasteboard.general.setString(cmd, forType: .string)
-                        Helpers.shared.openTerminal()
+                        TerminalLauncher.openTerminal()
                     }) {
                         Text(SettingsManager.shared.generalUsername4VMs.isEmpty ? "Go to settings to set username" : "Open SSH")
                     }
                     .disabled(SettingsManager.shared.generalUsername4VMs.isEmpty)
                     
                     Button("Open RDP") {
-                        Helpers.shared.openRDPClient(to: ipAddress,
-                                                    username: SettingsManager.shared.generalUsername4VMs)
+                        RDPFileLauncher.openRDPClient(
+                            to: ipAddress,
+                            username: SettingsManager.shared.generalUsername4VMs
+                        )
                     }
                     //.disabled(SettingsManager.shared.generalUsername4VMs.isEmpty)
                 }

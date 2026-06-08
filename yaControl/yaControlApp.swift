@@ -18,39 +18,9 @@ struct yaControlApp: App {
     init() {
         // Initialize the app lifecycle observer
         _ = AppLifecycleObserver.shared
-        
-        // Create local copies of the properties we need to modify
-        let autoStartEnabled = SettingsManager.shared.autoStartEnabled
-        let startOptions = SettingsManager.shared.startOptions
-        let oAuthKey = SettingsManager.shared.oAuthKey
-        let vmsToStart = SettingsManager.shared.getAllAutostartVMs()
-        
-        Helpers.checkInternetConnection {
-            if autoStartEnabled && startOptions.contains(.afterAppLaunched) && !vmsToStart.isEmpty {
-                Task {
-                    do {
-                        // 1. Get IAM token
-                        let authResponse = try await YandexAPIService.shared.checkOauthKey(
-                            yandexPassportOauthToken: oAuthKey
-                        )
-                        
-                        // 2. Start all marked VMs
-                        await Helpers.shared.startAllMarkedVMs(
-                            iamToken: authResponse.iamToken,
-                            vmIds: vmsToStart
-                        )
-                        
-                    } catch {
-                        await MainActor.run {
-                            LoggerHelper.error("Auto-start failed: \(error.localizedDescription)")
-                        }
-                    }
-                }
-            }
-            else {
-                LoggerHelper.info("No VMs selected for auto-start on app launch")
-            }
-            AppState.shared.checkNumRunningVMs()
+
+        Task {
+            await VMPowerAutomationService.shared.handleAppLaunch()
         }
     }
     
@@ -84,4 +54,3 @@ struct MenuBarContentView: View {
 
  
  
-

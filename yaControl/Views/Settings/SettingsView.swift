@@ -10,12 +10,10 @@ import LaunchAtLogin
 
 struct SettingsTabContent: View {
     // General Settings
-    @AppStorage("com.krusty84.yaControl.settings.oAuthKey")
-    private var oAuthKey: String = SettingsManager.shared.oAuthKey
-
     @AppStorage("com.krusty84.yaControl.settings.generalUsername4VMs")
     private var generalUsername4VMs: String = SettingsManager.shared.generalUsername4VMs
 
+    @State private var oAuthKey: String = ""
     @State private var appLogging: Bool = false
     
     @State private var ycCLIInstalled: Bool = false
@@ -32,18 +30,6 @@ struct SettingsTabContent: View {
     @AppStorage("com.krusty84.yaControl.settings.billingThreshold")
     private var billingThreshold: Double = SettingsManager.shared.billingThreshold
 
-    enum StartOption: String, CaseIterable {
-        case afterAppLaunched = "After app launched"
-        case afterMacOSStarted = "After macOS started"
-        case afterWakeup       = "After wakeup"
-    }
-
-    enum ShutdownOption: String, CaseIterable {
-        case afterAppExit     = "After app exit"
-        case afterMacOSShutdown = "After macOS shutdown"
-        case afterMacOSSleep    = "After macOS sleep"
-    }
-    
     @State private var isHovering = false
 
     var body: some View {
@@ -337,13 +323,31 @@ struct SettingsTabContent: View {
     }
 
     private func checkOAuthKey() {
+        let token = oAuthKey.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        guard !token.isEmpty else {
+            responseCode = nil
+            errorMessage = "OAuth token is empty."
+            return
+        }
+
         Task {
             do {
                 let response = try await YandexAPIService.shared
-                    .checkOauthKey(yandexPassportOauthToken: oAuthKey)
+                    .checkOauthKey(yandexPassportOauthToken: token)
+
+                if response.code == 200 {
+                    try KeychainTokenStore.shared.saveOAuthToken(token)
+                }
+
                 await MainActor.run {
                     responseCode = response.code
-                    errorMessage = (response.code == 200 ? nil : "Invalid OAuth key (Code \(response.code))")
+                    if response.code == 200 {
+                        oAuthKey = token
+                        errorMessage = nil
+                    } else {
+                        errorMessage = "Invalid OAuth key (Code \(response.code))"
+                    }
                 }
             } catch {
                 await MainActor.run {

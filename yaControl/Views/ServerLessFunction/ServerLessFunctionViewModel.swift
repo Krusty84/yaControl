@@ -22,7 +22,6 @@ class ServerLessFunctionViewModel: ObservableObject {
     @Published var billingUrl: URL? = nil
 
     private let api = YandexAPIService.shared
-    private let helpers = Helpers.shared
     private var iamToken = ""
 
     // Computed helpers

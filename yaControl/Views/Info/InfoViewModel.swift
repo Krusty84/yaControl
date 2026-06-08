@@ -46,7 +46,7 @@ class InfoWindowViewModel: ObservableObject {
 
             // 3. Update published values
             totalVMsCount    = vmsData.count
-            runningVMsCount  = vmsData.filter { $0.status == "RUNNING" }.count
+            runningVMsCount  = vmsData.filter { $0.status.isRunning }.count
 
             totalSLFsCount   = slfData.count
             activeSLFsCount  = slfData.filter { $0.status == "ACTIVE" }.count

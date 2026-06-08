@@ -11,7 +11,7 @@ class SettingsManager {
     static let shared = SettingsManager()
     private let defaults = UserDefaults.standard
     // Keys
-    private let oAuthKey_ = "com.krusty84.yaControl.settings.oAuthKey"
+    private let legacyOAuthKey = "com.krusty84.yaControl.settings.oAuthKey"
     private let billingThresholdKey = "com.krusty84.yaControl.settings.billingThreshold"
     private let billingDefaultThreshold = 50.0
     private let autoStartEnabledKey = "com.krusty84.yaControl.settings.autoStartEnabled"
@@ -21,6 +21,10 @@ class SettingsManager {
     private let shutdownOptionsKey = "com.krusty84.yaControl.settings.shutdownOptions"
     private let autostartVMIdsKey = "com.krusty84.yaControl.settings.autostart_vm_ids"
     private let generalUsername4VMs_ = "com.krusty84.yaControl.settings.generalUsername4VMs"
+
+    init() {
+        migrateLegacyOAuthToken()
+    }
 
     // General
     var appLoggingEnabled: Bool {
@@ -34,8 +38,14 @@ class SettingsManager {
     }
     
     var oAuthKey: String {
-        get { defaults.string(forKey: oAuthKey_) ?? "" }
-        set { defaults.set(newValue, forKey: oAuthKey_) }
+        get { (try? KeychainTokenStore.shared.readOAuthToken()) ?? "" }
+        set {
+            if newValue.isEmpty {
+                try? KeychainTokenStore.shared.deleteOAuthToken()
+            } else {
+                try? KeychainTokenStore.shared.saveOAuthToken(newValue)
+            }
+        }
     }
 
     var generalUsername4VMs: String {
@@ -62,7 +72,7 @@ class SettingsManager {
         set { defaults.set(newValue, forKey: autoStartEnabledKey) }
     }
 
-    var startOptions: [SettingsTabContent.StartOption] {
+    var startOptions: [StartOption] {
         get {
             guard
                 let data = defaults.data(forKey: startOptionsKey),
@@ -80,7 +90,7 @@ class SettingsManager {
         }
     }
 
-    var shutdownOptions: [SettingsTabContent.ShutdownOption] {
+    var shutdownOptions: [ShutdownOption] {
         get {
             guard
                 let data = defaults.data(forKey: shutdownOptionsKey),
@@ -129,6 +139,12 @@ class SettingsManager {
 
         toRemove.forEach { defaults.removeObject(forKey: "vm_\($0)_isSelected") }
     }
+
+    private func migrateLegacyOAuthToken() {
+        if let token = defaults.string(forKey: legacyOAuthKey), !token.isEmpty {
+            try? KeychainTokenStore.shared.saveOAuthToken(token)
+        }
+
+        defaults.removeObject(forKey: legacyOAuthKey)
+    }
 }
-
-

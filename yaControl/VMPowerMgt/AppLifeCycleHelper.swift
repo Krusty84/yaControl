@@ -11,18 +11,12 @@ import AppKit
 //handle termination and ensure async code executes before the app quits, the nuance of shutdown
 class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
-        if SettingsManager.shared.autoStartEnabled {
-            let shutdownOptions = SettingsManager.shared.shutdownOptions
-            if shutdownOptions.contains(.afterAppExit) ||  shutdownOptions.contains(.afterMacOSShutdown) {
-                AppState.shared.handleShutdown { success in
-                    LoggerHelper.info(success ? "Shutdown tasks completed successfully." : "Shutdown tasks finished with errors.")
-                    NSApplication.shared.reply(toApplicationShouldTerminate: true)
-                }
-                return .terminateLater  // Wait for async completion
-            }
+        Task {
+            let success = await VMPowerAutomationService.shared.handleAppExit()
+            LoggerHelper.info(success ? "Shutdown tasks completed successfully." : "Shutdown tasks finished with errors.")
+            NSApplication.shared.reply(toApplicationShouldTerminate: true)
         }
-        // Default: Terminate immediately if conditions aren't met
-        return .terminateNow
+        return .terminateLater
     }
 }
 
@@ -64,15 +58,9 @@ class AppLifecycleObserver: ObservableObject {
                 self.systemStatus = .aboutToSleep
                 UserDefaults.standard.set(Date(), forKey: self.lastSleepDateKey)
                 LoggerHelper.info("System gonna sleep")
-                if SettingsManager.shared.autoStartEnabled {
-                    let shutdownOptions = SettingsManager.shared.shutdownOptions
-                    if shutdownOptions.contains(.afterMacOSSleep) {
-                        AppState.shared.handleSleep { success in
-                            LoggerHelper.info(success ? "Shutdown tasks completed successfully." : "Shutdown tasks finished with errors.")
-                            NSApplication.shared.reply(toApplicationShouldTerminate: true)
-                        }
-                        NSApplication.shared.reply(toApplicationShouldTerminate: true)
-                    }
+                Task {
+                    let success = await VMPowerAutomationService.shared.handleMacSleep()
+                    LoggerHelper.info(success ? "Shutdown tasks completed successfully." : "Shutdown tasks finished with errors.")
                 }
             },
 
@@ -116,7 +104,9 @@ class AppLifecycleObserver: ObservableObject {
             LoggerHelper.info("System slept for \(sleepDuration) seconds")
         }
 
-        AppState.shared.handleWake()
+        Task {
+            await VMPowerAutomationService.shared.handleMacWake()
+        }
 
         // Reset state after 2 sec
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
@@ -129,4 +119,3 @@ class AppLifecycleObserver: ObservableObject {
         observers.forEach(NotificationCenter.default.removeObserver)
     }
 }
-

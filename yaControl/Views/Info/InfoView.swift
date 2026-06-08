@@ -38,7 +38,7 @@ struct InfoWindow: View {
                             title: "Billing Information",
                             icon: "creditcard",
                             stats: [
-                                ("Current Balance", Helpers.billingBalanceFormatter(amount: vm.currentBalance, currency: vm.currency, warningThreshold:SettingsManager.shared.billingThreshold)),
+                                ("Current Balance", BillingFormattingHelper.balanceAttributedString(amount: vm.currentBalance, currency: vm.currency, warningThreshold:SettingsManager.shared.billingThreshold)),
                                 ("Details", "View Billing")
     
                             ],

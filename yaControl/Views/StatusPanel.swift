@@ -29,7 +29,7 @@ struct StatusPanel: View {
                         Text("Current Balance: ")
                             .font(.subheadline)
                             .foregroundColor(.gray)
-                        Text(Helpers.billingBalanceFormatter(
+                        Text(BillingFormattingHelper.balanceAttributedString(
                             amount: currentBalance,
                             currency: currency,
                             warningThreshold: SettingsManager.shared.billingThreshold
@@ -52,7 +52,7 @@ struct StatusPanel: View {
                     Text("Current Balance: ")
                         .font(.subheadline)
                         .foregroundColor(.gray)
-                    Text(Helpers.billingBalanceFormatter(
+                    Text(BillingFormattingHelper.balanceAttributedString(
                         amount: currentBalance,
                         currency: currency,
                         warningThreshold: SettingsManager.shared.billingThreshold

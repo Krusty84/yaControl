@@ -74,8 +74,7 @@ struct SLFInvokeColumn: View {
                     let cmd = "yc serverless function invoke \(slf.id)"
                     NSPasteboard.general.clearContents()
                     NSPasteboard.general.setString(cmd, forType: .string)
-                    // Call the singleton directly here:
-                    Helpers.shared.openTerminal()
+                    TerminalLauncher.openTerminal()
                 }
                 .disabled(!SettingsManager.shared.ycCLIInstalled)
             }
