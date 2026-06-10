@@ -37,6 +37,6 @@ struct BillingTabContent: View {
     var body: some View {
         VStack(spacing: 0) {
         }
-        Text("Under constraction")
+        Text(LocalizedStringKey(L10n.Common.underConstruction))
     }
 }

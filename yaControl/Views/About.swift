@@ -9,6 +9,13 @@ import SwiftUI
 import AppKit
 
 struct AboutTabContent: View {
+    @AppStorage("com.krusty84.yaControl.settings.appLanguage")
+    private var appLanguageRawValue: String = AppLanguage.system.rawValue
+
+    private var appLanguage: AppLanguage {
+        AppLanguage(rawValue: appLanguageRawValue) ?? .system
+    }
+
     var body: some View {
         VStack(spacing: 12) {
             // App Icon
@@ -18,12 +25,12 @@ struct AboutTabContent: View {
                 .cornerRadius(10)
 
             // Description
-            Text("yaControl")
+            Text(LocalizedStringKey(L10n.About.title))
                 .font(.title2)
                 .fontWeight(.semibold)
 
             VStack(spacing: 4) {
-                Text("This tool helps you manage your Yandex Cloud services from one place.\nYou can start or stop virtual machines, view storage buckets or serverless functions—all from one place.\nIt also supports automatic VM start/stop based on macOS conditions, like when your Mac goes to sleep or wakes up.")
+                Text(LocalizedStringKey(L10n.About.description))
                     .font(.body)
                     .multilineTextAlignment(.center)
             }
@@ -36,9 +43,9 @@ struct AboutTabContent: View {
                 // License & Author
                 VStack(alignment: .leading, spacing: 4) {
                     Group {
-                        Text("License: MIT")
-                        Text("Author: Alexey Sedoykin")
-                        Text("Contact: www.linkedin.com/in/sedoykin")
+                        Text(String(format: localized(L10n.About.license), "MIT"))
+                        Text(String(format: localized(L10n.About.author), "Alexey Sedoykin"))
+                        Text(String(format: localized(L10n.About.contact), "www.linkedin.com/in/sedoykin"))
                             .onHover { hovering in
                                 if hovering { NSCursor.pointingHand.push() }
                                 else       { NSCursor.pop() }
@@ -56,7 +63,7 @@ struct AboutTabContent: View {
                     Button(action: {
                         NSApplication.shared.terminate(nil)
                     }) {
-                        Text("Exit")
+                        Text(LocalizedStringKey(L10n.About.exit))
                             //.font(.system(size: 12, weight: .medium))
                             .font(.caption)
                             //.foregroundColor(.white)
@@ -77,5 +84,9 @@ struct AboutTabContent: View {
         .onAppear {
             // Any additional setup when the view appears
         }
+    }
+
+    private func localized(_ key: String) -> String {
+        LocalizedStringHelper.string(key, language: appLanguage)
     }
 }

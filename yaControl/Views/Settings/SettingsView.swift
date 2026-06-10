@@ -187,12 +187,12 @@ struct SettingsTabContent: View {
                     .toggleStyle(.switch)
                     .help(LocalizedStringHelper.string(L10n.Settings.launchAtLoginHelp, language: appLanguage))
 
-                Toggle(LocalizedStringKey(L10n.Settings.applicationLogging), isOn: $appLogging)
+                Toggle(LocalizedStringKey(L10n.Settings.appLoggingTitle), isOn: $appLogging)
                     .toggleStyle(.switch)
                     .onChange(of: appLogging) { _, newValue in
                         SettingsManager.shared.appLoggingEnabled = newValue
                     }
-                    .help(LocalizedStringHelper.string(L10n.Settings.applicationLoggingHelp, language: appLanguage))
+                    .help(LocalizedStringHelper.string(L10n.Settings.appLoggingHelp, language: appLanguage))
 
                 NotificationToggleView()
                     .help(LocalizedStringHelper.string(L10n.Settings.notificationsHelp, language: appLanguage))
@@ -247,8 +247,8 @@ struct SettingsTabContent: View {
                         .disabled(isOAuthTokenEmpty)
                         .help(
                             isOAuthTokenEmpty
-                            ? LocalizedStringHelper.string(L10n.Settings.oauthVerifyEmptyHelp, language: appLanguage)
-                            : LocalizedStringHelper.string(L10n.Settings.oauthVerifyHelp, language: appLanguage)
+                            ? LocalizedStringHelper.string(L10n.Settings.oauthVerifyDisabledHelp, language: appLanguage)
+                            : LocalizedStringHelper.string(L10n.Settings.oauthVerifyEnabledHelp, language: appLanguage)
                         )
                 }
 
@@ -526,7 +526,7 @@ struct SettingsTabContent: View {
                         errorMessage = nil
                     } else {
                         errorMessage = String(
-                            format: LocalizedStringHelper.string(L10n.Settings.oauthInvalidCode, language: appLanguage),
+                            format: LocalizedStringHelper.string(L10n.Settings.oauthInvalidWithCode, language: appLanguage),
                             Int64(response.code)
                         )
                     }

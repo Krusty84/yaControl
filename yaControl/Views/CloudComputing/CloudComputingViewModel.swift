@@ -186,7 +186,7 @@ final class CloudComputingModel {
                 NotificationManager.shared.postNotification(
                     title: "yaControl",
                     body: String(
-                        format: LocalizedStringHelper.string(L10n.Notifications.vmTimeoutName, language: SettingsManager.shared.appLanguage),
+                        format: LocalizedStringHelper.string(L10n.Notifications.vmTimeout, language: SettingsManager.shared.appLanguage),
                         vm.name,
                         timeStamp
                     )

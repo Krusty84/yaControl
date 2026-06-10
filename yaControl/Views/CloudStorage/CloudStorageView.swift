@@ -46,17 +46,17 @@ struct BucketTabContent: View {
                     .labelStyle(.iconOnly)
             }
             .buttonStyle(.plain)
-            .help(LocalizedStringHelper.string(L10n.Storage.refresh, language: SettingsManager.shared.appLanguage))
+            .help(LocalizedStringHelper.string(L10n.Storage.refreshHelp, language: SettingsManager.shared.appLanguage))
         }
         .padding(.horizontal)
         .padding(.vertical, 6)
-        .searchable(text: $model.searchText, prompt: LocalizedStringKey(L10n.Storage.search))
+        .searchable(text: $model.searchText, prompt: LocalizedStringKey(L10n.Storage.searchPrompt))
     }
 
     @ViewBuilder
     private var contentArea: some View {
         if model.isLoading {
-            ProgressView(LocalizedStringHelper.string(L10n.Common.loading, language: SettingsManager.shared.appLanguage)).padding()
+            ProgressView(LocalizedStringHelper.string(L10n.Storage.loading, language: SettingsManager.shared.appLanguage)).padding()
         } else if let err = model.errorMessage {
             ContentUnavailableView {
                 Label(LocalizedStringKey(L10n.Storage.errorTitle), systemImage: "exclamationmark.triangle")
@@ -75,18 +75,18 @@ struct BucketTabContent: View {
             )
         } else {
             Table(model.filteredBuckets, selection: $selectedBucket) {
-                TableColumn(LocalizedStringKey(L10n.Table.name)) { BucketNameColumn(bucket: $0) }
-                TableColumn(LocalizedStringKey(L10n.Table.maxSizeGb), value: \.maxSize)
+                TableColumn(LocalizedStringKey(L10n.Table.storageName)) { BucketNameColumn(bucket: $0) }
+                TableColumn(LocalizedStringKey(L10n.Table.storageMaxSizeGB), value: \.maxSize)
                     .width(min: 80, max: 80)
-                TableColumn(LocalizedStringKey(L10n.Table.usedSizeGb), value: \.usedSize)
+                TableColumn(LocalizedStringKey(L10n.Table.storageUsedSizeGB), value: \.usedSize)
                     .width(min: 90, max: 90)
-                TableColumn(LocalizedStringKey(L10n.Table.files), value: \.totalObjectCountString)
+                TableColumn(LocalizedStringKey(L10n.Table.storageFiles), value: \.totalObjectCountString)
                     .width(min: 40, ideal: 40, max: 120)
-                TableColumn(LocalizedStringKey(L10n.Table.createdAt), value: \.createdAt)
+                TableColumn(LocalizedStringKey(L10n.Table.storageCreatedAt), value: \.createdAt)
                     .width(min: 110, max: 120)
-                TableColumn(LocalizedStringKey(L10n.Table.updatedAt), value: \.updatedAt)
+                TableColumn(LocalizedStringKey(L10n.Table.storageUpdatedAt), value: \.updatedAt)
                     .width(min: 110, max: 120)
-                TableColumn(LocalizedStringKey(L10n.Table.folder)) { BucketFolderColumn(bucket: $0) }
+                TableColumn(LocalizedStringKey(L10n.Table.storageFolder)) { BucketFolderColumn(bucket: $0) }
                     .width(min: 80, max: 150)
             }
             .padding(.vertical, 6)

@@ -39,7 +39,7 @@ struct ServerLessFunctionTabContent: View {
             ))
                 .font(.subheadline).bold()
             Text(String(
-                format: LocalizedStringHelper.string(L10n.Serverless.active, language: SettingsManager.shared.appLanguage),
+                format: LocalizedStringHelper.string(L10n.Serverless.activeFunctions, language: SettingsManager.shared.appLanguage),
                 Int64(model.activeSLFs)
             ))
                 .font(.subheadline).bold()
@@ -51,17 +51,17 @@ struct ServerLessFunctionTabContent: View {
                     .labelStyle(.iconOnly)
             }
             .buttonStyle(.plain)
-            .help(LocalizedStringHelper.string(L10n.Serverless.refresh, language: SettingsManager.shared.appLanguage))
+            .help(LocalizedStringHelper.string(L10n.Serverless.refreshHelp, language: SettingsManager.shared.appLanguage))
         }
         .padding(.horizontal)
         .padding(.vertical, 6)
-        .searchable(text: $model.searchText, prompt: LocalizedStringKey(L10n.Serverless.search))
+        .searchable(text: $model.searchText, prompt: LocalizedStringKey(L10n.Serverless.searchPrompt))
     }
 
     @ViewBuilder
     private var contentArea: some View {
         if model.isLoading {
-            ProgressView(LocalizedStringHelper.string(L10n.Common.loading, language: SettingsManager.shared.appLanguage))
+            ProgressView(LocalizedStringHelper.string(L10n.Serverless.loading, language: SettingsManager.shared.appLanguage))
                 .padding()
         } else if let err = model.errorMessage {
             ContentUnavailableView {
@@ -81,17 +81,17 @@ struct ServerLessFunctionTabContent: View {
             )
         } else {
             Table(model.filteredSLFs, selection: $selectedSlf) {
-                TableColumn(LocalizedStringKey(L10n.Table.name)) { slf in
+                TableColumn(LocalizedStringKey(L10n.Table.serverlessName)) { slf in
                     SLFNameColumn(slf: slf)
                 }
-                TableColumn(LocalizedStringKey(L10n.Table.status)) { slf in
+                TableColumn(LocalizedStringKey(L10n.Table.serverlessStatus)) { slf in
                     SLFStatusColumn(slf: slf)
                 }
-                TableColumn(LocalizedStringKey(L10n.Table.createdAt), value: \.createdAt)
-                TableColumn(LocalizedStringKey(L10n.Table.invoke)) { slf in
+                TableColumn(LocalizedStringKey(L10n.Table.serverlessCreatedAt), value: \.createdAt)
+                TableColumn(LocalizedStringKey(L10n.Table.serverlessInvoke)) { slf in
                     SLFInvokeColumn(slf: slf)
                 }
-                TableColumn(LocalizedStringKey(L10n.Table.folder)) { slf in
+                TableColumn(LocalizedStringKey(L10n.Table.serverlessFolder)) { slf in
                     SLFFolderColumn(slf: slf)
                 }
             }

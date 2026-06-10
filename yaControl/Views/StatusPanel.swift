@@ -18,7 +18,7 @@ struct StatusPanel: View {
     var body: some View {
         HStack {
             Text(String(
-                format: LocalizedStringHelper.string(L10n.Common.lastUpdated, language: SettingsManager.shared.appLanguage),
+                format: LocalizedStringHelper.string(L10n.StatusPanel.lastUpdated, language: SettingsManager.shared.appLanguage),
                 lastUpdateTime.formatted(date: .omitted, time: .shortened)
             ))
                 .font(.subheadline)
@@ -29,7 +29,7 @@ struct StatusPanel: View {
             if let url = billingUrl {
                 Link(destination: url) {
                     HStack(spacing: 0) {
-                        Text(LocalizedStringHelper.string(L10n.Common.currentBalance, language: SettingsManager.shared.appLanguage) + " ")
+                        Text(LocalizedStringHelper.string(L10n.StatusPanel.currentBalance, language: SettingsManager.shared.appLanguage) + " ")
                             .font(.subheadline)
                             .foregroundColor(.gray)
                         Text(BillingFormattingHelper.balanceAttributedString(
@@ -52,7 +52,7 @@ struct StatusPanel: View {
                 .buttonStyle(.plain)
             } else {
                 HStack(spacing: 0) {
-                    Text(LocalizedStringHelper.string(L10n.Common.currentBalance, language: SettingsManager.shared.appLanguage) + " ")
+                    Text(LocalizedStringHelper.string(L10n.StatusPanel.currentBalance, language: SettingsManager.shared.appLanguage) + " ")
                         .font(.subheadline)
                         .foregroundColor(.gray)
                     Text(BillingFormattingHelper.balanceAttributedString(

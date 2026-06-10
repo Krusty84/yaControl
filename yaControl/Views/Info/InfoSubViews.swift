@@ -41,7 +41,8 @@ struct StatsBillingSection: View {
                 Spacer()
             }
             ForEach(stats, id: \.0) { label, value in
-                if label == "Details", let link = url {
+                if label == LocalizedStringHelper.string(L10n.Info.details, language: SettingsManager.shared.appLanguage),
+                   let link = url {
                     Link(destination: link) {
                         StatBillingRow(label: label, value: value, isLink: true)
                     }

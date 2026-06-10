@@ -20,7 +20,7 @@ struct MainWindow: View {
     var body: some View {
         GoodProperTabsView(content: [
                 (title: localized(L10n.Tabs.computing), icon: "system:desktopcomputer", view: AnyView(CloudComputingTabContent().environmentObject(AppState.shared))),
-                (title: localized(L10n.Tabs.function), icon: "system:function", view: AnyView(ServerLessFunctionTabContent())),
+                (title: localized(L10n.Tabs.functions), icon: "system:function", view: AnyView(ServerLessFunctionTabContent())),
                 (title: localized(L10n.Tabs.storage), icon: "system:archivebox", view: AnyView(BucketTabContent())),
                 //TODO: for future, maybe, for that is need to add gRPC support
                 //(title: "Billing", icon: "system:creditcard", view: AnyView(BillingTabContent())),

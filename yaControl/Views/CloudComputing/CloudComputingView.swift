@@ -41,7 +41,7 @@ struct CloudComputingTabContent: View {
             ))
                 .font(.subheadline).bold()
             Text(String(
-                format: LocalizedStringHelper.string(L10n.Computing.running, language: SettingsManager.shared.appLanguage),
+                format: LocalizedStringHelper.string(L10n.Computing.runningVMs, language: SettingsManager.shared.appLanguage),
                 Int64(model.runningVMs)
             ))
                 .font(.subheadline).bold()
@@ -53,7 +53,7 @@ struct CloudComputingTabContent: View {
                     .labelStyle(.iconOnly)
             }
             .buttonStyle(.plain)
-            .help(LocalizedStringHelper.string(L10n.Computing.refresh, language: SettingsManager.shared.appLanguage))
+            .help(LocalizedStringHelper.string(L10n.Computing.refreshHelp, language: SettingsManager.shared.appLanguage))
 
             Button {
                 isStopAllConfirmationPresented = true
@@ -81,13 +81,13 @@ struct CloudComputingTabContent: View {
         }
         .padding(.horizontal)
         .padding(.vertical, 6)
-        .searchable(text: $model.searchText, prompt: LocalizedStringKey(L10n.Computing.search))
+        .searchable(text: $model.searchText, prompt: LocalizedStringKey(L10n.Computing.searchPrompt))
     }
 
     @ViewBuilder
     private var contentArea: some View {
         if model.isLoading {
-            ProgressView(LocalizedStringHelper.string(L10n.Common.loading, language: SettingsManager.shared.appLanguage))
+            ProgressView(LocalizedStringHelper.string(L10n.Computing.loading, language: SettingsManager.shared.appLanguage))
                 .padding()
         } else if let err = model.errorMessage {
             ContentUnavailableView {
@@ -107,7 +107,7 @@ struct CloudComputingTabContent: View {
             )
         } else {
             Table(model.filteredVMs, selection: $selectedVM) {
-                TableColumn(LocalizedStringKey(L10n.Table.autoStart)) { item in
+                TableColumn(LocalizedStringKey(L10n.Table.vmAutoStart)) { item in
                     VMAutoStartColumn(
                         vm: item,
                         isOn: item.isAutoStarted,
@@ -116,10 +116,10 @@ struct CloudComputingTabContent: View {
                 }
                 .width(min: 20, max: 20)
 
-                TableColumn(LocalizedStringKey(L10n.Table.name)) { VMNameColumn(vm: $0) }
+                TableColumn(LocalizedStringKey(L10n.Table.vmName)) { VMNameColumn(vm: $0) }
                     .width(min: 150, max: 150)
 
-                TableColumn(LocalizedStringKey(L10n.Table.status)) { item in
+                TableColumn(LocalizedStringKey(L10n.Table.vmStatus)) { item in
                     let processing = model.processingStates[item.id] == true
                     VMStatusColumn(
                         vm: item,
@@ -129,17 +129,17 @@ struct CloudComputingTabContent: View {
                 }
                 .width(min: 40, max: 40)
 
-                TableColumn(LocalizedStringKey(L10n.Table.createdAt), value: \.createdAt)
+                TableColumn(LocalizedStringKey(L10n.Table.vmCreatedAt), value: \.createdAt)
                     .width(min: 120, max: 120)
-                TableColumn(LocalizedStringKey(L10n.Table.cores), value: \.cores)
+                TableColumn(LocalizedStringKey(L10n.Table.vmCores), value: \.cores)
                     .width(min: 40, max: 40)
-                TableColumn(LocalizedStringKey(L10n.Table.ram), value: \.memoryGB)
+                TableColumn(LocalizedStringKey(L10n.Table.vmRam), value: \.memoryGB)
                     .width(min: 30, max: 30)
 
-                TableColumn(LocalizedStringKey(L10n.Table.publicIP)) { VMPublicIPColumn(vm: $0) }
+                TableColumn(LocalizedStringKey(L10n.Table.vmPublicIP)) { VMPublicIPColumn(vm: $0) }
                     .width(min: 120, max: 120)
 
-                TableColumn(LocalizedStringKey(L10n.Table.folder)) { VMFolderColumn(vm: $0) }
+                TableColumn(LocalizedStringKey(L10n.Table.vmFolder)) { VMFolderColumn(vm: $0) }
                     .width(min: 120, max: 120)
             }
             .padding(.vertical, 6)

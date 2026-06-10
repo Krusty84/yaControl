@@ -8,33 +8,40 @@
 import SwiftUI
 
 struct InfoWindow: View {
+    @AppStorage("com.krusty84.yaControl.settings.appLanguage")
+    private var appLanguageRawValue: String = AppLanguage.system.rawValue
+
     @State private var model = InfoWindowModel()
+
+    private var appLanguage: AppLanguage {
+        AppLanguage(rawValue: appLanguageRawValue) ?? .system
+    }
 
     var body: some View {
         VStack(spacing: 16) {
-            Text("Yandex Cloud Statistics")
+            Text(LocalizedStringKey(L10n.Info.title))
                 .font(.headline)
                 .padding(.top, 8)
 
             if model.isLoading {
-                ProgressView("Loading…")
+                ProgressView(localized(L10n.Info.loading))
                     .frame(maxHeight: .infinity)
             } else if let error = model.errorMessage {
                 ContentUnavailableView {
-                    Label("Couldn’t Load Statistics", systemImage: "exclamationmark.triangle")
+                    Label(LocalizedStringKey(L10n.Info.errorTitle), systemImage: "exclamationmark.triangle")
                 } description: {
                     Text(error)
                 } actions: {
-                    Button("Retry") {
+                    Button(LocalizedStringKey(L10n.Common.retry)) {
                         Task { await model.loadAllData() }
                     }
                 }
                 .frame(maxHeight: .infinity)
             } else if model.hasNoResources {
                 ContentUnavailableView(
-                    "No Resources Found",
+                    LocalizedStringKey(L10n.Info.emptyTitle),
                     systemImage: "tray",
-                    description: Text("Refresh statistics or check your Yandex Cloud credentials.")
+                    description: Text(LocalizedStringKey(L10n.Info.emptyDescription))
                 )
                 .frame(maxHeight: .infinity)
             } else {
@@ -42,11 +49,11 @@ struct InfoWindow: View {
                     VStack(spacing: 20) {
                         // Billing
                         StatsBillingSection(
-                            title: "Billing Information",
+                            title: localized(L10n.Info.billingInformation),
                             icon: "creditcard",
                             stats: [
-                                ("Current Balance", BillingFormattingHelper.balanceAttributedString(amount: model.currentBalance, currency: model.currency, warningThreshold:SettingsManager.shared.billingThreshold)),
-                                ("Details", "View Billing")
+                                (localized(L10n.Info.currentBalance), BillingFormattingHelper.balanceAttributedString(amount: model.currentBalance, currency: model.currency, warningThreshold:SettingsManager.shared.billingThreshold)),
+                                (localized(L10n.Info.details), AttributedString(localized(L10n.Info.viewBilling)))
     
                             ],
                             url: model.billingUrl
@@ -56,12 +63,12 @@ struct InfoWindow: View {
 
                         // VMs
                         StatsSection(
-                            title: "Virtual Machines",
+                            title: localized(L10n.Info.virtualMachines),
                             icon: "desktopcomputer",
                             stats: [
-                                ("Total VMs", "\(model.totalVMsCount)"),
-                                ("Running", "\(model.runningVMsCount)"),
-                                ("Stopped", "\(model.totalVMsCount - model.runningVMsCount)")
+                                (localized(L10n.Info.totalVMs), "\(model.totalVMsCount)"),
+                                (localized(L10n.Info.runningVMs), "\(model.runningVMsCount)"),
+                                (localized(L10n.Info.stoppedVMs), "\(model.totalVMsCount - model.runningVMsCount)")
                             ]
                         )
 
@@ -69,12 +76,12 @@ struct InfoWindow: View {
 
                         // Serverless
                         StatsSection(
-                            title: "Serverless Functions",
+                            title: localized(L10n.Info.serverlessFunctions),
                             icon: "function",
                             stats: [
-                                ("Total Functions", "\(model.totalSLFsCount)"),
-                                ("Active", "\(model.activeSLFsCount)"),
-                                ("Inactive", "\(model.totalSLFsCount - model.activeSLFsCount)")
+                                (localized(L10n.Info.totalFunctions), "\(model.totalSLFsCount)"),
+                                (localized(L10n.Info.activeFunctions), "\(model.activeSLFsCount)"),
+                                (localized(L10n.Info.inactiveFunctions), "\(model.totalSLFsCount - model.activeSLFsCount)")
                             ]
                         )
 
@@ -82,10 +89,10 @@ struct InfoWindow: View {
 
                         // Buckets
                         StatsSection(
-                            title: "Storage Buckets",
+                            title: localized(L10n.Info.storageBuckets),
                             icon: "archivebox",
                             stats: [
-                                ("Total Buckets", "\(model.totalBucketsCount)")
+                                (localized(L10n.Info.totalBuckets), "\(model.totalBucketsCount)")
                             ]
                         )
                     }
@@ -93,7 +100,10 @@ struct InfoWindow: View {
                 }
             }
 
-            Text("Last updated: \(model.lastUpdated.formatted(date: .omitted, time: .shortened))")
+            Text(String(
+                format: localized(L10n.Info.lastUpdated),
+                model.lastUpdated.formatted(date: .omitted, time: .shortened)
+            ))
                 .font(.caption)
                 .foregroundColor(.secondary)
                 .padding(.bottom, 8)
@@ -102,5 +112,9 @@ struct InfoWindow: View {
         .task {
             await model.loadIfNeeded()
         }
+    }
+
+    private func localized(_ key: String) -> String {
+        LocalizedStringHelper.string(key, language: appLanguage)
     }
 }

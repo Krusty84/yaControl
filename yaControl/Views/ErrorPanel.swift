@@ -12,11 +12,14 @@ struct ErrorView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Error: \(error)")
+            Text(String(
+                format: LocalizedStringHelper.string(L10n.Errors.errorFormat, language: SettingsManager.shared.appLanguage),
+                error
+            ))
                 .foregroundColor(.red)
-            Text("Check your internet connection")
-            Text("Check the validity of the OAuth key (go to application settings)")
-            Text("Cloud may be pending - refresh data in a few seconds")
+            Text(LocalizedStringKey(L10n.Errors.checkConnection))
+            Text(LocalizedStringKey(L10n.Errors.checkOAuth))
+            Text(LocalizedStringKey(L10n.Errors.cloudPending))
         }
         .padding()
     }

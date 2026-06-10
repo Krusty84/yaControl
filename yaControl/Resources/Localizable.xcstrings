@@ -4,17 +4,143 @@
     "" : {
 
     },
-    "Author: Alexey Sedoykin" : {
-
+    "about.author" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Author: %@"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Автор: %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Автор: %@"
+          }
+        }
+      }
     },
-    "Check the validity of the OAuth key (go to application settings)" : {
-
+    "about.contact" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contact: %@"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Байланыс: %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Контакт: %@"
+          }
+        }
+      }
     },
-    "Check your internet connection" : {
-
+    "about.description" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This tool helps you manage your Yandex Cloud services from one place.\nYou can start or stop virtual machines, view storage buckets or serverless functions all from one place.\nIt also supports automatic VM start/stop based on macOS conditions, like when your Mac goes to sleep or wakes up."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Бұл құрал Yandex Cloud қызметтерін бір жерден басқаруға көмектеседі.\nВиртуалды машиналарды іске қосып немесе тоқтатып, сақтау бакеттерін және серверсіз функцияларды бір жерден көре аласыз.\nСондай-ақ Mac ұйқы режиміне өткенде немесе оянғанда macOS жағдайларына негізделген ВМ автоматты іске қосу/тоқтатуды қолдайды."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Этот инструмент помогает управлять сервисами Yandex Cloud из одного места.\nВы можете запускать и останавливать виртуальные машины, просматривать бакеты хранилища и serverless-функции из одного места.\nТакже поддерживается автоматический запуск и остановка ВМ по событиям macOS, например при переходе Mac в сон или пробуждении."
+          }
+        }
+      }
     },
-    "Cloud may be pending - refresh data in a few seconds" : {
-
+    "about.exit" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exit"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Шығу"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выход"
+          }
+        }
+      }
+    },
+    "about.license" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "License: %@"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Лицензия: %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Лицензия: %@"
+          }
+        }
+      }
+    },
+    "about.title" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "yaControl"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "yaControl"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "yaControl"
+          }
+        }
+      }
     },
     "common.cancel" : {
       "extractionState" : "stale",
@@ -39,71 +165,140 @@
         }
       }
     },
-    "common.currentBalance" : {
+    "common.close" : {
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Current Balance:"
+            "value" : "Close"
           }
         },
         "kk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ағымдағы баланс:"
+            "value" : "Жабу"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Текущий баланс:"
+            "value" : "Закрыть"
           }
         }
       }
     },
-    "common.empty.description" : {
+    "common.copy" : {
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Refresh the list or check your Yandex Cloud credentials."
+            "value" : "Copy"
           }
         },
         "kk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Тізімді жаңартыңыз немесе Yandex Cloud тіркелгі деректерін тексеріңіз."
+            "value" : "Көшіру"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Обновите список или проверьте учетные данные Yandex Cloud."
+            "value" : "Копировать"
           }
         }
       }
     },
-    "common.lastUpdated" : {
+    "common.createdAt" : {
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Last updated: %@"
+            "value" : "Created At"
           }
         },
         "kk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Жаңартылды: %@"
+            "value" : "Жасалған уақыты"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Обновлено: %@"
+            "value" : "Создано"
+          }
+        }
+      }
+    },
+    "common.empty" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Empty"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Бос"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пусто"
+          }
+        }
+      }
+    },
+    "common.error" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Қате"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка"
+          }
+        }
+      }
+    },
+    "common.folder" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Folder"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Каталог"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Каталог"
           }
         }
       }
@@ -127,6 +322,52 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Загрузка..."
+          }
+        }
+      }
+    },
+    "common.name" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Аты"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Имя"
+          }
+        }
+      }
+    },
+    "common.open" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ашу"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открыть"
           }
         }
       }
@@ -173,6 +414,75 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Повторить"
+          }
+        }
+      }
+    },
+    "common.status" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Status"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Күйі"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Статус"
+          }
+        }
+      }
+    },
+    "common.underConstruction" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Under construction"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Әзірленуде"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "В разработке"
+          }
+        }
+      }
+    },
+    "common.updatedAt" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Updated At"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Жаңартылған уақыты"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Обновлено"
           }
         }
       }
@@ -246,6 +556,29 @@
         }
       }
     },
+    "computing.loading" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading..."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Жүктелуде..."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Загрузка..."
+          }
+        }
+      }
+    },
     "computing.refresh" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -269,7 +602,30 @@
         }
       }
     },
-    "computing.running" : {
+    "computing.refresh.help" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Refresh VMs"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ВМ тізімін жаңарту"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Обновить список ВМ"
+          }
+        }
+      }
+    },
+    "computing.runningVMs" : {
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
@@ -292,7 +648,7 @@
         }
       }
     },
-    "computing.search" : {
+    "computing.searchPrompt" : {
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
@@ -430,29 +786,580 @@
         }
       }
     },
-    "Contact: www.linkedin.com/in/sedoykin" : {
-
+    "errors.checkConnection" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check your internet connection"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Интернет қосылымын тексеріңіз"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Проверьте подключение к интернету"
+          }
+        }
+      }
     },
-    "Couldn’t Load Statistics" : {
-
+    "errors.checkOAuth" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check the validity of the OAuth key (go to application settings)"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Қолданба баптауларында OAuth кілтінің дұрыстығын тексеріңіз"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Проверьте корректность OAuth-ключа в настройках приложения"
+          }
+        }
+      }
     },
-    "Error: %@" : {
-
+    "errors.cloudPending" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cloud may be pending - refresh data in a few seconds"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cloud күту күйінде болуы мүмкін - деректерді бірнеше секундтан кейін жаңартыңыз"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Облако может быть в ожидании - обновите данные через несколько секунд"
+          }
+        }
+      }
     },
-    "Exit" : {
-
+    "errors.errorFormat" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error: %@"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Қате: %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка: %@"
+          }
+        }
+      }
     },
-    "Last updated: %@" : {
-
+    "info.activeFunctions" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Active"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Белсенді"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Активно"
+          }
+        }
+      }
     },
-    "License: MIT" : {
-
+    "info.billingInformation" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Billing Information"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Төлем ақпараты"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Информация об оплате"
+          }
+        }
+      }
     },
-    "Loading…" : {
-
+    "info.currentBalance" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Current Balance"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ағымдағы баланс"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Текущий баланс"
+          }
+        }
+      }
     },
-    "No Resources Found" : {
-
+    "info.details" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Details"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Толығырақ"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подробности"
+          }
+        }
+      }
+    },
+    "info.empty.description" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Refresh statistics or check your Yandex Cloud credentials."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Статистиканы жаңартыңыз немесе Yandex Cloud тіркелгі деректерін тексеріңіз."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Обновите статистику или проверьте учетные данные Yandex Cloud."
+          }
+        }
+      }
+    },
+    "info.empty.title" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Resources Found"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ресурстар табылмады"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ресурсы не найдены"
+          }
+        }
+      }
+    },
+    "info.error.title" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't Load Statistics"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Статистика жүктелмеді"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не удалось загрузить статистику"
+          }
+        }
+      }
+    },
+    "info.inactiveFunctions" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inactive"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Белсенді емес"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Неактивно"
+          }
+        }
+      }
+    },
+    "info.lastUpdated" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Last updated: %@"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Жаңартылды: %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Обновлено: %@"
+          }
+        }
+      }
+    },
+    "info.loading" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading..."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Жүктелуде..."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Загрузка..."
+          }
+        }
+      }
+    },
+    "info.runningVMs" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Running"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Іске қосылған"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Запущено"
+          }
+        }
+      }
+    },
+    "info.serverlessFunctions" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Serverless Functions"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Серверсіз функциялар"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Serverless-функции"
+          }
+        }
+      }
+    },
+    "info.stoppedVMs" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stopped"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тоқтатылған"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Остановлено"
+          }
+        }
+      }
+    },
+    "info.storageBuckets" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Storage Buckets"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сақтау бакеттері"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Бакеты хранилища"
+          }
+        }
+      }
+    },
+    "info.title" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yandex Cloud Statistics"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yandex Cloud статистикасы"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Статистика Yandex Cloud"
+          }
+        }
+      }
+    },
+    "info.totalBuckets" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total Buckets"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Барлық бакеттер"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Всего бакетов"
+          }
+        }
+      }
+    },
+    "info.totalFunctions" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total Functions"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Барлық функциялар"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Всего функций"
+          }
+        }
+      }
+    },
+    "info.totalVMs" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total VMs"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Барлық ВМ"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Всего ВМ"
+          }
+        }
+      }
+    },
+    "info.viewBilling" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "View Billing"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Биллингті көру"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открыть биллинг"
+          }
+        }
+      }
+    },
+    "info.virtualMachines" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Virtual Machines"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Виртуалды машиналар"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Виртуальные машины"
+          }
+        }
+      }
+    },
+    "notification.vm.autoStartFailed" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VM auto-start failed: %@"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ВМ автоматты іске қосылмады: %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Автозапуск ВМ не удался: %@"
+          }
+        }
+      }
     },
     "notification.vm.error" : {
       "extractionState" : "stale",
@@ -466,13 +1373,59 @@
         "kk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ВМ: %@ қатесі: %@. [%@]"
+            "value" : "ВМ %@ қатесі: %@. [%@]"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ВМ: %@ ошибка: %@. [%@]"
+            "value" : "ВМ %@: ошибка: %@. [%@]"
+          }
+        }
+      }
+    },
+    "notification.vm.shutdownCompleted" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VM shutdown completed."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ВМ тоқтату аяқталды."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Остановка ВМ завершена."
+          }
+        }
+      }
+    },
+    "notification.vm.shutdownFinishedWithErrors" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VM shutdown finished with errors."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ВМ тоқтату қателермен аяқталды."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Остановка ВМ завершилась с ошибками."
           }
         }
       }
@@ -489,13 +1442,13 @@
         "kk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ВМ: %@ іске қосылды. [%@]"
+            "value" : "ВМ %@ іске қосылды. [%@]"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ВМ: %@ запущена. [%@]"
+            "value" : "ВМ %@ запущена. [%@]"
           }
         }
       }
@@ -512,13 +1465,36 @@
         "kk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ВМ: %@ тоқтатылды. [%@]"
+            "value" : "ВМ %@ тоқтатылды. [%@]"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ВМ: %@ остановлена. [%@]"
+            "value" : "ВМ %@ остановлена. [%@]"
+          }
+        }
+      }
+    },
+    "notification.vm.timeout" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VM: Timeout: couldn't verify status for %@. [%@]"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ВМ: тайм-аут: %@ күйін тексеру мүмкін болмады. [%@]"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ВМ: тайм-аут: не удалось проверить статус %@. [%@]"
           }
         }
       }
@@ -546,36 +1522,7 @@
         }
       }
     },
-    "notification.vm.timeout.name" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "VM: Timeout: couldn't verify status for %@. [%@]"
-          }
-        },
-        "kk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ВМ: күту уақыты аяқталды: %@ күйін тексеру мүмкін болмады. [%@]"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ВМ: тайм-аут: не удалось проверить статус для %@. [%@]"
-          }
-        }
-      }
-    },
-    "Refresh statistics or check your Yandex Cloud credentials." : {
-
-    },
-    "Retry" : {
-
-    },
-    "serverless.active" : {
+    "serverless.activeFunctions" : {
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
@@ -667,48 +1614,94 @@
         }
       }
     },
+    "serverless.loading" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading..."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Жүктелуде..."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Загрузка..."
+          }
+        }
+      }
+    },
     "serverless.refresh" : {
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Refresh functions"
+            "value" : "Refresh Serverless Functions"
           }
         },
         "kk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Функцияларды жаңарту"
+            "value" : "Серверсіз функцияларды жаңарту"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Обновить функции"
+            "value" : "Обновить Serverless-функции"
           }
         }
       }
     },
-    "serverless.search" : {
+    "serverless.refresh.help" : {
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Search functions"
+            "value" : "Refresh Serverless Functions"
           }
         },
         "kk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Функцияларды іздеу"
+            "value" : "Серверсіз функциялар тізімін жаңарту"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Поиск функций"
+            "value" : "Обновить список Serverless-функций"
+          }
+        }
+      }
+    },
+    "serverless.searchPrompt" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search Serverless Functions"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Серверсіз функцияларды іздеу"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Поиск Serverless-функций"
           }
         }
       }
@@ -736,30 +1729,30 @@
         }
       }
     },
-    "settings.applicationLogging" : {
+    "settings.applicationPreferences.title" : {
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Application Logging"
+            "value" : "Application Preferences"
           }
         },
         "kk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Қолданба журналдары"
+            "value" : "Қолданба баптаулары"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Журналирование приложения"
+            "value" : "Настройки приложения"
           }
         }
       }
     },
-    "settings.applicationLogging.help" : {
+    "settings.appLogging.help" : {
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
@@ -782,25 +1775,25 @@
         }
       }
     },
-    "settings.applicationPreferences.title" : {
+    "settings.appLogging.title" : {
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Application Preferences"
+            "value" : "Application Logging"
           }
         },
         "kk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Қолданба баптаулары"
+            "value" : "Қолданба журналдары"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Настройки приложения"
+            "value" : "Журналирование приложения"
           }
         }
       }
@@ -1196,7 +2189,7 @@
         }
       }
     },
-    "settings.oauth.invalidCode" : {
+    "settings.oauth.invalidWithCode" : {
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
@@ -1334,7 +2327,7 @@
         }
       }
     },
-    "settings.oauth.verify.emptyHelp" : {
+    "settings.oauth.verify.disabledHelp" : {
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
@@ -1357,7 +2350,7 @@
         }
       }
     },
-    "settings.oauth.verify.help" : {
+    "settings.oauth.verify.enabledHelp" : {
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
@@ -1587,6 +2580,29 @@
         }
       }
     },
+    "settings.vm.username.placeholder" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "General VM's Username"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ВМ үшін жалпы пайдаланушы аты"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Общее имя пользователя ВМ"
+          }
+        }
+      }
+    },
     "settings.vm.username.title" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1702,6 +2718,52 @@
         }
       }
     },
+    "status.currentBalance" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Current Balance:"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ағымдағы баланс:"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Текущий баланс:"
+          }
+        }
+      }
+    },
+    "status.lastUpdated" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Last updated: %@"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Жаңартылды: %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Обновлено: %@"
+          }
+        }
+      }
+    },
     "storage.empty.description" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1771,13 +2833,36 @@
         }
       }
     },
+    "storage.loading" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading..."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Жүктелуде..."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Загрузка..."
+          }
+        }
+      }
+    },
     "storage.refresh" : {
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Refresh buckets"
+            "value" : "Refresh Buckets"
           }
         },
         "kk" : {
@@ -1794,7 +2879,30 @@
         }
       }
     },
-    "storage.search" : {
+    "storage.refresh.help" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Refresh Buckets"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Бакеттер тізімін жаңарту"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Обновить список бакетов"
+          }
+        }
+      }
+    },
+    "storage.searchPrompt" : {
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
@@ -2024,53 +3132,7 @@
         }
       }
     },
-    "table.column.autoStart" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "AS"
-          }
-        },
-        "kk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "АҚ"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "АП"
-          }
-        }
-      }
-    },
-    "table.column.cores" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cores"
-          }
-        },
-        "kk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ядролар"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ядра"
-          }
-        }
-      }
-    },
-    "table.column.createdAt" : {
+    "table.serverless.createdAt" : {
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
@@ -2093,30 +3155,7 @@
         }
       }
     },
-    "table.column.files" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Files"
-          }
-        },
-        "kk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Файлдар"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Файлы"
-          }
-        }
-      }
-    },
-    "table.column.folder" : {
+    "table.serverless.folder" : {
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
@@ -2139,7 +3178,7 @@
         }
       }
     },
-    "table.column.invoke" : {
+    "table.serverless.invoke" : {
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
@@ -2162,30 +3201,7 @@
         }
       }
     },
-    "table.column.maxSizeGb" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Max Size (Gb)"
-          }
-        },
-        "kk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Макс. өлшем (Гб)"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Макс. размер (Гб)"
-          }
-        }
-      }
-    },
-    "table.column.name" : {
+    "table.serverless.name" : {
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
@@ -2208,53 +3224,7 @@
         }
       }
     },
-    "table.column.publicIP" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Public IP"
-          }
-        },
-        "kk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Жария IP"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Публичный IP"
-          }
-        }
-      }
-    },
-    "table.column.ram" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "RAM"
-          }
-        },
-        "kk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Жедел жад"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ОЗУ"
-          }
-        }
-      }
-    },
-    "table.column.status" : {
+    "table.serverless.status" : {
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
@@ -2277,7 +3247,122 @@
         }
       }
     },
-    "table.column.updatedAt" : {
+    "table.storage.createdAt" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Created At"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Жасалған уақыты"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Создано"
+          }
+        }
+      }
+    },
+    "table.storage.files" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Files"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Файлдар"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Файлы"
+          }
+        }
+      }
+    },
+    "table.storage.folder" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Folder"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Каталог"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Каталог"
+          }
+        }
+      }
+    },
+    "table.storage.maxSizeGB" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Max Size (Gb)"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Макс. өлшем (Гб)"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Макс. размер (Гб)"
+          }
+        }
+      }
+    },
+    "table.storage.name" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Аты"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Имя"
+          }
+        }
+      }
+    },
+    "table.storage.updatedAt" : {
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
@@ -2300,7 +3385,7 @@
         }
       }
     },
-    "table.column.usedSizeGb" : {
+    "table.storage.usedSizeGB" : {
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
@@ -2319,6 +3404,190 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Использовано (Гб)"
+          }
+        }
+      }
+    },
+    "table.vm.autoStart" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AS"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "АҚ"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "АП"
+          }
+        }
+      }
+    },
+    "table.vm.cores" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cores"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ядролар"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ядра"
+          }
+        }
+      }
+    },
+    "table.vm.createdAt" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Created At"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Жасалған уақыты"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Создано"
+          }
+        }
+      }
+    },
+    "table.vm.folder" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Folder"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Каталог"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Каталог"
+          }
+        }
+      }
+    },
+    "table.vm.name" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Аты"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Имя"
+          }
+        }
+      }
+    },
+    "table.vm.publicIP" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Public IP"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Жария IP"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Публичный IP"
+          }
+        }
+      }
+    },
+    "table.vm.ram" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RAM"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Жедел жад"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ОЗУ"
+          }
+        }
+      }
+    },
+    "table.vm.status" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Status"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Күйі"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Статус"
           }
         }
       }
@@ -2369,13 +3638,13 @@
         }
       }
     },
-    "tabs.function" : {
+    "tabs.functions" : {
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Function"
+            "value" : "Functions"
           }
         },
         "kk" : {
@@ -2438,13 +3707,7 @@
         }
       }
     },
-    "This tool helps you manage your Yandex Cloud services from one place.\nYou can start or stop virtual machines, view storage buckets or serverless functions—all from one place.\nIt also supports automatic VM start/stop based on macOS conditions, like when your Mac goes to sleep or wakes up." : {
-
-    },
-    "Under constraction" : {
-
-    },
-    "vm.shutdown.afterAppExit" : {
+    "vmAutomation.shutdown.afterAppExit" : {
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
@@ -2467,7 +3730,7 @@
         }
       }
     },
-    "vm.shutdown.afterMacOSShutdown" : {
+    "vmAutomation.shutdown.afterMacOSShutdown" : {
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
@@ -2490,7 +3753,7 @@
         }
       }
     },
-    "vm.shutdown.afterMacOSSleep" : {
+    "vmAutomation.shutdown.afterMacOSSleep" : {
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
@@ -2513,7 +3776,7 @@
         }
       }
     },
-    "vm.start.afterAppLaunched" : {
+    "vmAutomation.start.afterAppLaunched" : {
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
@@ -2536,7 +3799,7 @@
         }
       }
     },
-    "vm.start.afterMacOSStarted" : {
+    "vmAutomation.start.afterMacOSStarted" : {
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
@@ -2559,7 +3822,7 @@
         }
       }
     },
-    "vm.start.afterWakeup" : {
+    "vmAutomation.start.afterWakeup" : {
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
@@ -2581,12 +3844,6 @@
           }
         }
       }
-    },
-    "yaControl" : {
-
-    },
-    "Yandex Cloud Statistics" : {
-
     }
   },
   "version" : "1.0"
