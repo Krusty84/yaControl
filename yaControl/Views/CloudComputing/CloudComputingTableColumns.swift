@@ -19,7 +19,7 @@ struct VMAutoStartColumn: View {
             set: { onToggle($0) }
         ))
         .toggleStyle(CheckboxToggleStyle())
-        .help("Auto power management")
+        .help(LocalizedStringHelper.string(L10n.Table.autoPowerManagement, language: SettingsManager.shared.appLanguage))
     }
 }
 
@@ -42,7 +42,7 @@ struct VMNameColumn: View {
                 else   { NSCursor.pop() }
             }
             .contextMenu {
-                Button("Copy name & ID") {
+                Button(LocalizedStringKey(L10n.Table.copyNameAndID)) {
                     let s = "\(vm.name) (\(vm.id))"
                     NSPasteboard.general.clearContents()
                     NSPasteboard.general.setString(s, forType: .string)
@@ -102,7 +102,7 @@ struct VMPublicIPColumn: View {
         Text(vm.addresses.joined(separator: ", "))
             .fixedSize(horizontal: false, vertical: true)
             .contextMenu {
-                Button("Copy IPs") {
+                Button(LocalizedStringKey(L10n.Table.copyIPs)) {
                     let s = vm.addresses.joined(separator: ", ")
                     NSPasteboard.general.clearContents()
                     NSPasteboard.general.setString(s, forType: .string)
@@ -114,11 +114,17 @@ struct VMPublicIPColumn: View {
                         NSPasteboard.general.setString(cmd, forType: .string)
                         TerminalLauncher.openTerminal()
                     }) {
-                        Text(SettingsManager.shared.generalUsername4VMs.isEmpty ? "Go to settings to set username" : "Open SSH")
+                        Text(
+                            LocalizedStringKey(
+                                SettingsManager.shared.generalUsername4VMs.isEmpty
+                                ? L10n.Table.goToSettingsSetUsername
+                                : L10n.Table.openSSH
+                            )
+                        )
                     }
                     .disabled(SettingsManager.shared.generalUsername4VMs.isEmpty)
                     
-                    Button("Open RDP") {
+                    Button(LocalizedStringKey(L10n.Table.openRDP)) {
                         RDPFileLauncher.openRDPClient(
                             to: ipAddress,
                             username: SettingsManager.shared.generalUsername4VMs

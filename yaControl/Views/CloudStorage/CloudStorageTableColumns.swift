@@ -28,7 +28,7 @@ struct BucketNameColumn: View {
                 else       { NSCursor.pop() }
             }
             .contextMenu {
-                Button("Copy name & ID") {
+                Button(LocalizedStringKey(L10n.Table.copyNameAndID)) {
                     let s = "\(bucket.name) (\(bucket.id))"
                     NSPasteboard.general.clearContents()
                     NSPasteboard.general.setString(s, forType: .string)

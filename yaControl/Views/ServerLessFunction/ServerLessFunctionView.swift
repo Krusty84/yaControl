@@ -33,59 +33,65 @@ struct ServerLessFunctionTabContent: View {
 
     private var headerView: some View {
         HStack {
-            Text("Total SLF's: \(model.totalSLFs)")
+            Text(String(
+                format: LocalizedStringHelper.string(L10n.Serverless.totalFunctions, language: SettingsManager.shared.appLanguage),
+                Int64(model.totalSLFs)
+            ))
                 .font(.subheadline).bold()
-            Text("Active: \(model.activeSLFs)")
+            Text(String(
+                format: LocalizedStringHelper.string(L10n.Serverless.active, language: SettingsManager.shared.appLanguage),
+                Int64(model.activeSLFs)
+            ))
                 .font(.subheadline).bold()
             Spacer()
             Button {
                 Task { await model.fetchServerLessFunctions() }
             } label: {
-                Label("Refresh SLF's", systemImage: "arrow.clockwise")
+                Label(LocalizedStringKey(L10n.Serverless.refresh), systemImage: "arrow.clockwise")
                     .labelStyle(.iconOnly)
             }
             .buttonStyle(.plain)
-            .help("Refresh SLF's")
+            .help(LocalizedStringHelper.string(L10n.Serverless.refresh, language: SettingsManager.shared.appLanguage))
         }
         .padding(.horizontal)
         .padding(.vertical, 6)
-        .searchable(text: $model.searchText, prompt: "Search SLF's")
+        .searchable(text: $model.searchText, prompt: LocalizedStringKey(L10n.Serverless.search))
     }
 
     @ViewBuilder
     private var contentArea: some View {
         if model.isLoading {
-            ProgressView("Loading…")
+            ProgressView(LocalizedStringHelper.string(L10n.Common.loading, language: SettingsManager.shared.appLanguage))
                 .padding()
         } else if let err = model.errorMessage {
             ContentUnavailableView {
-                Label("Couldn’t Load Functions", systemImage: "exclamationmark.triangle")
+                Label(LocalizedStringKey(L10n.Serverless.errorTitle), systemImage: "exclamationmark.triangle")
             } description: {
                 Text(err)
             } actions: {
-                Button("Retry") {
+                Button(LocalizedStringKey(L10n.Common.retry)) {
                     Task { await model.fetchServerLessFunctions() }
                 }
             }
         } else if model.filteredSLFs.isEmpty {
             ContentUnavailableView(
-                "No Serverless Functions Found",
+                LocalizedStringKey(L10n.Serverless.emptyTitle),
                 systemImage: "function",
-                description: Text("Refresh the list or check your Yandex Cloud credentials.")
+                description: Text(LocalizedStringKey(L10n.Serverless.emptyDescription))
             )
         } else {
             Table(model.filteredSLFs, selection: $selectedSlf) {
-                TableColumn("Name") { slf in
+                TableColumn(LocalizedStringKey(L10n.Table.name)) { slf in
                     SLFNameColumn(slf: slf)
                 }
-                TableColumn("Status") { slf in
+                TableColumn(LocalizedStringKey(L10n.Table.status)) { slf in
                     SLFStatusColumn(slf: slf)
                 }
-                TableColumn("Created At", value: \.createdAt)
-                TableColumn("Invoke") { slf in
+                TableColumn(LocalizedStringKey(L10n.Table.createdAt), value: \.createdAt)
+                TableColumn(LocalizedStringKey(L10n.Table.invoke)) { slf in
                     SLFInvokeColumn(slf: slf)
                 }
-                TableColumn("Folder") { slf in
+                TableColumn(LocalizedStringKey(L10n.Table.folder)) { slf in
                     SLFFolderColumn(slf: slf)
                 }
             }

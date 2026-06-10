@@ -15,6 +15,9 @@ struct SettingsTabContent: View {
     @AppStorage("com.krusty84.yaControl.settings.billingThreshold")
     private var billingThreshold: Double = SettingsManager.shared.billingThreshold
 
+    @AppStorage("com.krusty84.yaControl.settings.appLanguage")
+    private var appLanguageRawValue: String = AppLanguage.system.rawValue
+
     @State private var oAuthKey = ""
     @State private var appLogging = false
     @State private var ycCLIInstalled = false
@@ -63,6 +66,22 @@ struct SettingsTabContent: View {
         trimmedOAuthKey.isEmpty
     }
 
+    private var appLanguage: AppLanguage {
+        AppLanguage(rawValue: appLanguageRawValue) ?? .system
+    }
+
+    private var selectedAppLanguageBinding: Binding<AppLanguage> {
+        Binding(
+            get: {
+                appLanguage
+            },
+            set: { newValue in
+                appLanguageRawValue = newValue.rawValue
+                SettingsManager.shared.appLanguage = newValue
+            }
+        )
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             tabPicker
@@ -79,14 +98,20 @@ struct SettingsTabContent: View {
 
     private var tabPicker: some View {
         HStack(spacing: 0) {
-            settingsTabButton("General", tab: .general)
+            settingsTabButton(
+                LocalizedStringKey(L10n.Settings.generalTab),
+                tab: .general
+            )
 
             settingsTabButton(
-                "Virtual Machine Management",
+                LocalizedStringKey(L10n.Settings.vmManagementTab),
                 tab: .virtualMachineManagement
             )
 
-            settingsTabButton("Billing Management", tab: .billingManagement)
+            settingsTabButton(
+                LocalizedStringKey(L10n.Settings.billingManagementTab),
+                tab: .billingManagement
+            )
         }
         .background(.quaternary)
         .clipShape(.rect(cornerRadius: 6))
@@ -96,7 +121,7 @@ struct SettingsTabContent: View {
     }
 
     private func settingsTabButton(
-        _ title: String,
+        _ title: LocalizedStringKey,
         tab: SettingsTab
     ) -> some View {
         Button {
@@ -140,6 +165,10 @@ struct SettingsTabContent: View {
 
                 Divider()
 
+                interfaceLanguageSection
+
+                Divider()
+
                 yandexAuthenticationSection
 
                 Divider()
@@ -156,23 +185,49 @@ struct SettingsTabContent: View {
             HStack(spacing: SettingsLayout.horizontalRowSpacing) {
                 LaunchAtLogin.Toggle()
                     .toggleStyle(.switch)
-                    .help("Launch this app automatically when you log in")
+                    .help(LocalizedStringHelper.string(L10n.Settings.launchAtLoginHelp, language: appLanguage))
 
-                Toggle("Application Logging", isOn: $appLogging)
+                Toggle(LocalizedStringKey(L10n.Settings.applicationLogging), isOn: $appLogging)
                     .toggleStyle(.switch)
                     .onChange(of: appLogging) { _, newValue in
                         SettingsManager.shared.appLoggingEnabled = newValue
                     }
-                    .help("Enable or disable application logging")
+                    .help(LocalizedStringHelper.string(L10n.Settings.applicationLoggingHelp, language: appLanguage))
 
                 NotificationToggleView()
-                    .help("Request permission for user notifications")
+                    .help(LocalizedStringHelper.string(L10n.Settings.notificationsHelp, language: appLanguage))
 
                 Spacer()
             }
             .padding(.horizontal, SettingsLayout.innerHorizontalPadding)
         } header: {
-            SectionHeader(title: "Application Preferences", systemImage: "gearshape.fill")
+            SectionHeader(
+                title: LocalizedStringKey(L10n.Settings.applicationPreferencesTitle),
+                systemImage: "gearshape.fill"
+            )
+        }
+    }
+
+    private var interfaceLanguageSection: some View {
+        Section {
+            Picker(
+                LocalizedStringKey(L10n.Settings.languageTitle),
+                selection: selectedAppLanguageBinding
+            ) {
+                ForEach(AppLanguage.allCases) { language in
+                    Text(language.displayName)
+                        .tag(language)
+                }
+            }
+            .pickerStyle(.menu)
+            .frame(maxWidth: 260, alignment: .leading)
+            .help(LocalizedStringHelper.string(L10n.Settings.languageHelp, language: appLanguage))
+            .padding(.horizontal, SettingsLayout.innerHorizontalPadding)
+        } header: {
+            SectionHeader(
+                title: LocalizedStringKey(L10n.Settings.languageTitle),
+                systemImage: "globe"
+            )
         }
     }
 
@@ -180,25 +235,25 @@ struct SettingsTabContent: View {
         Section {
             VStack(alignment: .leading, spacing: SettingsLayout.rowSpacing) {
                 HStack(spacing: SettingsLayout.horizontalRowSpacing) {
-                    TextField("OAuth Key", text: $oAuthKey)
+                    TextField(LocalizedStringKey(L10n.Settings.oauthPlaceholder), text: $oAuthKey)
                         .textFieldStyle(.roundedBorder)
-                        .accessibilityLabel("Yandex Cloud OAuth token")
-                        .help("Paste your Yandex Cloud OAuth token, then verify it before saving.")
+                        .accessibilityLabel(Text(LocalizedStringKey(L10n.Settings.oauthAccessibilityLabel)))
+                        .help(LocalizedStringHelper.string(L10n.Settings.oauthHelp, language: appLanguage))
 
                     oAuthStatusIndicator
 
-                    Button("Verify", action: checkOAuthKey)
+                    Button(LocalizedStringKey(L10n.Settings.oauthVerify), action: checkOAuthKey)
                         .frame(minWidth: SettingsLayout.verifyButtonMinWidth)
                         .disabled(isOAuthTokenEmpty)
                         .help(
                             isOAuthTokenEmpty
-                            ? "Enter an OAuth token before verification"
-                            : "Verify and save OAuth token"
+                            ? LocalizedStringHelper.string(L10n.Settings.oauthVerifyEmptyHelp, language: appLanguage)
+                            : LocalizedStringHelper.string(L10n.Settings.oauthVerifyHelp, language: appLanguage)
                         )
                 }
 
                 if isOAuthTokenEmpty {
-                    Text("OAuth token is required to verify credentials.")
+                    Text(LocalizedStringKey(L10n.Settings.oauthRequired))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -206,13 +261,13 @@ struct SettingsTabContent: View {
             .padding(.horizontal, SettingsLayout.innerHorizontalPadding)
         } header: {
             HStack {
-                Label("Yandex Cloud Authentication", systemImage: "key.fill")
+                Label(LocalizedStringKey(L10n.Settings.oauthTitle), systemImage: "key.fill")
                     .font(.subheadline.bold())
 
                 Spacer()
 
                 if let url = URL(string: APIConfig.yaGetOAuthKey) {
-                    Link("Get OAuth Key", destination: url)
+                    Link(LocalizedStringKey(L10n.Settings.oauthGetKey), destination: url)
                         .font(.caption)
                 }
             }
@@ -223,24 +278,24 @@ struct SettingsTabContent: View {
     private var yandexCLiSection: some View {
         Section {
             VStack(alignment: .leading, spacing: SettingsLayout.compactRowSpacing) {
-                Toggle("Installed", isOn: $ycCLIInstalled)
+                Toggle(LocalizedStringKey(L10n.Settings.ycCliInstalled), isOn: $ycCLIInstalled)
                     .toggleStyle(.switch)
                     .onChange(of: ycCLIInstalled) { _, newValue in
                         SettingsManager.shared.ycCLIInstalled = newValue
                     }
-                    .help("Mark whether Yandex Cloud CLI is installed")
+                    .help(LocalizedStringHelper.string(L10n.Settings.ycCliInstalledHelp, language: appLanguage))
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
             .padding(.horizontal, SettingsLayout.innerHorizontalPadding)
         } header: {
             HStack {
-                Label("Yandex Cloud CLI", systemImage: "terminal.fill")
+                Label(LocalizedStringKey(L10n.Settings.ycCliTitle), systemImage: "terminal.fill")
                     .font(.subheadline.bold())
 
                 Spacer()
 
                 if let url = URL(string: APIConfig.yaGetYCCLI) {
-                    Link("Get Yandex Cloud CLI", destination: url)
+                    Link(LocalizedStringKey(L10n.Settings.ycCliGet), destination: url)
                         .font(.caption)
                 }
             }
@@ -270,15 +325,18 @@ struct SettingsTabContent: View {
 
     private var autoStartModeSection: some View {
         Section {
-            Toggle("Enable VM power management", isOn: $autoStartVM)
+            Toggle(LocalizedStringKey(L10n.Settings.vmEnablePowerManagement), isOn: $autoStartVM)
                 .toggleStyle(.switch)
                 .onChange(of: autoStartVM) { _, newValue in
                     SettingsManager.shared.autoStartEnabled = newValue
                 }
-                .help("Enable or disable automatic VM power management")
+                .help(LocalizedStringHelper.string(L10n.Settings.vmEnablePowerManagementHelp, language: appLanguage))
                 .padding(.horizontal, SettingsLayout.innerHorizontalPadding)
         } header: {
-            SectionHeader(title: "Auto Start/Stop Mode", systemImage: "power")
+            SectionHeader(
+                title: LocalizedStringKey(L10n.Settings.vmAutoStartStopTitle),
+                systemImage: "power"
+            )
         }
     }
 
@@ -286,13 +344,13 @@ struct SettingsTabContent: View {
         HStack(alignment: .top, spacing: SettingsLayout.columnSpacing) {
             VStack(alignment: .leading, spacing: SettingsLayout.columnRowSpacing) {
                 Section {
-                    Text("How to start VM")
+                    Text(LocalizedStringKey(L10n.Settings.vmStartModeTitle))
                         .font(.subheadline)
                         .padding(.bottom, SettingsLayout.compactRowSpacing)
 
                     ForEach(StartOption.allCases, id: \.self) { option in
                         Toggle(
-                            option.rawValue,
+                            option.localizedTitle,
                             isOn: Binding(
                                 get: { startOptions.contains(option) },
                                 set: { isOn in
@@ -318,13 +376,13 @@ struct SettingsTabContent: View {
 
             VStack(alignment: .leading, spacing: SettingsLayout.columnRowSpacing) {
                 Section {
-                    Text("How to shutdown VM")
+                    Text(LocalizedStringKey(L10n.Settings.vmShutdownModeTitle))
                         .font(.subheadline)
                         .padding(.bottom, SettingsLayout.compactRowSpacing)
 
                     ForEach(ShutdownOption.allCases, id: \.self) { option in
                         Toggle(
-                            option.rawValue,
+                            option.localizedTitle,
                             isOn: Binding(
                                 get: { shutdownOptions.contains(option) },
                                 set: { isOn in
@@ -353,12 +411,15 @@ struct SettingsTabContent: View {
 
     private var generalVMUsernameSection: some View {
         Section {
-            TextField("General VM's Username", text: $generalUsername4VMs)
+            TextField(LocalizedStringKey(L10n.Settings.vmUsernameTitle), text: $generalUsername4VMs)
                 .textFieldStyle(.roundedBorder)
-                .help("Username for managing your virtual machines")
+                .help(LocalizedStringHelper.string(L10n.Settings.vmUsernameHelp, language: appLanguage))
                 .padding(.horizontal, SettingsLayout.innerHorizontalPadding)
         } header: {
-            SectionHeader(title: "General VM's Username", systemImage: "person.fill")
+            SectionHeader(
+                title: LocalizedStringKey(L10n.Settings.vmUsernameTitle),
+                systemImage: "person.fill"
+            )
         }
     }
 
@@ -370,17 +431,17 @@ struct SettingsTabContent: View {
                 Section {
                     HStack {
                         TextField(
-                            "The Lower Limit",
+                            LocalizedStringKey(L10n.Settings.billingThresholdPlaceholder),
                             value: $billingThreshold,
                             format: .number.precision(.fractionLength(2))
                         )
                         .textFieldStyle(.roundedBorder)
-                        .help("Set the minimum balance threshold")
+                        .help(LocalizedStringHelper.string(L10n.Settings.billingThresholdHelp, language: appLanguage))
                     }
                     .padding(.horizontal, SettingsLayout.innerHorizontalPadding)
                 } header: {
                     SectionHeader(
-                        title: "Billing Threshold",
+                        title: LocalizedStringKey(L10n.Settings.billingThresholdTitle),
                         systemImage: "dollarsign.circle.fill"
                     )
                 }
@@ -401,7 +462,13 @@ struct SettingsTabContent: View {
                     Image(systemName: code == 200 ? "checkmark.circle.fill" : "xmark.circle.fill")
                         .foregroundStyle(code == 200 ? .green : .red)
 
-                    Text(code == 200 ? "Valid credentials" : "Invalid credentials")
+                    Text(
+                        LocalizedStringKey(
+                            code == 200
+                            ? L10n.Settings.oauthValid
+                            : L10n.Settings.oauthInvalid
+                        )
+                    )
                         .font(.caption)
                         .foregroundStyle(code == 200 ? .green : .red)
                 }
@@ -438,7 +505,7 @@ struct SettingsTabContent: View {
 
         guard !token.isEmpty else {
             responseCode = nil
-            errorMessage = "OAuth token is empty."
+            errorMessage = LocalizedStringHelper.string(L10n.Settings.oauthEmptyError, language: appLanguage)
             return
         }
 
@@ -458,7 +525,10 @@ struct SettingsTabContent: View {
                         oAuthKey = token
                         errorMessage = nil
                     } else {
-                        errorMessage = "Invalid OAuth key (Code \(response.code))"
+                        errorMessage = String(
+                            format: LocalizedStringHelper.string(L10n.Settings.oauthInvalidCode, language: appLanguage),
+                            Int64(response.code)
+                        )
                     }
                 }
             } catch {
@@ -471,7 +541,7 @@ struct SettingsTabContent: View {
     }
 
     private struct SectionHeader: View {
-        let title: String
+        let title: LocalizedStringKey
         let systemImage: String
 
         var body: some View {

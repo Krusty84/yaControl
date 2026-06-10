@@ -14,6 +14,12 @@ struct yaControlApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @Environment(\.openWindow) var openWindow
     @StateObject private var appState = AppState.shared
+    @AppStorage("com.krusty84.yaControl.settings.appLanguage")
+    private var appLanguageRawValue: String = AppLanguage.system.rawValue
+
+    private var appLanguage: AppLanguage {
+        AppLanguage(rawValue: appLanguageRawValue) ?? .system
+    }
     
     init() {
         // Initialize the app lifecycle observer
@@ -27,6 +33,7 @@ struct yaControlApp: App {
     var body: some Scene {
         MenuBarExtra {
             MenuBarContentView()
+                .environment(\.locale, appLanguage.locale)
         } label: {
             MenuBarIcon(appState: appState)
         }

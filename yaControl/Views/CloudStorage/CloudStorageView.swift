@@ -33,57 +33,60 @@ struct BucketTabContent: View {
 
     private var headerView: some View {
         HStack {
-            Text("Total Buckets: \(model.totalBuckets)")
+            Text(String(
+                format: LocalizedStringHelper.string(L10n.Storage.totalBuckets, language: SettingsManager.shared.appLanguage),
+                Int64(model.totalBuckets)
+            ))
                 .font(.subheadline).bold()
             Spacer()
             Button {
                 Task { await model.fetchBuckets() }
             } label: {
-                Label("Refresh Buckets", systemImage: "arrow.clockwise")
+                Label(LocalizedStringKey(L10n.Storage.refresh), systemImage: "arrow.clockwise")
                     .labelStyle(.iconOnly)
             }
             .buttonStyle(.plain)
-            .help("Refresh Buckets")
+            .help(LocalizedStringHelper.string(L10n.Storage.refresh, language: SettingsManager.shared.appLanguage))
         }
         .padding(.horizontal)
         .padding(.vertical, 6)
-        .searchable(text: $model.searchText, prompt: "Search buckets")
+        .searchable(text: $model.searchText, prompt: LocalizedStringKey(L10n.Storage.search))
     }
 
     @ViewBuilder
     private var contentArea: some View {
         if model.isLoading {
-            ProgressView("Loading…").padding()
+            ProgressView(LocalizedStringHelper.string(L10n.Common.loading, language: SettingsManager.shared.appLanguage)).padding()
         } else if let err = model.errorMessage {
             ContentUnavailableView {
-                Label("Couldn’t Load Buckets", systemImage: "exclamationmark.triangle")
+                Label(LocalizedStringKey(L10n.Storage.errorTitle), systemImage: "exclamationmark.triangle")
             } description: {
                 Text(err)
             } actions: {
-                Button("Retry") {
+                Button(LocalizedStringKey(L10n.Common.retry)) {
                     Task { await model.fetchBuckets() }
                 }
             }
         } else if model.filteredBuckets.isEmpty {
             ContentUnavailableView(
-                "No Buckets Found",
+                LocalizedStringKey(L10n.Storage.emptyTitle),
                 systemImage: "archivebox",
-                description: Text("Refresh the list or check your Yandex Cloud credentials.")
+                description: Text(LocalizedStringKey(L10n.Storage.emptyDescription))
             )
         } else {
             Table(model.filteredBuckets, selection: $selectedBucket) {
-                TableColumn("Name") { BucketNameColumn(bucket: $0) }
-                TableColumn("Max Size (Gb)", value: \.maxSize)
+                TableColumn(LocalizedStringKey(L10n.Table.name)) { BucketNameColumn(bucket: $0) }
+                TableColumn(LocalizedStringKey(L10n.Table.maxSizeGb), value: \.maxSize)
                     .width(min: 80, max: 80)
-                TableColumn("Used Size (Gb)", value: \.usedSize)
+                TableColumn(LocalizedStringKey(L10n.Table.usedSizeGb), value: \.usedSize)
                     .width(min: 90, max: 90)
-                TableColumn("Files", value: \.totalObjectCountString)
+                TableColumn(LocalizedStringKey(L10n.Table.files), value: \.totalObjectCountString)
                     .width(min: 40, ideal: 40, max: 120)
-                TableColumn("Created At", value: \.createdAt)
+                TableColumn(LocalizedStringKey(L10n.Table.createdAt), value: \.createdAt)
                     .width(min: 110, max: 120)
-                TableColumn("Updated At", value: \.updatedAt)
+                TableColumn(LocalizedStringKey(L10n.Table.updatedAt), value: \.updatedAt)
                     .width(min: 110, max: 120)
-                TableColumn("Folder") { BucketFolderColumn(bucket: $0) }
+                TableColumn(LocalizedStringKey(L10n.Table.folder)) { BucketFolderColumn(bucket: $0) }
                     .width(min: 80, max: 150)
             }
             .padding(.vertical, 6)

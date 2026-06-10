@@ -13,7 +13,10 @@ struct NotificationToggleView: View {
     private let animationDuration = 0.25
 
     var body: some View {
-        Toggle("Enable Notifications", isOn: $isOn.animation(.easeInOut(duration: animationDuration)))
+        Toggle(
+            LocalizedStringKey(L10n.Settings.enableNotifications),
+            isOn: $isOn.animation(.easeInOut(duration: animationDuration))
+        )
             .toggleStyle(.switch)
             .onChange(of: isOn) { _, newValue in
                 if newValue {

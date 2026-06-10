@@ -127,23 +127,40 @@ class Helpers: ObservableObject {
             if vm.status.isRunning {
                 NotificationManager.shared.postNotification(
                     title: "yaControl",
-                    body: "VM: \(vm.name) has started. [\(timeStamp)]"
+                    body: String(
+                        format: LocalizedStringHelper.string(L10n.Notifications.vmStarted, language: SettingsManager.shared.appLanguage),
+                        vm.name,
+                        timeStamp
+                    )
                 )
             } else if vm.status.isStopped {
                 NotificationManager.shared.postNotification(
                     title: "yaControl",
-                    body: "VM: \(vm.name) has stopped. [\(timeStamp)]"
+                    body: String(
+                        format: LocalizedStringHelper.string(L10n.Notifications.vmStopped, language: SettingsManager.shared.appLanguage),
+                        vm.name,
+                        timeStamp
+                    )
                 )
             } else if vm.status.isFailure {
                 NotificationManager.shared.postNotification(
                     title: "yaControl",
-                    body: "VM: \(vm.name) error: \(vm.statusText). [\(timeStamp)]"
+                    body: String(
+                        format: LocalizedStringHelper.string(L10n.Notifications.vmError, language: SettingsManager.shared.appLanguage),
+                        vm.name,
+                        vm.statusText,
+                        timeStamp
+                    )
                 )
             }
         case .timeout(let vmId):
             NotificationManager.shared.postNotification(
                 title: "yaControl",
-                body: "VM: Timeout: couldn’t verify status for ID \(vmId). [\(timeStamp)]"
+                body: String(
+                    format: LocalizedStringHelper.string(L10n.Notifications.vmTimeoutID, language: SettingsManager.shared.appLanguage),
+                    vmId,
+                    timeStamp
+                )
             )
         case .failed(let vmId, let message):
             LoggerHelper.error("Polling VM \(vmId) failed: \(message)")

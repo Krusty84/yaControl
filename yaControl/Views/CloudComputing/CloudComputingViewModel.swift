@@ -153,26 +153,43 @@ final class CloudComputingModel {
             if !initialStatus.isRunning && newVM.status.isRunning {
                 NotificationManager.shared.postNotification(
                     title: "yaControl",
-                    body: "VM: \(newVM.name) has started. [\(timeStamp)]"
+                    body: String(
+                        format: LocalizedStringHelper.string(L10n.Notifications.vmStarted, language: SettingsManager.shared.appLanguage),
+                        newVM.name,
+                        timeStamp
+                    )
                 )
             }
             if initialStatus.isRunning && newVM.status.isStopped {
                 NotificationManager.shared.postNotification(
                     title: "yaControl",
-                    body: "VM: \(newVM.name) has stopped. [\(timeStamp)]"
+                    body: String(
+                        format: LocalizedStringHelper.string(L10n.Notifications.vmStopped, language: SettingsManager.shared.appLanguage),
+                        newVM.name,
+                        timeStamp
+                    )
                 )
             }
             if newVM.status.isFailure {
                 NotificationManager.shared.postNotification(
                     title: "yaControl",
-                    body: "VM: \(newVM.name) error: \(newVM.statusText). [\(timeStamp)]"
+                    body: String(
+                        format: LocalizedStringHelper.string(L10n.Notifications.vmError, language: SettingsManager.shared.appLanguage),
+                        newVM.name,
+                        newVM.statusText,
+                        timeStamp
+                    )
                 )
             }
         case .timeout:
             if let vm = vmTableData.first(where: { $0.id == vmID }) {
                 NotificationManager.shared.postNotification(
                     title: "yaControl",
-                    body: "VM: Timeout: couldn’t verify status for \(vm.name). [\(timeStamp)]"
+                    body: String(
+                        format: LocalizedStringHelper.string(L10n.Notifications.vmTimeoutName, language: SettingsManager.shared.appLanguage),
+                        vm.name,
+                        timeStamp
+                    )
                 )
             }
         case .failed(let vmId, let message):

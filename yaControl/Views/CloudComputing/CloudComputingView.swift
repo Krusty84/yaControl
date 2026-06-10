@@ -35,73 +35,79 @@ struct CloudComputingTabContent: View {
 
     private var headerView: some View {
         HStack {
-            Text("Total VM's: \(model.totalVMs)")
+            Text(String(
+                format: LocalizedStringHelper.string(L10n.Computing.totalVMs, language: SettingsManager.shared.appLanguage),
+                Int64(model.totalVMs)
+            ))
                 .font(.subheadline).bold()
-            Text("Running: \(model.runningVMs)")
+            Text(String(
+                format: LocalizedStringHelper.string(L10n.Computing.running, language: SettingsManager.shared.appLanguage),
+                Int64(model.runningVMs)
+            ))
                 .font(.subheadline).bold()
             Spacer()
             Button {
                 Task { await model.fetchVMs() }
             } label: {
-                Label("Refresh VMs", systemImage: "arrow.clockwise")
+                Label(LocalizedStringKey(L10n.Computing.refresh), systemImage: "arrow.clockwise")
                     .labelStyle(.iconOnly)
             }
             .buttonStyle(.plain)
-            .help("Refresh VM's")
+            .help(LocalizedStringHelper.string(L10n.Computing.refresh, language: SettingsManager.shared.appLanguage))
 
             Button {
                 isStopAllConfirmationPresented = true
             } label: {
-                Label("Stop All", systemImage: "stop.fill")
+                Label(LocalizedStringKey(L10n.Computing.stopAll), systemImage: "stop.fill")
                     .foregroundColor(.red)
                     .padding(.horizontal, 10)
                     .background(Color.red.opacity(0.2))
                     .clipShape(.rect(cornerRadius: 2))
             }
             .disabled(model.runningVMs == 0)
-            .help("Stop all running VMs")
+            .help(LocalizedStringHelper.string(L10n.Computing.stopAllHelp, language: SettingsManager.shared.appLanguage))
             .buttonStyle(.plain)
             .confirmationDialog(
-                "Stop all running VMs?",
+                LocalizedStringKey(L10n.Computing.stopAllConfirmTitle),
                 isPresented: $isStopAllConfirmationPresented
             ) {
-                Button("Stop All", role: .destructive) {
+                Button(LocalizedStringKey(L10n.Computing.stopAll), role: .destructive) {
                     model.stopAllAndPoll()
                 }
-                Button("Cancel", role: .cancel) {}
+                Button(LocalizedStringKey(L10n.Common.cancel), role: .cancel) {}
             } message: {
-                Text("This will stop all currently running virtual machines visible to yaControl.")
+                Text(LocalizedStringKey(L10n.Computing.stopAllConfirmMessage))
             }
         }
         .padding(.horizontal)
         .padding(.vertical, 6)
-        .searchable(text: $model.searchText, prompt: "Search VMs")
+        .searchable(text: $model.searchText, prompt: LocalizedStringKey(L10n.Computing.search))
     }
 
     @ViewBuilder
     private var contentArea: some View {
         if model.isLoading {
-            ProgressView("Loading…")
+            ProgressView(LocalizedStringHelper.string(L10n.Common.loading, language: SettingsManager.shared.appLanguage))
                 .padding()
         } else if let err = model.errorMessage {
             ContentUnavailableView {
-                Label("Couldn’t Load VMs", systemImage: "exclamationmark.triangle")
+                Label(LocalizedStringKey(L10n.Computing.errorTitle), systemImage: "exclamationmark.triangle")
             } description: {
                 Text(err)
             } actions: {
-                Button("Retry") {
+                Button(LocalizedStringKey(L10n.Common.retry)) {
                     Task { await model.fetchVMs() }
                 }
             }
         } else if model.filteredVMs.isEmpty {
             ContentUnavailableView(
-                "No VMs Found",
+                LocalizedStringKey(L10n.Computing.emptyTitle),
                 systemImage: "desktopcomputer",
-                description: Text("Refresh the list or check your Yandex Cloud credentials.")
+                description: Text(LocalizedStringKey(L10n.Computing.emptyDescription))
             )
         } else {
             Table(model.filteredVMs, selection: $selectedVM) {
-                TableColumn("AS") { item in
+                TableColumn(LocalizedStringKey(L10n.Table.autoStart)) { item in
                     VMAutoStartColumn(
                         vm: item,
                         isOn: item.isAutoStarted,
@@ -110,10 +116,10 @@ struct CloudComputingTabContent: View {
                 }
                 .width(min: 20, max: 20)
 
-                TableColumn("Name") { VMNameColumn(vm: $0) }
+                TableColumn(LocalizedStringKey(L10n.Table.name)) { VMNameColumn(vm: $0) }
                     .width(min: 150, max: 150)
 
-                TableColumn("Status") { item in
+                TableColumn(LocalizedStringKey(L10n.Table.status)) { item in
                     let processing = model.processingStates[item.id] == true
                     VMStatusColumn(
                         vm: item,
@@ -123,17 +129,17 @@ struct CloudComputingTabContent: View {
                 }
                 .width(min: 40, max: 40)
 
-                TableColumn("Created At", value: \.createdAt)
+                TableColumn(LocalizedStringKey(L10n.Table.createdAt), value: \.createdAt)
                     .width(min: 120, max: 120)
-                TableColumn("Cores", value: \.cores)
+                TableColumn(LocalizedStringKey(L10n.Table.cores), value: \.cores)
                     .width(min: 40, max: 40)
-                TableColumn("RAM", value: \.memoryGB)
+                TableColumn(LocalizedStringKey(L10n.Table.ram), value: \.memoryGB)
                     .width(min: 30, max: 30)
 
-                TableColumn("Public IP") { VMPublicIPColumn(vm: $0) }
+                TableColumn(LocalizedStringKey(L10n.Table.publicIP)) { VMPublicIPColumn(vm: $0) }
                     .width(min: 120, max: 120)
 
-                TableColumn("Folder") { VMFolderColumn(vm: $0) }
+                TableColumn(LocalizedStringKey(L10n.Table.folder)) { VMFolderColumn(vm: $0) }
                     .width(min: 120, max: 120)
             }
             .padding(.vertical, 6)

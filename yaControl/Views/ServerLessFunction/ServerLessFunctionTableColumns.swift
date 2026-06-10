@@ -28,7 +28,7 @@ struct SLFNameColumn: View {
                 else       { NSCursor.pop() }
             }
             .contextMenu {
-                Button("Copy name & ID") {
+                Button(LocalizedStringKey(L10n.Table.copyNameAndID)) {
                     let s = "\(slf.name) (\(slf.id))"
                     NSPasteboard.general.clearContents()
                     NSPasteboard.general.setString(s, forType: .string)
@@ -65,12 +65,12 @@ struct SLFInvokeColumn: View {
     var body: some View {
         Text(slf.id)
             .contextMenu {
-                Button("Copy invoke URL") {
+                Button(LocalizedStringKey(L10n.Table.copyInvokeURL)) {
                     NSPasteboard.general.clearContents()
                     NSPasteboard.general.setString(slf.httpInvokeUrl,
                                                    forType: .string)
                 }
-                Button("Call via CLI Yandex Cloud") {
+                Button(LocalizedStringKey(L10n.Table.callViaYandexCloudCLI)) {
                     let cmd = "yc serverless function invoke \(slf.id)"
                     NSPasteboard.general.clearContents()
                     NSPasteboard.general.setString(cmd, forType: .string)
