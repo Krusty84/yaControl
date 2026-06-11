@@ -8,15 +8,39 @@
 import Foundation
 
 enum LocalizedStringHelper {
-    static func string(_ key: String, language: AppLanguage) -> String {
-        if let localeIdentifier = language.localeIdentifier {
-            return String(
-                localized: String.LocalizationValue(key),
-                bundle: .main,
-                locale: Locale(identifier: localeIdentifier)
-            )
-        }
+    static func string(_ key: String, locale: Locale) -> String {
+        String(
+            localized: String.LocalizationValue(key),
+            bundle: .main,
+            locale: locale
+        )
+    }
 
-        return String(localized: String.LocalizationValue(key), bundle: .main)
+    static func string(_ key: String, language: AppLanguage) -> String {
+        string(key, locale: language.locale)
+    }
+
+    static func formatted(
+        _ key: String,
+        locale: Locale,
+        _ arguments: CVarArg...
+    ) -> String {
+        String(
+            format: string(key, locale: locale),
+            locale: locale,
+            arguments: arguments
+        )
+    }
+
+    static func formatted(
+        _ key: String,
+        language: AppLanguage,
+        _ arguments: CVarArg...
+    ) -> String {
+        String(
+            format: string(key, language: language),
+            locale: language.locale,
+            arguments: arguments
+        )
     }
 }

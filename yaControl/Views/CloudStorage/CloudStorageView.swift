@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct BucketTabContent: View {
+    @Environment(\.locale) private var locale
+
     @State private var model = CloudStorageModel()
     @State private var selectedBucket: BucketTableData.ID? = nil
 
@@ -33,10 +35,7 @@ struct BucketTabContent: View {
 
     private var headerView: some View {
         HStack {
-            Text(String(
-                format: LocalizedStringHelper.string(L10n.Storage.totalBuckets, language: SettingsManager.shared.appLanguage),
-                Int64(model.totalBuckets)
-            ))
+            Text(localizedFormat(L10n.Storage.totalBuckets, Int64(model.totalBuckets)))
                 .font(.subheadline).bold()
             Spacer()
             Button {
@@ -46,7 +45,7 @@ struct BucketTabContent: View {
                     .labelStyle(.iconOnly)
             }
             .buttonStyle(.plain)
-            .help(LocalizedStringHelper.string(L10n.Storage.refreshHelp, language: SettingsManager.shared.appLanguage))
+            .help(localized(L10n.Storage.refreshHelp))
         }
         .padding(.horizontal)
         .padding(.vertical, 6)
@@ -56,7 +55,7 @@ struct BucketTabContent: View {
     @ViewBuilder
     private var contentArea: some View {
         if model.isLoading {
-            ProgressView(LocalizedStringHelper.string(L10n.Storage.loading, language: SettingsManager.shared.appLanguage)).padding()
+            ProgressView(localized(L10n.Storage.loading)).padding()
         } else if let err = model.errorMessage {
             ContentUnavailableView {
                 Label(LocalizedStringKey(L10n.Storage.errorTitle), systemImage: "exclamationmark.triangle")
@@ -90,9 +89,22 @@ struct BucketTabContent: View {
                     .width(min: 80, max: 150)
             }
             .padding(.vertical, 6)
+            .id(locale.identifier)
             .refreshable {
                 await model.fetchBuckets()
             }
         }
+    }
+
+    private func localized(_ key: String) -> String {
+        LocalizedStringHelper.string(key, locale: locale)
+    }
+
+    private func localizedFormat(_ key: String, _ arguments: CVarArg...) -> String {
+        String(
+            format: localized(key),
+            locale: locale,
+            arguments: arguments
+        )
     }
 }

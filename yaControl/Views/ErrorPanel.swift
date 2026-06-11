@@ -8,12 +8,15 @@
 import SwiftUI
 
 struct ErrorView: View {
+    @Environment(\.locale) private var locale
+
     let error: String
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(String(
-                format: LocalizedStringHelper.string(L10n.Errors.errorFormat, language: SettingsManager.shared.appLanguage),
+            Text(LocalizedStringHelper.formatted(
+                L10n.Errors.errorFormat,
+                locale: locale,
                 error
             ))
                 .foregroundColor(.red)

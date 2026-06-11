@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct StatusPanel: View {
+    @Environment(\.locale) private var locale
+
     let lastUpdateTime: Date
     let currentBalance: String
     let currency: String
@@ -17,8 +19,9 @@ struct StatusPanel: View {
     
     var body: some View {
         HStack {
-            Text(String(
-                format: LocalizedStringHelper.string(L10n.StatusPanel.lastUpdated, language: SettingsManager.shared.appLanguage),
+            Text(LocalizedStringHelper.formatted(
+                L10n.StatusPanel.lastUpdated,
+                locale: locale,
                 lastUpdateTime.formatted(date: .omitted, time: .shortened)
             ))
                 .font(.subheadline)
@@ -29,7 +32,7 @@ struct StatusPanel: View {
             if let url = billingUrl {
                 Link(destination: url) {
                     HStack(spacing: 0) {
-                        Text(LocalizedStringHelper.string(L10n.StatusPanel.currentBalance, language: SettingsManager.shared.appLanguage) + " ")
+                        Text(localized(L10n.StatusPanel.currentBalance) + " ")
                             .font(.subheadline)
                             .foregroundColor(.gray)
                         Text(BillingFormattingHelper.balanceAttributedString(
@@ -52,7 +55,7 @@ struct StatusPanel: View {
                 .buttonStyle(.plain)
             } else {
                 HStack(spacing: 0) {
-                    Text(LocalizedStringHelper.string(L10n.StatusPanel.currentBalance, language: SettingsManager.shared.appLanguage) + " ")
+                    Text(localized(L10n.StatusPanel.currentBalance) + " ")
                         .font(.subheadline)
                         .foregroundColor(.gray)
                     Text(BillingFormattingHelper.balanceAttributedString(
@@ -67,5 +70,9 @@ struct StatusPanel: View {
         }
         .padding(.horizontal)
         .padding(.vertical, 8)
+    }
+
+    private func localized(_ key: String) -> String {
+        LocalizedStringHelper.string(key, locale: locale)
     }
 }

@@ -9,12 +9,7 @@ import SwiftUI
 import AppKit
 
 struct AboutTabContent: View {
-    @AppStorage("com.krusty84.yaControl.settings.appLanguage")
-    private var appLanguageRawValue: String = AppLanguage.system.rawValue
-
-    private var appLanguage: AppLanguage {
-        AppLanguage(rawValue: appLanguageRawValue) ?? .system
-    }
+    @Environment(\.locale) private var locale
 
     var body: some View {
         VStack(spacing: 12) {
@@ -87,6 +82,6 @@ struct AboutTabContent: View {
     }
 
     private func localized(_ key: String) -> String {
-        LocalizedStringHelper.string(key, language: appLanguage)
+        LocalizedStringHelper.string(key, locale: locale)
     }
 }

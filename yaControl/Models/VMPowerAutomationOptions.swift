@@ -20,27 +20,27 @@ enum ShutdownOption: String, CaseIterable {
 }
 
 extension StartOption {
-    var localizedTitle: String {
+    func localizedTitle(locale: Locale) -> String {
         switch self {
         case .afterAppLaunched:
-            LocalizedStringHelper.string(L10n.VMAutomation.startAfterAppLaunched, language: SettingsManager.shared.appLanguage)
+            LocalizedStringHelper.string(L10n.VMAutomation.startAfterAppLaunched, locale: locale)
         case .afterMacOSStarted:
-            LocalizedStringHelper.string(L10n.VMAutomation.startAfterMacOSStarted, language: SettingsManager.shared.appLanguage)
+            LocalizedStringHelper.string(L10n.VMAutomation.startAfterMacOSStarted, locale: locale)
         case .afterWakeup:
-            LocalizedStringHelper.string(L10n.VMAutomation.startAfterWakeup, language: SettingsManager.shared.appLanguage)
+            LocalizedStringHelper.string(L10n.VMAutomation.startAfterWakeup, locale: locale)
         }
     }
 }
 
 extension ShutdownOption {
-    var localizedTitle: String {
+    func localizedTitle(locale: Locale) -> String {
         switch self {
         case .afterAppExit:
-            LocalizedStringHelper.string(L10n.VMAutomation.shutdownAfterAppExit, language: SettingsManager.shared.appLanguage)
+            LocalizedStringHelper.string(L10n.VMAutomation.shutdownAfterAppExit, locale: locale)
         case .afterMacOSShutdown:
-            LocalizedStringHelper.string(L10n.VMAutomation.shutdownAfterMacOSShutdown, language: SettingsManager.shared.appLanguage)
+            LocalizedStringHelper.string(L10n.VMAutomation.shutdownAfterMacOSShutdown, locale: locale)
         case .afterMacOSSleep:
-            LocalizedStringHelper.string(L10n.VMAutomation.shutdownAfterMacOSSleep, language: SettingsManager.shared.appLanguage)
+            LocalizedStringHelper.string(L10n.VMAutomation.shutdownAfterMacOSSleep, locale: locale)
         }
     }
 }

@@ -9,6 +9,8 @@ import SwiftUI
 import AppKit
 
 struct VMAutoStartColumn: View {
+    @Environment(\.locale) private var locale
+
     let vm: VMTableData
     let isOn: Bool
     let onToggle: (Bool) -> Void
@@ -19,7 +21,7 @@ struct VMAutoStartColumn: View {
             set: { onToggle($0) }
         ))
         .toggleStyle(CheckboxToggleStyle())
-        .help(LocalizedStringHelper.string(L10n.Table.autoPowerManagement, language: SettingsManager.shared.appLanguage))
+        .help(LocalizedStringHelper.string(L10n.Table.autoPowerManagement, locale: locale))
     }
 }
 

@@ -27,6 +27,8 @@ struct StatsSection: View {
 }
 
 struct StatsBillingSection: View {
+    @Environment(\.locale) private var locale
+
     let title: String
     let icon: String
     let stats: [(String, AttributedString)]
@@ -41,7 +43,7 @@ struct StatsBillingSection: View {
                 Spacer()
             }
             ForEach(stats, id: \.0) { label, value in
-                if label == LocalizedStringHelper.string(L10n.Info.details, language: SettingsManager.shared.appLanguage),
+                if label == LocalizedStringHelper.string(L10n.Info.details, locale: locale),
                    let link = url {
                     Link(destination: link) {
                         StatBillingRow(label: label, value: value, isLink: true)

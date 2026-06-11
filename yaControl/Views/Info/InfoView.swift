@@ -8,14 +8,9 @@
 import SwiftUI
 
 struct InfoWindow: View {
-    @AppStorage("com.krusty84.yaControl.settings.appLanguage")
-    private var appLanguageRawValue: String = AppLanguage.system.rawValue
+    @Environment(\.locale) private var locale
 
     @State private var model = InfoWindowModel()
-
-    private var appLanguage: AppLanguage {
-        AppLanguage(rawValue: appLanguageRawValue) ?? .system
-    }
 
     var body: some View {
         VStack(spacing: 16) {
@@ -100,8 +95,9 @@ struct InfoWindow: View {
                 }
             }
 
-            Text(String(
-                format: localized(L10n.Info.lastUpdated),
+            Text(LocalizedStringHelper.formatted(
+                L10n.Info.lastUpdated,
+                locale: locale,
                 model.lastUpdated.formatted(date: .omitted, time: .shortened)
             ))
                 .font(.caption)
@@ -115,6 +111,6 @@ struct InfoWindow: View {
     }
 
     private func localized(_ key: String) -> String {
-        LocalizedStringHelper.string(key, language: appLanguage)
+        LocalizedStringHelper.string(key, locale: locale)
     }
 }

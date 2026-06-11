@@ -8,8 +8,10 @@
 import SwiftUI
 
 struct CloudComputingTabContent: View {
-    @State private var model = CloudComputingModel()
+    @Environment(\.locale) private var locale
     @EnvironmentObject var appState: AppState
+
+    @State private var model = CloudComputingModel()
     @State private var selectedVM: VMTableData.ID? = nil
     @State private var isStopAllConfirmationPresented = false
 
@@ -35,15 +37,9 @@ struct CloudComputingTabContent: View {
 
     private var headerView: some View {
         HStack {
-            Text(String(
-                format: LocalizedStringHelper.string(L10n.Computing.totalVMs, language: SettingsManager.shared.appLanguage),
-                Int64(model.totalVMs)
-            ))
+            Text(localizedFormat(L10n.Computing.totalVMs, Int64(model.totalVMs)))
                 .font(.subheadline).bold()
-            Text(String(
-                format: LocalizedStringHelper.string(L10n.Computing.runningVMs, language: SettingsManager.shared.appLanguage),
-                Int64(model.runningVMs)
-            ))
+            Text(localizedFormat(L10n.Computing.runningVMs, Int64(model.runningVMs)))
                 .font(.subheadline).bold()
             Spacer()
             Button {
@@ -53,7 +49,7 @@ struct CloudComputingTabContent: View {
                     .labelStyle(.iconOnly)
             }
             .buttonStyle(.plain)
-            .help(LocalizedStringHelper.string(L10n.Computing.refreshHelp, language: SettingsManager.shared.appLanguage))
+            .help(localized(L10n.Computing.refreshHelp))
 
             Button {
                 isStopAllConfirmationPresented = true
@@ -65,7 +61,7 @@ struct CloudComputingTabContent: View {
                     .clipShape(.rect(cornerRadius: 2))
             }
             .disabled(model.runningVMs == 0)
-            .help(LocalizedStringHelper.string(L10n.Computing.stopAllHelp, language: SettingsManager.shared.appLanguage))
+            .help(localized(L10n.Computing.stopAllHelp))
             .buttonStyle(.plain)
             .confirmationDialog(
                 LocalizedStringKey(L10n.Computing.stopAllConfirmTitle),
@@ -87,7 +83,7 @@ struct CloudComputingTabContent: View {
     @ViewBuilder
     private var contentArea: some View {
         if model.isLoading {
-            ProgressView(LocalizedStringHelper.string(L10n.Computing.loading, language: SettingsManager.shared.appLanguage))
+            ProgressView(localized(L10n.Computing.loading))
                 .padding()
         } else if let err = model.errorMessage {
             ContentUnavailableView {
@@ -143,7 +139,20 @@ struct CloudComputingTabContent: View {
                     .width(min: 120, max: 120)
             }
             .padding(.vertical, 6)
+            .id(locale.identifier)
             .refreshable { await model.fetchVMs() }
         }
+    }
+
+    private func localized(_ key: String) -> String {
+        LocalizedStringHelper.string(key, locale: locale)
+    }
+
+    private func localizedFormat(_ key: String, _ arguments: CVarArg...) -> String {
+        String(
+            format: localized(key),
+            locale: locale,
+            arguments: arguments
+        )
     }
 }

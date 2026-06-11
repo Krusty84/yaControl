@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct ServerLessFunctionTabContent: View {
+    @Environment(\.locale) private var locale
+
     @State private var model = ServerlessFunctionModel()
     @State private var selectedSlf: ServerLessFunctionTableData.ID? = nil
 
@@ -33,15 +35,9 @@ struct ServerLessFunctionTabContent: View {
 
     private var headerView: some View {
         HStack {
-            Text(String(
-                format: LocalizedStringHelper.string(L10n.Serverless.totalFunctions, language: SettingsManager.shared.appLanguage),
-                Int64(model.totalSLFs)
-            ))
+            Text(localizedFormat(L10n.Serverless.totalFunctions, Int64(model.totalSLFs)))
                 .font(.subheadline).bold()
-            Text(String(
-                format: LocalizedStringHelper.string(L10n.Serverless.activeFunctions, language: SettingsManager.shared.appLanguage),
-                Int64(model.activeSLFs)
-            ))
+            Text(localizedFormat(L10n.Serverless.activeFunctions, Int64(model.activeSLFs)))
                 .font(.subheadline).bold()
             Spacer()
             Button {
@@ -51,7 +47,7 @@ struct ServerLessFunctionTabContent: View {
                     .labelStyle(.iconOnly)
             }
             .buttonStyle(.plain)
-            .help(LocalizedStringHelper.string(L10n.Serverless.refreshHelp, language: SettingsManager.shared.appLanguage))
+            .help(localized(L10n.Serverless.refreshHelp))
         }
         .padding(.horizontal)
         .padding(.vertical, 6)
@@ -61,7 +57,7 @@ struct ServerLessFunctionTabContent: View {
     @ViewBuilder
     private var contentArea: some View {
         if model.isLoading {
-            ProgressView(LocalizedStringHelper.string(L10n.Serverless.loading, language: SettingsManager.shared.appLanguage))
+            ProgressView(localized(L10n.Serverless.loading))
                 .padding()
         } else if let err = model.errorMessage {
             ContentUnavailableView {
@@ -96,9 +92,22 @@ struct ServerLessFunctionTabContent: View {
                 }
             }
             .padding(.vertical, 6)
+            .id(locale.identifier)
             .refreshable {
                 await model.fetchServerLessFunctions()
             }
         }
+    }
+
+    private func localized(_ key: String) -> String {
+        LocalizedStringHelper.string(key, locale: locale)
+    }
+
+    private func localizedFormat(_ key: String, _ arguments: CVarArg...) -> String {
+        String(
+            format: localized(key),
+            locale: locale,
+            arguments: arguments
+        )
     }
 }

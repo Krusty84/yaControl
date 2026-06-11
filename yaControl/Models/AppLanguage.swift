@@ -15,10 +15,6 @@ enum AppLanguage: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
-    var displayName: String {
-        LocalizedStringHelper.string(displayNameKey, language: SettingsManager.shared.appLanguage)
-    }
-
     var locale: Locale {
         switch self {
         case .system:
@@ -45,16 +41,16 @@ enum AppLanguage: String, CaseIterable, Identifiable {
         }
     }
 
-    private var displayNameKey: String {
+    func displayName(locale: Locale) -> String {
         switch self {
         case .system:
-            L10n.Settings.languageSystem
+            LocalizedStringHelper.string(L10n.Settings.languageSystem, locale: locale)
         case .english:
-            L10n.Settings.languageEnglish
+            "English"
         case .russian:
-            L10n.Settings.languageRussian
+            "Русский"
         case .kazakh:
-            L10n.Settings.languageKazakh
+            "Қазақша"
         }
     }
 }

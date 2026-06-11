@@ -10,12 +10,7 @@ import GoodProperTabs
 
 struct MainWindow: View {
    // @EnvironmentObject var propagationModel: PropagationModel
-    @AppStorage("com.krusty84.yaControl.settings.appLanguage")
-    private var appLanguageRawValue: String = AppLanguage.system.rawValue
-
-    private var appLanguage: AppLanguage {
-        AppLanguage(rawValue: appLanguageRawValue) ?? .system
-    }
+    @Environment(\.locale) private var locale
 
     var body: some View {
         GoodProperTabsView(content: [
@@ -28,9 +23,10 @@ struct MainWindow: View {
                 (title: localized(L10n.Tabs.about), icon: "system:info", view: AnyView(AboutTabContent()))
                 ])
                 .frame(minWidth: 800, idealWidth: 900, minHeight: 420, idealHeight: 520)
+                .id(locale.identifier)
     }
 
     private func localized(_ key: String) -> String {
-        LocalizedStringHelper.string(key, language: appLanguage)
+        LocalizedStringHelper.string(key, locale: locale)
     }
 }

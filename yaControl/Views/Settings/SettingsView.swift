@@ -9,6 +9,8 @@ import SwiftUI
 import LaunchAtLogin
 
 struct SettingsTabContent: View {
+    @Environment(\.locale) private var locale
+
     @AppStorage("com.krusty84.yaControl.settings.generalUsername4VMs")
     private var generalUsername4VMs: String = SettingsManager.shared.generalUsername4VMs
 
@@ -185,17 +187,17 @@ struct SettingsTabContent: View {
             HStack(spacing: SettingsLayout.horizontalRowSpacing) {
                 LaunchAtLogin.Toggle()
                     .toggleStyle(.switch)
-                    .help(LocalizedStringHelper.string(L10n.Settings.launchAtLoginHelp, language: appLanguage))
+                    .help(localized(L10n.Settings.launchAtLoginHelp))
 
                 Toggle(LocalizedStringKey(L10n.Settings.appLoggingTitle), isOn: $appLogging)
                     .toggleStyle(.switch)
                     .onChange(of: appLogging) { _, newValue in
                         SettingsManager.shared.appLoggingEnabled = newValue
                     }
-                    .help(LocalizedStringHelper.string(L10n.Settings.appLoggingHelp, language: appLanguage))
+                    .help(localized(L10n.Settings.appLoggingHelp))
 
                 NotificationToggleView()
-                    .help(LocalizedStringHelper.string(L10n.Settings.notificationsHelp, language: appLanguage))
+                    .help(localized(L10n.Settings.notificationsHelp))
 
                 Spacer()
             }
@@ -215,13 +217,13 @@ struct SettingsTabContent: View {
                 selection: selectedAppLanguageBinding
             ) {
                 ForEach(AppLanguage.allCases) { language in
-                    Text(language.displayName)
+                    Text(language.displayName(locale: locale))
                         .tag(language)
                 }
             }
             .pickerStyle(.menu)
             .frame(maxWidth: 260, alignment: .leading)
-            .help(LocalizedStringHelper.string(L10n.Settings.languageHelp, language: appLanguage))
+            .help(localized(L10n.Settings.languageHelp))
             .padding(.horizontal, SettingsLayout.innerHorizontalPadding)
         } header: {
             SectionHeader(
@@ -238,7 +240,7 @@ struct SettingsTabContent: View {
                     TextField(LocalizedStringKey(L10n.Settings.oauthPlaceholder), text: $oAuthKey)
                         .textFieldStyle(.roundedBorder)
                         .accessibilityLabel(Text(LocalizedStringKey(L10n.Settings.oauthAccessibilityLabel)))
-                        .help(LocalizedStringHelper.string(L10n.Settings.oauthHelp, language: appLanguage))
+                        .help(localized(L10n.Settings.oauthHelp))
 
                     oAuthStatusIndicator
 
@@ -247,8 +249,8 @@ struct SettingsTabContent: View {
                         .disabled(isOAuthTokenEmpty)
                         .help(
                             isOAuthTokenEmpty
-                            ? LocalizedStringHelper.string(L10n.Settings.oauthVerifyDisabledHelp, language: appLanguage)
-                            : LocalizedStringHelper.string(L10n.Settings.oauthVerifyEnabledHelp, language: appLanguage)
+                            ? localized(L10n.Settings.oauthVerifyDisabledHelp)
+                            : localized(L10n.Settings.oauthVerifyEnabledHelp)
                         )
                 }
 
@@ -283,7 +285,7 @@ struct SettingsTabContent: View {
                     .onChange(of: ycCLIInstalled) { _, newValue in
                         SettingsManager.shared.ycCLIInstalled = newValue
                     }
-                    .help(LocalizedStringHelper.string(L10n.Settings.ycCliInstalledHelp, language: appLanguage))
+                    .help(localized(L10n.Settings.ycCliInstalledHelp))
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
             .padding(.horizontal, SettingsLayout.innerHorizontalPadding)
@@ -330,7 +332,7 @@ struct SettingsTabContent: View {
                 .onChange(of: autoStartVM) { _, newValue in
                     SettingsManager.shared.autoStartEnabled = newValue
                 }
-                .help(LocalizedStringHelper.string(L10n.Settings.vmEnablePowerManagementHelp, language: appLanguage))
+                .help(localized(L10n.Settings.vmEnablePowerManagementHelp))
                 .padding(.horizontal, SettingsLayout.innerHorizontalPadding)
         } header: {
             SectionHeader(
@@ -350,7 +352,7 @@ struct SettingsTabContent: View {
 
                     ForEach(StartOption.allCases, id: \.self) { option in
                         Toggle(
-                            option.localizedTitle,
+                            option.localizedTitle(locale: locale),
                             isOn: Binding(
                                 get: { startOptions.contains(option) },
                                 set: { isOn in
@@ -382,7 +384,7 @@ struct SettingsTabContent: View {
 
                     ForEach(ShutdownOption.allCases, id: \.self) { option in
                         Toggle(
-                            option.localizedTitle,
+                            option.localizedTitle(locale: locale),
                             isOn: Binding(
                                 get: { shutdownOptions.contains(option) },
                                 set: { isOn in
@@ -413,7 +415,7 @@ struct SettingsTabContent: View {
         Section {
             TextField(LocalizedStringKey(L10n.Settings.vmUsernameTitle), text: $generalUsername4VMs)
                 .textFieldStyle(.roundedBorder)
-                .help(LocalizedStringHelper.string(L10n.Settings.vmUsernameHelp, language: appLanguage))
+                .help(localized(L10n.Settings.vmUsernameHelp))
                 .padding(.horizontal, SettingsLayout.innerHorizontalPadding)
         } header: {
             SectionHeader(
@@ -436,7 +438,7 @@ struct SettingsTabContent: View {
                             format: .number.precision(.fractionLength(2))
                         )
                         .textFieldStyle(.roundedBorder)
-                        .help(LocalizedStringHelper.string(L10n.Settings.billingThresholdHelp, language: appLanguage))
+                        .help(localized(L10n.Settings.billingThresholdHelp))
                     }
                     .padding(.horizontal, SettingsLayout.innerHorizontalPadding)
                 } header: {
@@ -505,7 +507,7 @@ struct SettingsTabContent: View {
 
         guard !token.isEmpty else {
             responseCode = nil
-            errorMessage = LocalizedStringHelper.string(L10n.Settings.oauthEmptyError, language: appLanguage)
+            errorMessage = localized(L10n.Settings.oauthEmptyError)
             return
         }
 
@@ -525,8 +527,9 @@ struct SettingsTabContent: View {
                         oAuthKey = token
                         errorMessage = nil
                     } else {
-                        errorMessage = String(
-                            format: LocalizedStringHelper.string(L10n.Settings.oauthInvalidWithCode, language: appLanguage),
+                        errorMessage = LocalizedStringHelper.formatted(
+                            L10n.Settings.oauthInvalidWithCode,
+                            locale: locale,
                             Int64(response.code)
                         )
                     }
@@ -553,5 +556,9 @@ struct SettingsTabContent: View {
             }
             .padding(.bottom, SettingsLayout.headerBottomPadding)
         }
+    }
+
+    private func localized(_ key: String) -> String {
+        LocalizedStringHelper.string(key, locale: locale)
     }
 }
