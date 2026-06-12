@@ -1,13 +1,13 @@
 {
-  "originHash" : "62ed88e36158cb95572ee718fd6eb56bff610519a85238c7bcbc4af0b1452257",
+  "originHash" : "7e7846c65c78008c71a738ee8ce982f377dfd87278138110aa18e0d735a9b848",
   "pins" : [
     {
-      "identity" : "goodpropertabs",
+      "identity" : "eleganttabs",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/Krusty84/GoodProperTabs.git",
+      "location" : "https://github.com/Krusty84/ElegantTabs.git",
       "state" : {
-        "revision" : "e9c72a1de3c8a6a190cfdab77a7efeddce993f85",
-        "version" : "1.1.1"
+        "revision" : "88275a8e68873ac121624061a1730af1edaca292",
+        "version" : "1.1.0"
       }
     },
     {

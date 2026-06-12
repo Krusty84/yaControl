@@ -34,6 +34,7 @@ struct yaControlApp: App {
         MenuBarExtra {
             MenuBarContentView()
                 .environment(\.locale, appLanguage.locale)
+                .id(appLanguage.rawValue)
         } label: {
             MenuBarIcon(appState: appState)
         }

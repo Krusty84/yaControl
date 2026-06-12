@@ -6,27 +6,51 @@
 //
 
 import SwiftUI
-import GoodProperTabs
+import ElegantTabs
 
 struct MainWindow: View {
    // @EnvironmentObject var propagationModel: PropagationModel
-    @Environment(\.locale) private var locale
-
+    @State private var selectedTab = 0
+    
     var body: some View {
-        GoodProperTabsView(content: [
-                (title: localized(L10n.Tabs.computing), icon: "system:desktopcomputer", view: AnyView(CloudComputingTabContent().environmentObject(AppState.shared))),
-                (title: localized(L10n.Tabs.functions), icon: "system:function", view: AnyView(ServerLessFunctionTabContent())),
-                (title: localized(L10n.Tabs.storage), icon: "system:archivebox", view: AnyView(BucketTabContent())),
-                //TODO: for future, maybe, for that is need to add gRPC support
-                //(title: "Billing", icon: "system:creditcard", view: AnyView(BillingTabContent())),
-                (title: localized(L10n.Tabs.settings), icon: "system:gear", view: AnyView(SettingsTabContent())),
-                (title: localized(L10n.Tabs.about), icon: "system:info", view: AnyView(AboutTabContent()))
-                ])
-                .frame(minWidth: 800, idealWidth: 900, minHeight: 420, idealHeight: 520)
-                .id(locale.identifier)
-    }
+        ElegantTabsView(selection: $selectedTab) {
+            TabItem(
+                localizedTitle: LocalizedStringKey(L10n.Tabs.computing),
+                icon: .system(name: "desktopcomputer")
+            ) {
+                CloudComputingTabContent()
+                    .environmentObject(AppState.shared)
+            }
 
-    private func localized(_ key: String) -> String {
-        LocalizedStringHelper.string(key, locale: locale)
+            TabItem(
+                localizedTitle: LocalizedStringKey(L10n.Tabs.functions),
+                icon: .system(name: "function")
+            ) {
+                ServerLessFunctionTabContent()
+            }
+
+            TabItem(
+                localizedTitle: LocalizedStringKey(L10n.Tabs.storage),
+                icon: .system(name: "archivebox")
+            ) {
+                BucketTabContent()
+            }
+
+            TabItem(
+                localizedTitle: LocalizedStringKey(L10n.Tabs.settings),
+                icon: .system(name: "gear")
+            ) {
+                SettingsTabContent()
+            }
+
+            TabItem(
+                localizedTitle: LocalizedStringKey(L10n.Tabs.about),
+                icon: .system(name: "info")
+            ) {
+                AboutTabContent()
+            }
+        }
+        .frame(minWidth: 800, idealWidth: 900, minHeight: 420, idealHeight: 520)
+        
     }
 }
