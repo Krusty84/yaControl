@@ -32,12 +32,12 @@ func tintedIcon(named iconName: String, color: NSColor) -> NSImage {
     return tintedIcon
 }
 
-// MARK: - MenuBar (near clock:)) Implementation
+// MARK: - MenuBar Implementation
 struct MenuBarIcon: View {
     @ObservedObject var appState: AppState
 
     var body: some View {
-        let iconColor = appState.latestConditionColor
+        let iconColor = appState.menuBarIconColor
         return Image(nsImage: tintedIcon(named: "AppIcon", color: iconColor))
     }
 }

@@ -29,7 +29,7 @@ actor VMPowerOperationRegistry {
 
     private var activeVMIds: Set<String> = []
 
-    func begin(vmId: String, source: VMPowerOperationSource) -> Bool {
+    func begin(vmId: String, source: VMPowerOperationSource) async -> Bool {
         guard !activeVMIds.contains(vmId) else {
             VMPowerOperationLogger.log(
                 vmId: vmId,
@@ -42,11 +42,19 @@ actor VMPowerOperationRegistry {
         }
 
         activeVMIds.insert(vmId)
+        await MainActor.run {
+            AppState.shared.beginVMPowerActivity()
+        }
         return true
     }
 
-    func finish(vmId: String) {
-        activeVMIds.remove(vmId)
+    func finish(vmId: String) async {
+        let wasActive = activeVMIds.remove(vmId) != nil
+        guard wasActive else { return }
+
+        await MainActor.run {
+            AppState.shared.endVMPowerActivity()
+        }
     }
 }
 

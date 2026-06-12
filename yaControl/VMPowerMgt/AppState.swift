@@ -15,24 +15,68 @@ class AppState: ObservableObject {
     private var isLoading = false
     private var errorMessage: String?
     private var vmTableData: [VMTableData] = []
+    private var activeVMPowerOperationCount = 0
+    private var blinkTask: Task<Void, Never>?
+    private var blinkPhase = false
     
     @Published var isVirtualMachineRunning: Bool = false {
         didSet {
-            updateLatestConditionColor()
+            updateMenuBarIconColor()
         }
     }
 
     @Published private(set) var latestConditionColor: NSColor = .systemGray // Track the latest condition color
+    @Published private(set) var menuBarIconColor: NSColor = .systemGray
 
-    // Helper function to update the latestConditionColor based on the latest changed variable
-    private func updateLatestConditionColor() {
-        let newColor: NSColor
-        if isVirtualMachineRunning {
-            newColor = .systemGreen
-        } else {
-            newColor = .clear
+    private var baseMenuBarIconColor: NSColor {
+        isVirtualMachineRunning ? .systemGreen : .clear
+    }
+
+    @MainActor
+    func beginVMPowerActivity() {
+        activeVMPowerOperationCount += 1
+
+        if activeVMPowerOperationCount == 1 {
+            startMenuBarBlinking()
         }
-        latestConditionColor = newColor
+    }
+
+    @MainActor
+    func endVMPowerActivity() {
+        activeVMPowerOperationCount = max(0, activeVMPowerOperationCount - 1)
+
+        if activeVMPowerOperationCount == 0 {
+            stopMenuBarBlinking()
+        }
+    }
+
+    private func startMenuBarBlinking() {
+        blinkTask?.cancel()
+        blinkPhase = true
+        updateMenuBarIconColor()
+
+        blinkTask = Task { @MainActor [weak self] in
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .milliseconds(500))
+                guard !Task.isCancelled else { return }
+                self?.blinkPhase.toggle()
+                self?.updateMenuBarIconColor()
+            }
+        }
+    }
+
+    private func stopMenuBarBlinking() {
+        blinkTask?.cancel()
+        blinkTask = nil
+        blinkPhase = false
+        updateMenuBarIconColor()
+    }
+
+    private func updateMenuBarIconColor() {
+        latestConditionColor = baseMenuBarIconColor
+        menuBarIconColor = activeVMPowerOperationCount > 0 && blinkPhase
+            ? .systemOrange
+            : baseMenuBarIconColor
     }
 
     // Fetch VMs and update the app state
