@@ -5,13 +5,10 @@
 //  Created by Sedoykin Alexey on 19/02/2025.
 //
 
-import Combine
 import Foundation
 
-final class YandexAPIService: ObservableObject {
+final class YandexAPIService: @unchecked Sendable {
     static let shared = YandexAPIService()
-
-    @Published var lastUpdateTime = Date()
 
     private let authAPI: YandexAuthAPI
     private let resourceManagerAPI: YandexResourceManagerAPI
@@ -46,27 +43,15 @@ final class YandexAPIService: ObservableObject {
     }
 
     func getVMs(iamToken: String) async throws -> [VMTableData] {
-        let vms = try await inventoryService.loadVMTableData(iamToken: iamToken)
-        await MainActor.run {
-            lastUpdateTime = Date()
-        }
-        return vms
+        try await inventoryService.loadVMTableData(iamToken: iamToken)
     }
 
     func getBuckets(iamToken: String) async throws -> [BucketTableData] {
-        let buckets = try await inventoryService.loadBucketTableData(iamToken: iamToken)
-        await MainActor.run {
-            lastUpdateTime = Date()
-        }
-        return buckets
+        try await inventoryService.loadBucketTableData(iamToken: iamToken)
     }
 
     func getServerLessFunctions(iamToken: String) async throws -> [ServerLessFunctionTableData] {
-        let functions = try await inventoryService.loadServerlessFunctionTableData(iamToken: iamToken)
-        await MainActor.run {
-            lastUpdateTime = Date()
-        }
-        return functions
+        try await inventoryService.loadServerlessFunctionTableData(iamToken: iamToken)
     }
 
     func getCosts(iamToken: String) async throws -> [BillingTableData] {

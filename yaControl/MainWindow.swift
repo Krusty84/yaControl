@@ -9,7 +9,6 @@ import SwiftUI
 import ElegantTabs
 
 struct MainWindow: View {
-   // @EnvironmentObject var propagationModel: PropagationModel
     @State private var selectedTab = 0
     
     var body: some View {
@@ -19,7 +18,6 @@ struct MainWindow: View {
                 icon: .system(name: "desktopcomputer")
             ) {
                 CloudComputingTabContent()
-                    .environmentObject(AppState.shared)
             }
 
             TabItem(

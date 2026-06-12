@@ -9,14 +9,14 @@ import Foundation
 import Network
 
 enum InternetConnectionMonitor {
-    static func runWhenConnected(_ completion: @escaping () -> Void) {
+    static func runWhenConnected(_ completion: @escaping @MainActor @Sendable () -> Void) {
         let monitor = NWPathMonitor()
         let queue = DispatchQueue(label: "InternetConnectionMonitor")
 
         monitor.pathUpdateHandler = { path in
             if path.status == .satisfied {
                 LoggerHelper.info("Internet access is available")
-                DispatchQueue.main.async {
+                Task { @MainActor in
                     completion()
                 }
                 monitor.cancel()

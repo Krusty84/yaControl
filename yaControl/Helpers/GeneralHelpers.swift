@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-class Helpers: ObservableObject {
+final class Helpers: @unchecked Sendable {
     static let shared = Helpers()
 
     func restResponseToString(for intValue: Binding<Int?>) -> Binding<String> {
@@ -92,7 +92,7 @@ class Helpers: ObservableObject {
         ByteFormattingHelper.convertBytesToGB(bytes: bytes)
     }
 
-    static func checkInternetConnection(completion: @escaping () -> Void) {
+    static func checkInternetConnection(completion: @escaping @MainActor @Sendable () -> Void) {
         InternetConnectionMonitor.runWhenConnected(completion)
     }
 

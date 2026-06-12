@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class VMPowerAutomationService {
+final class VMPowerAutomationService: @unchecked Sendable {
     static let shared = VMPowerAutomationService()
 
     private let authAPI: YandexAuthAPI
@@ -55,32 +55,32 @@ final class VMPowerAutomationService {
 
         guard autoStartEnabled else {
             LoggerHelper.info("VM auto-start skipped source=\(source.rawValue) reason=disabled")
-            AppState.shared.checkNumRunningVMs()
+            await AppState.shared.checkNumRunningVMs()
             return
         }
 
         guard startOptions.contains(option) else {
             LoggerHelper.info("VM auto-start skipped source=\(source.rawValue) reason=start_option_disabled")
-            AppState.shared.checkNumRunningVMs()
+            await AppState.shared.checkNumRunningVMs()
             return
         }
 
         guard !vmIds.isEmpty else {
             LoggerHelper.info("VM auto-start skipped source=\(source.rawValue) reason=no_configured_vms")
-            AppState.shared.checkNumRunningVMs()
+            await AppState.shared.checkNumRunningVMs()
             return
         }
 
         guard !token.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             LoggerHelper.error("VM auto-start failed source=\(source.rawValue) error=\(YandexRequestError.emptyOAuthToken.localizedDescription)")
-            AppState.shared.checkNumRunningVMs()
+            await AppState.shared.checkNumRunningVMs()
             return
         }
 
         let isConnected = await InternetConnectionMonitor.waitUntilConnected(timeout: internetWaitTimeout)
         guard isConnected else {
             LoggerHelper.error("VM auto-start failed source=\(source.rawValue) error=internet_wait_timeout")
-            AppState.shared.checkNumRunningVMs()
+            await AppState.shared.checkNumRunningVMs()
             return
         }
 
@@ -130,7 +130,7 @@ final class VMPowerAutomationService {
             LoggerHelper.error("VM auto-start failed source=\(source.rawValue) error=\(error.localizedDescription)")
         }
 
-        AppState.shared.checkNumRunningVMs()
+        await AppState.shared.checkNumRunningVMs()
     }
 
     private func handleShutdown(options: [ShutdownOption], source: VMPowerOperationSource) async -> Bool {
@@ -174,7 +174,7 @@ final class VMPowerAutomationService {
                     iamToken: authResponse.iamToken,
                     source: source
                 )
-                AppState.shared.checkNumRunningVMs()
+                await AppState.shared.checkNumRunningVMs()
             }
 
             if !failedVMIds.isEmpty {

@@ -6,13 +6,11 @@
 //
 
 import UserNotifications
-import SwiftUI
 
 /*
  NotificationManager.shared.requestAuthorization()
  */
-class NotificationManager: ObservableObject {
-    
+final class NotificationManager: @unchecked Sendable {
     static let shared = NotificationManager()
     private init() {}
     

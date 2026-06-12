@@ -11,26 +11,8 @@ import LaunchAtLogin
 struct SettingsTabContent: View {
     @Environment(\.locale) private var locale
 
-    @AppStorage("com.krusty84.yaControl.settings.generalUsername4VMs")
-    private var generalUsername4VMs: String = SettingsManager.shared.generalUsername4VMs
-
-    @AppStorage("com.krusty84.yaControl.settings.billingThreshold")
-    private var billingThreshold: Double = SettingsManager.shared.billingThreshold
-
-    @AppStorage("com.krusty84.yaControl.settings.appLanguage")
-    private var appLanguageRawValue: String = AppLanguage.system.rawValue
-
-    @State private var oAuthKey = ""
-    @State private var appLogging = false
-    @State private var ycCLIInstalled = false
-
-    @State private var responseCode: Int?
-    @State private var errorMessage: String?
+    @State private var model = SettingsModel()
     @State private var selectedTab: SettingsTab = .general
-
-    @State private var autoStartVM = false
-    @State private var startOptions: [StartOption] = []
-    @State private var shutdownOptions: [ShutdownOption] = []
 
     private enum SettingsTab: Hashable {
         case general
@@ -60,30 +42,6 @@ struct SettingsTabContent: View {
         static let verifyButtonMinWidth: CGFloat = 60
     }
 
-    private var trimmedOAuthKey: String {
-        oAuthKey.trimmingCharacters(in: .whitespacesAndNewlines)
-    }
-
-    private var isOAuthTokenEmpty: Bool {
-        trimmedOAuthKey.isEmpty
-    }
-
-    private var appLanguage: AppLanguage {
-        AppLanguage(rawValue: appLanguageRawValue) ?? .system
-    }
-
-    private var selectedAppLanguageBinding: Binding<AppLanguage> {
-        Binding(
-            get: {
-                appLanguage
-            },
-            set: { newValue in
-                appLanguageRawValue = newValue.rawValue
-                SettingsManager.shared.appLanguage = newValue
-            }
-        )
-    }
-
     var body: some View {
         VStack(spacing: 0) {
             tabPicker
@@ -95,7 +53,7 @@ struct SettingsTabContent: View {
                 .controlSize(.small)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .onAppear(perform: loadSettings)
+        .onAppear(perform: model.loadSettings)
     }
 
     private var tabPicker: some View {
@@ -189,11 +147,8 @@ struct SettingsTabContent: View {
                     .toggleStyle(.switch)
                     .help(localized(L10n.Settings.launchAtLoginHelp))
 
-                Toggle(LocalizedStringKey(L10n.Settings.appLoggingTitle), isOn: $appLogging)
+                Toggle(LocalizedStringKey(L10n.Settings.appLoggingTitle), isOn: $model.appLogging)
                     .toggleStyle(.switch)
-                    .onChange(of: appLogging) { _, newValue in
-                        SettingsManager.shared.appLoggingEnabled = newValue
-                    }
                     .help(localized(L10n.Settings.appLoggingHelp))
 
                 NotificationToggleView()
@@ -214,7 +169,7 @@ struct SettingsTabContent: View {
         Section {
             Picker(
                 LocalizedStringKey(L10n.Settings.languageTitle),
-                selection: selectedAppLanguageBinding
+                selection: $model.appLanguage
             ) {
                 ForEach(AppLanguage.allCases) { language in
                     Text(language.displayName(locale: locale))
@@ -237,24 +192,28 @@ struct SettingsTabContent: View {
         Section {
             VStack(alignment: .leading, spacing: SettingsLayout.rowSpacing) {
                 HStack(spacing: SettingsLayout.horizontalRowSpacing) {
-                    TextField(LocalizedStringKey(L10n.Settings.oauthPlaceholder), text: $oAuthKey)
+                    TextField(LocalizedStringKey(L10n.Settings.oauthPlaceholder), text: $model.oAuthKey)
                         .textFieldStyle(.roundedBorder)
                         .accessibilityLabel(Text(LocalizedStringKey(L10n.Settings.oauthAccessibilityLabel)))
                         .help(localized(L10n.Settings.oauthHelp))
 
                     oAuthStatusIndicator
 
-                    Button(LocalizedStringKey(L10n.Settings.oauthVerify), action: checkOAuthKey)
+                    Button(LocalizedStringKey(L10n.Settings.oauthVerify)) {
+                        Task {
+                            await model.checkOAuthKey(locale: locale)
+                        }
+                    }
                         .frame(minWidth: SettingsLayout.verifyButtonMinWidth)
-                        .disabled(isOAuthTokenEmpty)
+                        .disabled(model.isOAuthTokenEmpty)
                         .help(
-                            isOAuthTokenEmpty
+                            model.isOAuthTokenEmpty
                             ? localized(L10n.Settings.oauthVerifyDisabledHelp)
                             : localized(L10n.Settings.oauthVerifyEnabledHelp)
                         )
                 }
 
-                if isOAuthTokenEmpty {
+                if model.isOAuthTokenEmpty {
                     Text(LocalizedStringKey(L10n.Settings.oauthRequired))
                         .font(.caption)
                         .foregroundStyle(.secondary)
@@ -280,11 +239,8 @@ struct SettingsTabContent: View {
     private var yandexCLiSection: some View {
         Section {
             VStack(alignment: .leading, spacing: SettingsLayout.compactRowSpacing) {
-                Toggle(LocalizedStringKey(L10n.Settings.ycCliInstalled), isOn: $ycCLIInstalled)
+                Toggle(LocalizedStringKey(L10n.Settings.ycCliInstalled), isOn: $model.ycCLIInstalled)
                     .toggleStyle(.switch)
-                    .onChange(of: ycCLIInstalled) { _, newValue in
-                        SettingsManager.shared.ycCLIInstalled = newValue
-                    }
                     .help(localized(L10n.Settings.ycCliInstalledHelp))
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
@@ -327,11 +283,8 @@ struct SettingsTabContent: View {
 
     private var autoStartModeSection: some View {
         Section {
-            Toggle(LocalizedStringKey(L10n.Settings.vmEnablePowerManagement), isOn: $autoStartVM)
+            Toggle(LocalizedStringKey(L10n.Settings.vmEnablePowerManagement), isOn: $model.autoStartVM)
                 .toggleStyle(.switch)
-                .onChange(of: autoStartVM) { _, newValue in
-                    SettingsManager.shared.autoStartEnabled = newValue
-                }
                 .help(localized(L10n.Settings.vmEnablePowerManagementHelp))
                 .padding(.horizontal, SettingsLayout.innerHorizontalPadding)
         } header: {
@@ -353,23 +306,10 @@ struct SettingsTabContent: View {
                     ForEach(StartOption.allCases, id: \.self) { option in
                         Toggle(
                             option.localizedTitle(locale: locale),
-                            isOn: Binding(
-                                get: { startOptions.contains(option) },
-                                set: { isOn in
-                                    withAnimation {
-                                        if isOn {
-                                            startOptions.append(option)
-                                        } else {
-                                            startOptions.removeAll { $0 == option }
-                                        }
-
-                                        SettingsManager.shared.startOptions = startOptions
-                                    }
-                                }
-                            )
+                            isOn: startOptionBinding(for: option)
                         )
                         .toggleStyle(.checkbox)
-                        .disabled(!autoStartVM || option == .afterMacOSStarted)
+                        .disabled(!model.autoStartVM || option == .afterMacOSStarted)
                     }
                 }
                 .padding(.horizontal, SettingsLayout.innerHorizontalPadding)
@@ -385,20 +325,7 @@ struct SettingsTabContent: View {
                     ForEach(ShutdownOption.allCases, id: \.self) { option in
                         Toggle(
                             option.localizedTitle(locale: locale),
-                            isOn: Binding(
-                                get: { shutdownOptions.contains(option) },
-                                set: { isOn in
-                                    withAnimation {
-                                        if isOn {
-                                            shutdownOptions.append(option)
-                                        } else {
-                                            shutdownOptions.removeAll { $0 == option }
-                                        }
-
-                                        SettingsManager.shared.shutdownOptions = shutdownOptions
-                                    }
-                                }
-                            )
+                            isOn: shutdownOptionBinding(for: option)
                         )
                         .toggleStyle(.checkbox)
                         .disabled(option == .afterMacOSShutdown)
@@ -413,7 +340,7 @@ struct SettingsTabContent: View {
 
     private var generalVMUsernameSection: some View {
         Section {
-            TextField(LocalizedStringKey(L10n.Settings.vmUsernameTitle), text: $generalUsername4VMs)
+            TextField(LocalizedStringKey(L10n.Settings.vmUsernameTitle), text: $model.generalUsername4VMs)
                 .textFieldStyle(.roundedBorder)
                 .help(localized(L10n.Settings.vmUsernameHelp))
                 .padding(.horizontal, SettingsLayout.innerHorizontalPadding)
@@ -434,7 +361,7 @@ struct SettingsTabContent: View {
                     HStack {
                         TextField(
                             LocalizedStringKey(L10n.Settings.billingThresholdPlaceholder),
-                            value: $billingThreshold,
+                            value: $model.billingThreshold,
                             format: .number.precision(.fractionLength(2))
                         )
                         .textFieldStyle(.roundedBorder)
@@ -459,7 +386,7 @@ struct SettingsTabContent: View {
 
     private var oAuthStatusIndicator: some View {
         VStack(alignment: .leading, spacing: SettingsLayout.compactRowSpacing) {
-            if let code = responseCode {
+            if let code = model.responseCode {
                 HStack(spacing: SettingsLayout.compactRowSpacing) {
                     Image(systemName: code == 200 ? "checkmark.circle.fill" : "xmark.circle.fill")
                         .foregroundStyle(code == 200 ? .green : .red)
@@ -476,7 +403,7 @@ struct SettingsTabContent: View {
                 }
             }
 
-            if let errorMessage {
+            if let errorMessage = model.errorMessage {
                 HStack(spacing: SettingsLayout.compactRowSpacing) {
                     Image(systemName: "exclamationmark.triangle.fill")
                         .foregroundStyle(.red)
@@ -490,58 +417,6 @@ struct SettingsTabContent: View {
     }
 
     // MARK: - Helpers
-
-    private func loadSettings() {
-        oAuthKey = SettingsManager.shared.oAuthKey
-        generalUsername4VMs = SettingsManager.shared.generalUsername4VMs
-        autoStartVM = SettingsManager.shared.autoStartEnabled
-        appLogging = SettingsManager.shared.appLoggingEnabled
-        ycCLIInstalled = SettingsManager.shared.ycCLIInstalled
-        startOptions = SettingsManager.shared.startOptions
-        shutdownOptions = SettingsManager.shared.shutdownOptions
-        billingThreshold = SettingsManager.shared.billingThreshold
-    }
-
-    private func checkOAuthKey() {
-        let token = trimmedOAuthKey
-
-        guard !token.isEmpty else {
-            responseCode = nil
-            errorMessage = localized(L10n.Settings.oauthEmptyError)
-            return
-        }
-
-        Task {
-            do {
-                let response = try await YandexAPIService.shared
-                    .checkOauthKey(yandexPassportOauthToken: token)
-
-                if response.code == 200 {
-                    try KeychainTokenStore.shared.saveOAuthToken(token)
-                }
-
-                await MainActor.run {
-                    responseCode = response.code
-
-                    if response.code == 200 {
-                        oAuthKey = token
-                        errorMessage = nil
-                    } else {
-                        errorMessage = LocalizedStringHelper.formatted(
-                            L10n.Settings.oauthInvalidWithCode,
-                            locale: locale,
-                            Int64(response.code)
-                        )
-                    }
-                }
-            } catch {
-                await MainActor.run {
-                    responseCode = nil
-                    errorMessage = error.localizedDescription
-                }
-            }
-        }
-    }
 
     private struct SectionHeader: View {
         let title: LocalizedStringKey
@@ -560,5 +435,27 @@ struct SettingsTabContent: View {
 
     private func localized(_ key: String) -> String {
         LocalizedStringHelper.string(key, locale: locale)
+    }
+
+    private func startOptionBinding(for option: StartOption) -> Binding<Bool> {
+        Binding(
+            get: { model.startOptions.contains(option) },
+            set: { isOn in
+                withAnimation {
+                    model.setStartOption(option, isOn: isOn)
+                }
+            }
+        )
+    }
+
+    private func shutdownOptionBinding(for option: ShutdownOption) -> Binding<Bool> {
+        Binding(
+            get: { model.shutdownOptions.contains(option) },
+            set: { isOn in
+                withAnimation {
+                    model.setShutdownOption(option, isOn: isOn)
+                }
+            }
+        )
     }
 }

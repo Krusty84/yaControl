@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct BillingTabContent: View {
-    @ObservedObject var yandexApi = YandexAPIService.shared
     @State private var iamToken: String = ""
     @State private var bucketTableData: [BucketTableData] = []
     @State private var errorMessage: String? = nil

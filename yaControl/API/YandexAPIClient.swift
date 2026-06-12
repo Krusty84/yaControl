@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class YandexAPIClient {
+final class YandexAPIClient: @unchecked Sendable {
     static let shared = YandexAPIClient()
 
     private init() {}
@@ -35,7 +35,8 @@ final class YandexAPIClient {
     }
 
     func throwYandexAPIErrorIfPresent(in data: Data) throws {
-        if let response = try? JSONDecoder().decode(YandexAPIErrorResponse.self, from: data) {
+        do {
+            let response = try JSONDecoder().decode(YandexAPIErrorResponse.self, from: data)
             if let message = response.error?.message,
                let sanitizedMessage = sanitizedAPIMessage(message) {
                 throw YandexRequestError.apiError(code: response.error?.code, message: sanitizedMessage)
@@ -44,14 +45,26 @@ final class YandexAPIClient {
                let sanitizedMessage = sanitizedAPIMessage(message) {
                 throw YandexRequestError.apiError(code: nil, message: sanitizedMessage)
             }
+        } catch let error as YandexRequestError {
+            throw error
+        } catch {
+            LoggerHelper.debug("Response did not match Yandex API error DTO: \(error.localizedDescription)")
         }
 
-        guard
-            let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-            let error = json["error"] as? [String: Any],
-            let message = error["message"] as? String,
-            let sanitizedMessage = sanitizedAPIMessage(message)
-        else {
+        let json: [String: Any]
+        do {
+            guard let parsedJSON = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+                return
+            }
+            json = parsedJSON
+        } catch {
+            LoggerHelper.debug("Response did not match Yandex API error JSON: \(error.localizedDescription)")
+            return
+        }
+
+        guard let error = json["error"] as? [String: Any],
+              let message = error["message"] as? String,
+              let sanitizedMessage = sanitizedAPIMessage(message) else {
             return
         }
 
@@ -82,18 +95,26 @@ final class YandexAPIClient {
     }
 
     private func yandexAPIErrorMessage(from data: Data) -> String? {
-        if let response = try? JSONDecoder().decode(YandexAPIErrorResponse.self, from: data) {
+        do {
+            let response = try JSONDecoder().decode(YandexAPIErrorResponse.self, from: data)
             if let message = response.error?.message {
                 return sanitizedAPIMessage(message)
             }
             if let message = response.message {
                 return sanitizedAPIMessage(message)
             }
+        } catch {
+            LoggerHelper.debug("HTTP error body did not match Yandex API error DTO: \(error.localizedDescription)")
         }
 
-        guard
-            let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
-        else {
+        let json: [String: Any]
+        do {
+            guard let parsedJSON = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+                return nil
+            }
+            json = parsedJSON
+        } catch {
+            LoggerHelper.debug("HTTP error body did not match Yandex API error JSON: \(error.localizedDescription)")
             return nil
         }
 

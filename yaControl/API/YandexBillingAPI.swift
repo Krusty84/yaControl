@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class YandexBillingAPI {
+final class YandexBillingAPI: @unchecked Sendable {
     private let client: YandexAPIClient
 
     init(client: YandexAPIClient = .shared) {

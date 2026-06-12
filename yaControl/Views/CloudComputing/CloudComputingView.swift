@@ -9,7 +9,6 @@ import SwiftUI
 
 struct CloudComputingTabContent: View {
     @Environment(\.locale) private var locale
-    @EnvironmentObject var appState: AppState
 
     @State private var model = CloudComputingModel()
     @State private var selectedVM: VMTableData.ID? = nil
@@ -63,7 +62,7 @@ struct CloudComputingTabContent: View {
                 isStopAllConfirmationPresented = true
             } label: {
                 Label(LocalizedStringKey(L10n.Computing.stopAll), systemImage: "stop.fill")
-                    .foregroundColor(.red)
+                    .foregroundStyle(.red)
                     .padding(.horizontal, 10)
                     .background(Color.red.opacity(0.2))
                     .clipShape(.rect(cornerRadius: 2))

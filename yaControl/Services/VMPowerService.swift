@@ -46,7 +46,7 @@ struct VMOperationResult: Identifiable, Equatable {
     let errorMessage: String?
 }
 
-final class VMPowerService {
+final class VMPowerService: @unchecked Sendable {
     static let shared = VMPowerService()
 
     private let computeAPI: YandexComputeAPI

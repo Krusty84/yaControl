@@ -5,11 +5,12 @@
 //  Created by Sedoykin Alexey on 30/03/2025.
 //
 
-import SwiftUI
 import AppKit
+import Foundation
+import Observation
 
 //handle termination and ensure async code executes before the app quits, the nuance of shutdown
-class AppDelegate: NSObject, NSApplicationDelegate {
+final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
         Task {
             let success = await VMPowerAutomationService.shared.handleAppExit()
@@ -20,17 +21,24 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 }
 
-class AppLifecycleObserver: ObservableObject {
+@Observable
+@MainActor
+final class AppLifecycleObserver {
     static let shared = AppLifecycleObserver()
+
+    var isFirstLaunch = true
+    var didJustWake = false
+    var systemStatus: SystemStatus = .active
+
+    @ObservationIgnored
     private var observers = [NSObjectProtocol]()
-    
-    @Published var isFirstLaunch: Bool = true
-    @Published var didJustWake: Bool = false
-    @Published var systemStatus: SystemStatus = .active
-    
+
+    @ObservationIgnored
+    private var wakeResetTask: Task<Void, Never>?
+
     private let hasLaunchedBeforeKey = "HasLaunchedBefore"
     private let lastSleepDateKey = "LastSleepDate"
-    
+
     enum SystemStatus {
         case firstLaunch
         case wakeFromSleep
@@ -49,24 +57,33 @@ class AppLifecycleObserver: ObservableObject {
 
         observers = [
             // App launch
-            nc.addObserver(forName: NSApplication.didFinishLaunchingNotification, object: nil, queue: .main) { _ in
-                self.handleFirstLaunch()
+            nc.addObserver(forName: NSApplication.didFinishLaunchingNotification, object: nil, queue: .main) { [weak self] _ in
+                Task { @MainActor [weak self] in
+                    self?.handleFirstLaunch()
+                }
             },
 
             // Will sleep
-            workspaceNC.addObserver(forName: NSWorkspace.willSleepNotification, object: nil, queue: .main) { _ in
-                self.systemStatus = .aboutToSleep
-                UserDefaults.standard.set(Date(), forKey: self.lastSleepDateKey)
-                LoggerHelper.info("System gonna sleep")
-                Task {
+            workspaceNC.addObserver(forName: NSWorkspace.willSleepNotification, object: nil, queue: .main) { [weak self] _ in
+                Task { @MainActor [weak self] in
+                    guard let self else { return }
+                    self.systemStatus = .aboutToSleep
+                    UserDefaults.standard.set(Date(), forKey: self.lastSleepDateKey)
+                    LoggerHelper.info("System gonna sleep")
                     let success = await VMPowerAutomationService.shared.handleMacSleep()
-                    LoggerHelper.info(success ? "Shutdown tasks completed successfully." : "Shutdown tasks finished with errors.")
+                    LoggerHelper.info(
+                        success
+                        ? "Shutdown tasks completed successfully."
+                        : "Shutdown tasks finished with errors."
+                    )
                 }
             },
 
             // Did wake
-            workspaceNC.addObserver(forName: NSWorkspace.didWakeNotification, object: nil, queue: .main) { _ in
-                self.handleWake()
+            workspaceNC.addObserver(forName: NSWorkspace.didWakeNotification, object: nil, queue: .main) { [weak self] _ in
+                Task { @MainActor [weak self] in
+                    self?.handleWake()
+                }
             },
 
             // Screen locked (optional)
@@ -108,14 +125,18 @@ class AppLifecycleObserver: ObservableObject {
             await VMPowerAutomationService.shared.handleMacWake()
         }
 
-        // Reset state after 2 sec
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+        wakeResetTask?.cancel()
+        wakeResetTask = Task { @MainActor [weak self] in
+            do {
+                try await Task.sleep(for: .seconds(2))
+            } catch {
+                return
+            }
+
+            guard let self else { return }
             self.didJustWake = false
             self.systemStatus = .active
         }
     }
-    
-    deinit {
-        observers.forEach(NotificationCenter.default.removeObserver)
-    }
+
 }

@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class BillingSummaryService {
+final class BillingSummaryService: @unchecked Sendable {
     static let shared = BillingSummaryService()
 
     private let billingAPI: YandexBillingAPI

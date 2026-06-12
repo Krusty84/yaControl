@@ -7,7 +7,7 @@
 
 import Foundation
 
-class SettingsManager {
+final class SettingsManager: @unchecked Sendable {
     static let shared = SettingsManager()
     private let defaults = UserDefaults.standard
     // Keys
@@ -50,12 +50,23 @@ class SettingsManager {
     }
     
     var oAuthKey: String {
-        get { (try? KeychainTokenStore.shared.readOAuthToken()) ?? "" }
+        get {
+            do {
+                return try KeychainTokenStore.shared.readOAuthToken() ?? ""
+            } catch {
+                LoggerHelper.error("Failed to read OAuth token from Keychain: \(error.localizedDescription)")
+                return ""
+            }
+        }
         set {
-            if newValue.isEmpty {
-                try? KeychainTokenStore.shared.deleteOAuthToken()
-            } else {
-                try? KeychainTokenStore.shared.saveOAuthToken(newValue)
+            do {
+                if newValue.isEmpty {
+                    try KeychainTokenStore.shared.deleteOAuthToken()
+                } else {
+                    try KeychainTokenStore.shared.saveOAuthToken(newValue)
+                }
+            } catch {
+                LoggerHelper.error("Failed to update OAuth token in Keychain: \(error.localizedDescription)")
             }
         }
     }
@@ -86,36 +97,50 @@ class SettingsManager {
 
     var startOptions: [StartOption] {
         get {
-            guard
-                let data = defaults.data(forKey: startOptionsKey),
-                let strings = try? JSONDecoder().decode([String].self, from: data)
-            else {
+            guard let data = defaults.data(forKey: startOptionsKey) else {
                 return [.afterAppLaunched, .afterMacOSStarted]
             }
-            return strings.compactMap(StartOption.fromStoredValue)
+
+            do {
+                let strings = try JSONDecoder().decode([String].self, from: data)
+                return strings.compactMap(StartOption.fromStoredValue)
+            } catch {
+                LoggerHelper.error("Failed to decode start options: \(error.localizedDescription)")
+                return [.afterAppLaunched, .afterMacOSStarted]
+            }
         }
         set {
             let strings = newValue.map(\.rawValue)
-            if let data = try? JSONEncoder().encode(strings) {
+            do {
+                let data = try JSONEncoder().encode(strings)
                 defaults.set(data, forKey: startOptionsKey)
+            } catch {
+                LoggerHelper.error("Failed to encode start options: \(error.localizedDescription)")
             }
         }
     }
 
     var shutdownOptions: [ShutdownOption] {
         get {
-            guard
-                let data = defaults.data(forKey: shutdownOptionsKey),
-                let strings = try? JSONDecoder().decode([String].self, from: data)
-            else {
+            guard let data = defaults.data(forKey: shutdownOptionsKey) else {
                 return [.afterAppExit, .afterMacOSShutdown]
             }
-            return strings.compactMap(ShutdownOption.fromStoredValue)
+
+            do {
+                let strings = try JSONDecoder().decode([String].self, from: data)
+                return strings.compactMap(ShutdownOption.fromStoredValue)
+            } catch {
+                LoggerHelper.error("Failed to decode shutdown options: \(error.localizedDescription)")
+                return [.afterAppExit, .afterMacOSShutdown]
+            }
         }
         set {
             let strings = newValue.map(\.rawValue)
-            if let data = try? JSONEncoder().encode(strings) {
+            do {
+                let data = try JSONEncoder().encode(strings)
                 defaults.set(data, forKey: shutdownOptionsKey)
+            } catch {
+                LoggerHelper.error("Failed to encode shutdown options: \(error.localizedDescription)")
             }
         }
     }
@@ -154,9 +179,14 @@ class SettingsManager {
 
     private func migrateLegacyOAuthToken() {
         if let token = defaults.string(forKey: legacyOAuthKey), !token.isEmpty {
-            try? KeychainTokenStore.shared.saveOAuthToken(token)
+            do {
+                try KeychainTokenStore.shared.saveOAuthToken(token)
+                defaults.removeObject(forKey: legacyOAuthKey)
+            } catch {
+                LoggerHelper.error("Failed to migrate OAuth token to Keychain: \(error.localizedDescription)")
+            }
+        } else {
+            defaults.removeObject(forKey: legacyOAuthKey)
         }
-
-        defaults.removeObject(forKey: legacyOAuthKey)
     }
 }

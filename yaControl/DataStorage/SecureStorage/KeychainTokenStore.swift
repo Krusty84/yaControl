@@ -28,7 +28,7 @@ enum KeychainTokenStoreError: LocalizedError {
     }
 }
 
-final class KeychainTokenStore: OAuthTokenStore {
+final class KeychainTokenStore: OAuthTokenStore, @unchecked Sendable {
     static let shared = KeychainTokenStore()
 
     private let service = "com.krusty84.yaControl"

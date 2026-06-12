@@ -13,7 +13,7 @@ enum VMPollingResult {
     case failed(vmId: String, message: String)
 }
 
-final class VMPollingService {
+final class VMPollingService: @unchecked Sendable {
     static let shared = VMPollingService()
 
     private let inventoryService: YandexInventoryService

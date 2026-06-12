@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class YandexServerlessAPI {
+final class YandexServerlessAPI: @unchecked Sendable {
     private let client: YandexAPIClient
 
     init(client: YandexAPIClient = .shared) {

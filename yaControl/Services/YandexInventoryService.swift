@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class YandexInventoryService {
+final class YandexInventoryService: @unchecked Sendable {
     static let shared = YandexInventoryService()
 
     private let resourceManagerAPI: YandexResourceManagerAPI

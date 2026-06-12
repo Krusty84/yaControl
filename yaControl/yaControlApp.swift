@@ -7,20 +7,19 @@
 
 import SwiftUI
 import AppKit
-//import UserNotifications
 
 @main
-struct yaControlApp: App {
+struct YaControlApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @Environment(\.openWindow) var openWindow
-    @StateObject private var appState = AppState.shared
+    @State private var appState = AppState.shared
     @AppStorage("com.krusty84.yaControl.settings.appLanguage")
     private var appLanguageRawValue: String = AppLanguage.system.rawValue
 
     private var appLanguage: AppLanguage {
         AppLanguage(rawValue: appLanguageRawValue) ?? .system
     }
-    
+
     init() {
         // Initialize the app lifecycle observer
         _ = AppLifecycleObserver.shared
@@ -58,7 +57,3 @@ struct MenuBarContentView: View {
         }
     }
 }
-
-
- 
- 
