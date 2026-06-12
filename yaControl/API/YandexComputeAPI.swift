@@ -66,15 +66,11 @@ final class YandexComputeAPI {
             throw YandexRequestError.invalidURL
         }
 
-        let (_, httpResponse) = try await client.request(
+        _ = try await client.request(
             url: url,
             method: "POST",
             iamToken: iamToken,
             endpoint: "\(operation) vm"
         )
-
-        guard httpResponse.statusCode == 200 else {
-            throw YandexRequestError.httpError(statusCode: httpResponse.statusCode, message: nil)
-        }
     }
 }

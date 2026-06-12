@@ -161,12 +161,21 @@ final class VMPowerAutomationService {
                 return true
             }
 
-            let failedVMIds = await stopVMs(
-                runningVMs,
-                iamToken: authResponse.iamToken,
-                source: source
-            )
-            AppState.shared.checkNumRunningVMs()
+            let failedVMIds: Set<String>
+            if source == .appExit || source == .macOSSleep {
+                failedVMIds = await sendStopCommandsOnly(
+                    runningVMs,
+                    iamToken: authResponse.iamToken,
+                    source: source
+                )
+            } else {
+                failedVMIds = await stopVMs(
+                    runningVMs,
+                    iamToken: authResponse.iamToken,
+                    source: source
+                )
+                AppState.shared.checkNumRunningVMs()
+            }
 
             if !failedVMIds.isEmpty {
                 LoggerHelper.error("VM shutdown finished with failures source=\(source.rawValue) failedVMIds=\(failedVMIds)")
@@ -305,6 +314,60 @@ final class VMPowerAutomationService {
         }
 
         await releaseLocks(lockedVMIds.subtracting(Set(failedResults.map(\.vmId))))
+        return failedVMIds
+    }
+
+    private func sendStopCommandsOnly(
+        _ vms: [VMTableData],
+        iamToken: String,
+        source: VMPowerOperationSource
+    ) async -> Set<String> {
+        let lockedVMs = await lockVMs(vms, source: source)
+        var failedVMIds = Set(vms.map(\.id)).subtracting(Set(lockedVMs.map(\.id)))
+
+        guard !lockedVMs.isEmpty else {
+            return failedVMIds
+        }
+
+        let lockedVMIds = Set(lockedVMs.map(\.id))
+        var didReleaseLocks = false
+        defer {
+            if !didReleaseLocks {
+                Task {
+                    await releaseLocks(lockedVMIds)
+                }
+            }
+        }
+
+        let results = await powerService.stopVMs(
+            iamToken: iamToken,
+            vmIds: Array(lockedVMIds)
+        )
+
+        for result in results {
+            if result.success {
+                VMPowerOperationLogger.log(
+                    vmId: result.vmId,
+                    operation: result.operation,
+                    source: source,
+                    outcome: .accepted,
+                    message: "Stop command accepted by API"
+                )
+            } else {
+                VMPowerOperationLogger.log(
+                    vmId: result.vmId,
+                    operation: result.operation,
+                    source: source,
+                    outcome: .failed,
+                    message: result.errorMessage ?? "Unknown error",
+                    isError: true
+                )
+                failedVMIds.insert(result.vmId)
+            }
+        }
+
+        await releaseLocks(lockedVMIds)
+        didReleaseLocks = true
         return failedVMIds
     }
 
