@@ -72,7 +72,7 @@ struct VMStatusColumn: View {
                 .foregroundColor(statusColor)
         }
         .buttonStyle(.plain)
-        .disabled(isProcessing)
+        .disabled(isProcessing || !vm.status.isActionable)
     }
 
     private var statusIcon: String {

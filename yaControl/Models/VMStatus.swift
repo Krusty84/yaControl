@@ -38,6 +38,10 @@ enum VMStatus: String, Decodable, Equatable {
         self == .error || self == .crashed
     }
 
+    var isActionable: Bool {
+        isRunning || isStopped
+    }
+
     var isTransitioning: Bool {
         switch self {
         case .starting, .stopping, .provisioning, .restarting, .updating:

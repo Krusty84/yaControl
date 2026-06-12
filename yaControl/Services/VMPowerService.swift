@@ -10,6 +10,32 @@ import Foundation
 enum VMOperation: String {
     case start
     case stop
+
+    var requiredStatus: VMStatus {
+        switch self {
+        case .start:
+            .stopped
+        case .stop:
+            .running
+        }
+    }
+
+    var targetStatus: VMStatus {
+        switch self {
+        case .start:
+            .running
+        case .stop:
+            .stopped
+        }
+    }
+
+    func isAlreadyCompleted(status: VMStatus) -> Bool {
+        status == targetStatus
+    }
+
+    func canSendRequest(status: VMStatus) -> Bool {
+        status == requiredStatus
+    }
 }
 
 struct VMOperationResult: Identifiable, Equatable {
