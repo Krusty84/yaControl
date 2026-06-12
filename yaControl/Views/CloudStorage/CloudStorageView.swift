@@ -35,7 +35,11 @@ struct BucketTabContent: View {
 
     private var headerView: some View {
         HStack {
-            Text(localizedFormat(L10n.Storage.totalBuckets, Int64(model.totalBuckets)))
+            Text(LocalizedStringHelper.formatted(
+                L10n.Storage.totalBuckets,
+                locale: locale,
+                Int64(model.totalBuckets)
+            ))
                 .font(.subheadline).bold()
             Spacer()
             Button {
@@ -98,13 +102,5 @@ struct BucketTabContent: View {
 
     private func localized(_ key: String) -> String {
         LocalizedStringHelper.string(key, locale: locale)
-    }
-
-    private func localizedFormat(_ key: String, _ arguments: CVarArg...) -> String {
-        String(
-            format: localized(key),
-            locale: locale,
-            arguments: arguments
-        )
     }
 }

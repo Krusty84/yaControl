@@ -153,8 +153,9 @@ final class CloudComputingModel {
             if !initialStatus.isRunning && newVM.status.isRunning {
                 NotificationManager.shared.postNotification(
                     title: "yaControl",
-                    body: String(
-                        format: LocalizedStringHelper.string(L10n.Notifications.vmStarted, language: SettingsManager.shared.appLanguage),
+                    body: LocalizedStringHelper.formatted(
+                        L10n.Notifications.vmStarted,
+                        language: SettingsManager.shared.appLanguage,
                         newVM.name,
                         timeStamp
                     )
@@ -163,8 +164,9 @@ final class CloudComputingModel {
             if initialStatus.isRunning && newVM.status.isStopped {
                 NotificationManager.shared.postNotification(
                     title: "yaControl",
-                    body: String(
-                        format: LocalizedStringHelper.string(L10n.Notifications.vmStopped, language: SettingsManager.shared.appLanguage),
+                    body: LocalizedStringHelper.formatted(
+                        L10n.Notifications.vmStopped,
+                        language: SettingsManager.shared.appLanguage,
                         newVM.name,
                         timeStamp
                     )
@@ -173,8 +175,9 @@ final class CloudComputingModel {
             if newVM.status.isFailure {
                 NotificationManager.shared.postNotification(
                     title: "yaControl",
-                    body: String(
-                        format: LocalizedStringHelper.string(L10n.Notifications.vmError, language: SettingsManager.shared.appLanguage),
+                    body: LocalizedStringHelper.formatted(
+                        L10n.Notifications.vmError,
+                        language: SettingsManager.shared.appLanguage,
                         newVM.name,
                         newVM.statusText,
                         timeStamp
@@ -185,8 +188,9 @@ final class CloudComputingModel {
             if let vm = vmTableData.first(where: { $0.id == vmID }) {
                 NotificationManager.shared.postNotification(
                     title: "yaControl",
-                    body: String(
-                        format: LocalizedStringHelper.string(L10n.Notifications.vmTimeout, language: SettingsManager.shared.appLanguage),
+                    body: LocalizedStringHelper.formatted(
+                        L10n.Notifications.vmTimeout,
+                        language: SettingsManager.shared.appLanguage,
                         vm.name,
                         timeStamp
                     )

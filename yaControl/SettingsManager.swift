@@ -92,7 +92,7 @@ class SettingsManager {
             else {
                 return [.afterAppLaunched, .afterMacOSStarted]
             }
-            return strings.compactMap { .init(rawValue: $0) }
+            return strings.compactMap(StartOption.fromStoredValue)
         }
         set {
             let strings = newValue.map(\.rawValue)
@@ -110,7 +110,7 @@ class SettingsManager {
             else {
                 return [.afterAppExit, .afterMacOSShutdown]
             }
-            return strings.compactMap { .init(rawValue: $0) }
+            return strings.compactMap(ShutdownOption.fromStoredValue)
         }
         set {
             let strings = newValue.map(\.rawValue)

@@ -35,9 +35,17 @@ struct ServerLessFunctionTabContent: View {
 
     private var headerView: some View {
         HStack {
-            Text(localizedFormat(L10n.Serverless.totalFunctions, Int64(model.totalSLFs)))
+            Text(LocalizedStringHelper.formatted(
+                L10n.Serverless.totalFunctions,
+                locale: locale,
+                Int64(model.totalSLFs)
+            ))
                 .font(.subheadline).bold()
-            Text(localizedFormat(L10n.Serverless.activeFunctions, Int64(model.activeSLFs)))
+            Text(LocalizedStringHelper.formatted(
+                L10n.Serverless.activeFunctions,
+                locale: locale,
+                Int64(model.activeSLFs)
+            ))
                 .font(.subheadline).bold()
             Spacer()
             Button {
@@ -101,13 +109,5 @@ struct ServerLessFunctionTabContent: View {
 
     private func localized(_ key: String) -> String {
         LocalizedStringHelper.string(key, locale: locale)
-    }
-
-    private func localizedFormat(_ key: String, _ arguments: CVarArg...) -> String {
-        String(
-            format: localized(key),
-            locale: locale,
-            arguments: arguments
-        )
     }
 }

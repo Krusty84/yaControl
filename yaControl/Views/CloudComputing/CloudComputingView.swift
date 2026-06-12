@@ -37,9 +37,17 @@ struct CloudComputingTabContent: View {
 
     private var headerView: some View {
         HStack {
-            Text(localizedFormat(L10n.Computing.totalVMs, Int64(model.totalVMs)))
+            Text(LocalizedStringHelper.formatted(
+                L10n.Computing.totalVMs,
+                locale: locale,
+                Int64(model.totalVMs)
+            ))
                 .font(.subheadline).bold()
-            Text(localizedFormat(L10n.Computing.runningVMs, Int64(model.runningVMs)))
+            Text(LocalizedStringHelper.formatted(
+                L10n.Computing.runningVMs,
+                locale: locale,
+                Int64(model.runningVMs)
+            ))
                 .font(.subheadline).bold()
             Spacer()
             Button {
@@ -146,13 +154,5 @@ struct CloudComputingTabContent: View {
 
     private func localized(_ key: String) -> String {
         LocalizedStringHelper.string(key, locale: locale)
-    }
-
-    private func localizedFormat(_ key: String, _ arguments: CVarArg...) -> String {
-        String(
-            format: localized(key),
-            locale: locale,
-            arguments: arguments
-        )
     }
 }

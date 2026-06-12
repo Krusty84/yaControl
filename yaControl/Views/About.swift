@@ -38,9 +38,21 @@ struct AboutTabContent: View {
                 // License & Author
                 VStack(alignment: .leading, spacing: 4) {
                     Group {
-                        Text(String(format: localized(L10n.About.license), "MIT"))
-                        Text(String(format: localized(L10n.About.author), "Alexey Sedoykin"))
-                        Text(String(format: localized(L10n.About.contact), "www.linkedin.com/in/sedoykin"))
+                        Text(LocalizedStringHelper.formatted(
+                            L10n.About.license,
+                            locale: locale,
+                            "MIT"
+                        ))
+                        Text(LocalizedStringHelper.formatted(
+                            L10n.About.author,
+                            locale: locale,
+                            "Alexey Sedoykin"
+                        ))
+                        Text(LocalizedStringHelper.formatted(
+                            L10n.About.contact,
+                            locale: locale,
+                            "www.linkedin.com/in/sedoykin"
+                        ))
                             .onHover { hovering in
                                 if hovering { NSCursor.pointingHand.push() }
                                 else       { NSCursor.pop() }
@@ -79,9 +91,5 @@ struct AboutTabContent: View {
         .onAppear {
             // Any additional setup when the view appears
         }
-    }
-
-    private func localized(_ key: String) -> String {
-        LocalizedStringHelper.string(key, locale: locale)
     }
 }

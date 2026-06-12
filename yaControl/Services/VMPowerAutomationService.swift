@@ -141,8 +141,9 @@ final class VMPowerAutomationService {
             if vm.status.isRunning {
                 NotificationManager.shared.postNotification(
                     title: "yaControl",
-                    body: String(
-                        format: LocalizedStringHelper.string(L10n.Notifications.vmStarted, language: SettingsManager.shared.appLanguage),
+                    body: LocalizedStringHelper.formatted(
+                        L10n.Notifications.vmStarted,
+                        language: SettingsManager.shared.appLanguage,
                         vm.name,
                         timeStamp
                     )
@@ -150,8 +151,9 @@ final class VMPowerAutomationService {
             } else if vm.status.isStopped {
                 NotificationManager.shared.postNotification(
                     title: "yaControl",
-                    body: String(
-                        format: LocalizedStringHelper.string(L10n.Notifications.vmStopped, language: SettingsManager.shared.appLanguage),
+                    body: LocalizedStringHelper.formatted(
+                        L10n.Notifications.vmStopped,
+                        language: SettingsManager.shared.appLanguage,
                         vm.name,
                         timeStamp
                     )
@@ -159,8 +161,9 @@ final class VMPowerAutomationService {
             } else if vm.status.isFailure {
                 NotificationManager.shared.postNotification(
                     title: "yaControl",
-                    body: String(
-                        format: LocalizedStringHelper.string(L10n.Notifications.vmError, language: SettingsManager.shared.appLanguage),
+                    body: LocalizedStringHelper.formatted(
+                        L10n.Notifications.vmError,
+                        language: SettingsManager.shared.appLanguage,
                         vm.name,
                         vm.statusText,
                         timeStamp
@@ -170,8 +173,9 @@ final class VMPowerAutomationService {
         case .timeout(let vmId):
             NotificationManager.shared.postNotification(
                 title: "yaControl",
-                body: String(
-                    format: LocalizedStringHelper.string(L10n.Notifications.vmTimeoutID, language: SettingsManager.shared.appLanguage),
+                body: LocalizedStringHelper.formatted(
+                    L10n.Notifications.vmTimeoutID,
+                    language: SettingsManager.shared.appLanguage,
                     vmId,
                     timeStamp
                 )

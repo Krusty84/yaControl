@@ -8,11 +8,13 @@
 import Foundation
 
 enum LocalizedStringHelper {
+
     static func string(_ key: String, locale: Locale) -> String {
-        String(
-            localized: String.LocalizationValue(key),
-            bundle: .main,
-            locale: locale
+        let bundle = bundle(for: locale)
+        return bundle.localizedString(
+            forKey: key,
+            value: key,
+            table: "Localizable"
         )
     }
 
@@ -42,5 +44,17 @@ enum LocalizedStringHelper {
             locale: language.locale,
             arguments: arguments
         )
+    }
+
+    private static func bundle(for locale: Locale) -> Bundle {
+        let languageCode = locale.language.languageCode?.identifier ?? locale.identifier
+        guard
+            let path = Bundle.main.path(forResource: languageCode, ofType: "lproj"),
+            let bundle = Bundle(path: path)
+        else {
+            return .main
+        }
+
+        return bundle
     }
 }

@@ -32,7 +32,7 @@ struct StatusPanel: View {
             if let url = billingUrl {
                 Link(destination: url) {
                     HStack(spacing: 0) {
-                        Text(localized(L10n.StatusPanel.currentBalance) + " ")
+                        Text(LocalizedStringHelper.string(L10n.StatusPanel.currentBalance, locale: locale) + " ")
                             .font(.subheadline)
                             .foregroundColor(.gray)
                         Text(BillingFormattingHelper.balanceAttributedString(
@@ -55,7 +55,7 @@ struct StatusPanel: View {
                 .buttonStyle(.plain)
             } else {
                 HStack(spacing: 0) {
-                    Text(localized(L10n.StatusPanel.currentBalance) + " ")
+                    Text(LocalizedStringHelper.string(L10n.StatusPanel.currentBalance, locale: locale) + " ")
                         .font(.subheadline)
                         .foregroundColor(.gray)
                     Text(BillingFormattingHelper.balanceAttributedString(
@@ -70,9 +70,5 @@ struct StatusPanel: View {
         }
         .padding(.horizontal)
         .padding(.vertical, 8)
-    }
-
-    private func localized(_ key: String) -> String {
-        LocalizedStringHelper.string(key, locale: locale)
     }
 }
