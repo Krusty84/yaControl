@@ -10,43 +10,49 @@ import Foundation
 struct CloudSummarySnapshotStore: Sendable {
     static let shared = CloudSummarySnapshotStore()
 
+    private let snapshotKey = "com.krusty84.yaControl.widget.cloudSummarySnapshot"
+
     func save(_ snapshot: CloudSummarySnapshot) throws {
-        let encoder = JSONEncoder()
-        let data = try encoder.encode(snapshot)
-        let fileURL = try snapshotURL()
-        try data.write(to: fileURL, options: .atomic)
+        guard let defaults = UserDefaults(suiteName: AppGroupConfig.identifier) else {
+            throw CloudSummarySnapshotStoreError.missingAppGroupDefaults
+        }
+
+        let data = try JSONEncoder().encode(snapshot)
+        defaults.set(data, forKey: snapshotKey)
+
+        // Useful for widget handoff after immediate refresh.
+        defaults.synchronize()
     }
 
     func load() throws -> CloudSummarySnapshot? {
-        let fileManager = FileManager.default
-        let fileURL = try snapshotURL()
-        guard fileManager.fileExists(atPath: fileURL.path) else {
+        guard let defaults = UserDefaults(suiteName: AppGroupConfig.identifier) else {
+            throw CloudSummarySnapshotStoreError.missingAppGroupDefaults
+        }
+
+        guard let data = defaults.data(forKey: snapshotKey) else {
             return nil
         }
 
-        let decoder = JSONDecoder()
-        let data = try Data(contentsOf: fileURL)
-        return try decoder.decode(CloudSummarySnapshot.self, from: data)
+        return try JSONDecoder().decode(CloudSummarySnapshot.self, from: data)
     }
 
-    private func snapshotURL() throws -> URL {
-        guard let containerURL = FileManager.default.containerURL(
-            forSecurityApplicationGroupIdentifier: AppGroupConfig.identifier
-        ) else {
-            throw CloudSummarySnapshotStoreError.missingAppGroupContainer
+    func clear() throws {
+        guard let defaults = UserDefaults(suiteName: AppGroupConfig.identifier) else {
+            throw CloudSummarySnapshotStoreError.missingAppGroupDefaults
         }
 
-        return containerURL.appending(path: "cloud-summary-snapshot.json")
+        defaults.removeObject(forKey: snapshotKey)
+        defaults.synchronize()
     }
 }
 
 enum CloudSummarySnapshotStoreError: LocalizedError {
-    case missingAppGroupContainer
+    case missingAppGroupDefaults
 
     var errorDescription: String? {
         switch self {
-        case .missingAppGroupContainer:
-            "App Group container is unavailable."
+        case .missingAppGroupDefaults:
+            "App Group UserDefaults is unavailable."
         }
     }
 }

@@ -40,7 +40,23 @@ struct CloudSummaryWidgetProvider: TimelineProvider {
                 isPlaceholder: false
             )
         } catch {
-            return .noData()
+            let snapshot = CloudSummarySnapshot(
+                currentBalance: "—",
+                currency: "",
+                totalVMsCount: 0,
+                runningVMsCount: 0,
+                totalFunctionsCount: 0,
+                activeFunctionsCount: 0,
+                totalBucketsCount: 0,
+                lastUpdated: .now,
+                errorMessage: error.localizedDescription
+            )
+
+            return CloudSummaryWidgetEntry(
+                date: .now,
+                snapshot: snapshot,
+                isPlaceholder: false
+            )
         }
     }
 }

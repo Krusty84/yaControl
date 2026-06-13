@@ -8,11 +8,7 @@
 	<array>
 		<string>group.com.krusty84.yaControl</string>
 	</array>
-	<key>com.apple.security.files.user-home.read-only</key>
-	<true/>
 	<key>com.apple.security.network.client</key>
-	<true/>
-	<key>com.apple.security.scripting-targets</key>
 	<true/>
 </dict>
 </plist>
