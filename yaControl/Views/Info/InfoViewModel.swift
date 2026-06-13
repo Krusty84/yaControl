@@ -7,6 +7,7 @@
 
 import Foundation
 import Observation
+import WidgetKit
 
 @Observable
 @MainActor
@@ -80,9 +81,31 @@ final class InfoWindowModel {
 
             lastUpdated = Date()
             isLoading   = false
+            saveWidgetSnapshot()
         } catch {
             self.error = error
             isLoading   = false
+        }
+    }
+
+    private func saveWidgetSnapshot() {
+        let snapshot = CloudSummarySnapshot(
+            currentBalance: currentBalance,
+            currency: currency,
+            totalVMsCount: totalVMsCount,
+            runningVMsCount: runningVMsCount,
+            totalFunctionsCount: totalSLFsCount,
+            activeFunctionsCount: activeSLFsCount,
+            totalBucketsCount: totalBucketsCount,
+            lastUpdated: lastUpdated,
+            errorMessage: nil
+        )
+
+        do {
+            try CloudSummarySnapshotStore.shared.save(snapshot)
+            WidgetCenter.shared.reloadTimelines(ofKind: "CloudSummaryWidget")
+        } catch {
+            LoggerHelper.error("Failed to save widget snapshot: \(error.localizedDescription)")
         }
     }
 }
