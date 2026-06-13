@@ -123,6 +123,18 @@ enum L10n {
         static let defaultFolderPlaceholder = "settings.defaultFolder.placeholder"
         static let defaultFolderReload = "settings.defaultFolder.reload"
         static let defaultFolderEmpty = "settings.defaultFolder.empty"
+
+        static let widgetAutoRefreshEnabled = "settings.widget.autoRefreshEnabled"
+        static let widgetAutoRefreshEnabledHelp = "settings.widget.autoRefreshEnabled.help"
+        static let widgetRefreshInterval = "settings.widget.refreshInterval"
+        static let widgetRefreshIntervalHelp = "settings.widget.refreshInterval.help"
+        static let widgetRefreshNow = "settings.widget.refreshNow"
+        static let widgetRefreshNowHelp = "settings.widget.refreshNow.help"
+        static let widgetIntervalFiveMinutes = "settings.widget.interval.fiveMinutes"
+        static let widgetIntervalFifteenMinutes = "settings.widget.interval.fifteenMinutes"
+        static let widgetIntervalThirtyMinutes = "settings.widget.interval.thirtyMinutes"
+        static let widgetIntervalOneHour = "settings.widget.interval.oneHour"
+        static let widgetIntervalThreeHours = "settings.widget.interval.threeHours"
         
         static let vmAutoStartStopTitle = "settings.vm.autoStartStop.title"
         static let vmEnablePowerManagement = "settings.vm.enablePowerManagement"

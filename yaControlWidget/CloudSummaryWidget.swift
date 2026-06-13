@@ -10,7 +10,7 @@ import WidgetKit
 
 @main
 struct CloudSummaryWidget: Widget {
-    static let kind = "CloudSummaryWidget"
+    static let kind = CloudSummaryWidgetKind.cloudSummary
 
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: Self.kind, provider: CloudSummaryWidgetProvider()) { entry in

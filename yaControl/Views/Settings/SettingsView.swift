@@ -180,6 +180,10 @@ struct SettingsTabContent: View {
                 Divider()
 
                 defaultFolderForCreationSection
+
+                Divider()
+
+                widgetSettingsSection
             }
             .padding(SettingsLayout.outerPadding)
             .frame(maxWidth: .infinity, alignment: .topLeading)
@@ -343,6 +347,45 @@ struct SettingsTabContent: View {
             SectionHeader(
                 title: LocalizedStringKey(L10n.Settings.defaultFolderTitle),
                 systemImage: "folder.fill"
+            )
+        }
+    }
+
+    private var widgetSettingsSection: some View {
+        Section {
+            VStack(alignment: .leading, spacing: SettingsLayout.rowSpacing) {
+                Toggle(
+                    LocalizedStringKey(L10n.Settings.widgetAutoRefreshEnabled),
+                    isOn: $model.widgetAutoRefreshEnabled
+                )
+                .toggleStyle(.switch)
+                .help(localized(L10n.Settings.widgetAutoRefreshEnabledHelp))
+
+                Picker(
+                    LocalizedStringKey(L10n.Settings.widgetRefreshInterval),
+                    selection: $model.widgetRefreshIntervalMinutes
+                ) {
+                    ForEach(WidgetRefreshInterval.allCases) { interval in
+                        Text(interval.localizedTitle(locale: locale))
+                            .tag(interval.rawValue)
+                    }
+                }
+                .pickerStyle(.menu)
+                .disabled(!model.widgetAutoRefreshEnabled)
+                .help(localized(L10n.Settings.widgetRefreshIntervalHelp))
+
+                Button(LocalizedStringKey(L10n.Settings.widgetRefreshNow)) {
+                    Task {
+                        await CloudSummarySnapshotUpdater.shared.refreshSnapshot()
+                    }
+                }
+                .help(localized(L10n.Settings.widgetRefreshNowHelp))
+            }
+            .padding(.horizontal, SettingsLayout.innerHorizontalPadding)
+        } header: {
+            SectionHeader(
+                title: "Widget",
+                systemImage: "square.grid.2x2"
             )
         }
     }

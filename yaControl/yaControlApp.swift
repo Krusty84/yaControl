@@ -26,6 +26,7 @@ struct YaControlApp: App {
 
         Task {
             await VMPowerAutomationService.shared.handleAppLaunch()
+            await CloudSummarySnapshotRefreshScheduler.shared.start()
         }
     }
     

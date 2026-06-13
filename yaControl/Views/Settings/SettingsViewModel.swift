@@ -42,6 +42,20 @@ final class SettingsModel {
         }
     }
 
+    var widgetAutoRefreshEnabled = true {
+        didSet {
+            settingsManager.widgetAutoRefreshEnabled = widgetAutoRefreshEnabled
+            restartWidgetSnapshotScheduler()
+        }
+    }
+
+    var widgetRefreshIntervalMinutes = 30 {
+        didSet {
+            settingsManager.widgetRefreshIntervalMinutes = widgetRefreshIntervalMinutes
+            restartWidgetSnapshotScheduler()
+        }
+    }
+
     var folderOptions: [CloudFolderOption] = []
     var isLoadingFolders = false
     var folderLoadErrorMessage: String?
@@ -91,6 +105,9 @@ final class SettingsModel {
     @ObservationIgnored
     private let tokenStore: KeychainTokenStore
 
+    @ObservationIgnored
+    private var isLoadingSettings = false
+
     init(
         settingsManager: SettingsManager = .shared,
         api: YandexAPIService = .shared,
@@ -111,6 +128,11 @@ final class SettingsModel {
     }
 
     func loadSettings() {
+        isLoadingSettings = true
+        defer {
+            isLoadingSettings = false
+        }
+
         oAuthKey = settingsManager.oAuthKey
         generalUsername4VMs = settingsManager.generalUsername4VMs
         autoStartVM = settingsManager.autoStartEnabled
@@ -118,6 +140,8 @@ final class SettingsModel {
         apiDebugEnabled = settingsManager.apiDebugEnabled
         ycCLIInstalled = settingsManager.ycCLIInstalled
         defaultFolderIdForCreation = settingsManager.defaultFolderIdForCreation
+        widgetAutoRefreshEnabled = settingsManager.widgetAutoRefreshEnabled
+        widgetRefreshIntervalMinutes = settingsManager.widgetRefreshIntervalMinutes
         startOptions = settingsManager.startOptions
         shutdownOptions = settingsManager.shutdownOptions
         billingThreshold = settingsManager.billingThreshold
@@ -239,6 +263,14 @@ final class SettingsModel {
             folderOptions = []
             folderLoadErrorMessage = error.localizedDescription
             LoggerHelper.error("Failed to load folders for creation: \(error.localizedDescription)")
+        }
+    }
+
+    private func restartWidgetSnapshotScheduler() {
+        guard !isLoadingSettings else { return }
+
+        Task { @MainActor in
+            CloudSummarySnapshotRefreshScheduler.shared.restart()
         }
     }
 }

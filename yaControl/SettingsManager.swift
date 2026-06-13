@@ -24,6 +24,9 @@ final class SettingsManager: @unchecked Sendable {
     private let shutdownOptionsKey = "com.krusty84.yaControl.settings.shutdownOptions"
     private let autostartVMIdsKey = "com.krusty84.yaControl.settings.autostart_vm_ids"
     private let generalUsername4VMs_ = "com.krusty84.yaControl.settings.generalUsername4VMs"
+    private let widgetAutoRefreshEnabledKey = "com.krusty84.yaControl.settings.widgetAutoRefreshEnabled"
+    private let widgetRefreshIntervalMinutesKey = "com.krusty84.yaControl.settings.widgetRefreshIntervalMinutes"
+    private let widgetDefaultRefreshIntervalMinutes = 30
 
     init() {
         migrateLegacyOAuthToken()
@@ -59,6 +62,28 @@ final class SettingsManager: @unchecked Sendable {
     var defaultFolderIdForCreation: String {
         get { defaults.string(forKey: defaultFolderIdForCreationKey) ?? "" }
         set { defaults.set(newValue, forKey: defaultFolderIdForCreationKey) }
+    }
+
+    var widgetAutoRefreshEnabled: Bool {
+        get {
+            guard defaults.object(forKey: widgetAutoRefreshEnabledKey) != nil else {
+                return true
+            }
+
+            return defaults.bool(forKey: widgetAutoRefreshEnabledKey)
+        }
+        set { defaults.set(newValue, forKey: widgetAutoRefreshEnabledKey) }
+    }
+
+    var widgetRefreshIntervalMinutes: Int {
+        get {
+            guard defaults.object(forKey: widgetRefreshIntervalMinutesKey) != nil else {
+                return widgetDefaultRefreshIntervalMinutes
+            }
+
+            return max(defaults.integer(forKey: widgetRefreshIntervalMinutesKey), 5)
+        }
+        set { defaults.set(max(newValue, 5), forKey: widgetRefreshIntervalMinutesKey) }
     }
     
     var oAuthKey: String {

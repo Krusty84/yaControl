@@ -7,56 +7,58 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-	3D023EB72D8B3BFA003FA336 /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 3D023EB62D8B3BFA003FA336 /* LaunchAtLogin */; };
-	3DA091FA2FDC1CF700A7CEE1 /* ElegantTabs in Frameworks */ = {isa = PBXBuildFile; productRef = 3DA091F92FDC1CF700A7CEE1 /* ElegantTabs */; };
-	3DF000012FDD000100000101 /* yaControlWidget.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 3DF000012FDD000100000001 /* yaControlWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-	3DF000012FDD000100000102 /* CloudSummaryWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF000012FDD000100000003 /* CloudSummaryWidget.swift */; };
-	3DF000012FDD000100000103 /* CloudSummaryWidgetEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF000012FDD000100000004 /* CloudSummaryWidgetEntry.swift */; };
-	3DF000012FDD000100000104 /* CloudSummaryWidgetProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF000012FDD000100000005 /* CloudSummaryWidgetProvider.swift */; };
-	3DF000012FDD000100000105 /* CloudSummaryWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF000012FDD000100000006 /* CloudSummaryWidgetView.swift */; };
-	3DF000012FDD000100000106 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 3DF000012FDD000100000009 /* Localizable.xcstrings */; };
-	3DF000012FDD000100000107 /* AppGroupConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF000012FDD00010000000A /* AppGroupConfig.swift */; };
-	3DF000012FDD000100000108 /* CloudSummarySnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF000012FDD00010000000B /* CloudSummarySnapshot.swift */; };
-	3DF000012FDD000100000109 /* CloudSummarySnapshotStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF000012FDD00010000000C /* CloudSummarySnapshotStore.swift */; };
+		3D023EB72D8B3BFA003FA336 /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 3D023EB62D8B3BFA003FA336 /* LaunchAtLogin */; };
+		3DA091FA2FDC1CF700A7CEE1 /* ElegantTabs in Frameworks */ = {isa = PBXBuildFile; productRef = 3DA091F92FDC1CF700A7CEE1 /* ElegantTabs */; };
+		3DF000012FDD000100000101 /* yaControlWidget.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 3DF000012FDD000100000001 /* yaControlWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		3DF000012FDD000100000102 /* CloudSummaryWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF000012FDD000100000003 /* CloudSummaryWidget.swift */; };
+		3DF000012FDD000100000103 /* CloudSummaryWidgetEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF000012FDD000100000004 /* CloudSummaryWidgetEntry.swift */; };
+		3DF000012FDD000100000104 /* CloudSummaryWidgetProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF000012FDD000100000005 /* CloudSummaryWidgetProvider.swift */; };
+		3DF000012FDD000100000105 /* CloudSummaryWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF000012FDD000100000006 /* CloudSummaryWidgetView.swift */; };
+		3DF000012FDD000100000106 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 3DF000012FDD000100000009 /* Localizable.xcstrings */; };
+		3DF000012FDD000100000107 /* yaControl/Helpers/Widget/AppGroupConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF000012FDD00010000000A /* yaControl/Helpers/Widget/AppGroupConfig.swift */; };
+		3DF000012FDD000100000108 /* yaControl/Helpers/Widget/CloudSummarySnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF000012FDD00010000000B /* yaControl/Helpers/Widget/CloudSummarySnapshot.swift */; };
+		3DF000012FDD000100000109 /* yaControl/Helpers/Widget/CloudSummarySnapshotStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF000012FDD00010000000C /* yaControl/Helpers/Widget/CloudSummarySnapshotStore.swift */; };
+		3DF000012FDD00010000010A /* yaControl/Helpers/Widget/CloudSummaryWidgetKind.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF000012FDD00010000000F /* yaControl/Helpers/Widget/CloudSummaryWidgetKind.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-	3DF000012FDD000100000201 /* PBXContainerItemProxy */ = {
-		isa = PBXContainerItemProxy;
-		containerPortal = 3D333ECB2D639DF100D795BF /* Project object */;
-		proxyType = 1;
-		remoteGlobalIDString = 3DF000012FDD000100000301;
-		remoteInfo = yaControlWidget;
-	};
+		3DF000012FDD000100000201 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3D333ECB2D639DF100D795BF /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3DF000012FDD000100000301;
+			remoteInfo = yaControlWidget;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-	3DF000012FDD000100000202 /* Embed App Extensions */ = {
-		isa = PBXCopyFilesBuildPhase;
-		buildActionMask = 2147483647;
-		dstPath = "";
-		dstSubfolderSpec = 13;
-		files = (
-			3DF000012FDD000100000101 /* yaControlWidget.appex in Embed App Extensions */,
-		);
-		name = "Embed App Extensions";
-		runOnlyForDeploymentPostprocessing = 0;
-	};
+		3DF000012FDD000100000202 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				3DF000012FDD000100000101 /* yaControlWidget.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-	3D333ED32D639DF100D795BF /* yaControl.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = yaControl.app; sourceTree = BUILT_PRODUCTS_DIR; };
-	3DF000012FDD000100000001 /* yaControlWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = yaControlWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
-	3DF000012FDD000100000003 /* CloudSummaryWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSummaryWidget.swift; sourceTree = "<group>"; };
-	3DF000012FDD000100000004 /* CloudSummaryWidgetEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSummaryWidgetEntry.swift; sourceTree = "<group>"; };
-	3DF000012FDD000100000005 /* CloudSummaryWidgetProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSummaryWidgetProvider.swift; sourceTree = "<group>"; };
-	3DF000012FDD000100000006 /* CloudSummaryWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSummaryWidgetView.swift; sourceTree = "<group>"; };
-	3DF000012FDD000100000007 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-	3DF000012FDD000100000008 /* yaControlWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = yaControlWidget.entitlements; sourceTree = "<group>"; };
-	3DF000012FDD000100000009 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
-	3DF000012FDD00010000000A /* AppGroupConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = yaControl/Helpers/Widget/AppGroupConfig.swift; sourceTree = "<group>"; };
-	3DF000012FDD00010000000B /* CloudSummarySnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = yaControl/Helpers/Widget/CloudSummarySnapshot.swift; sourceTree = "<group>"; };
-	3DF000012FDD00010000000C /* CloudSummarySnapshotStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = yaControl/Helpers/Widget/CloudSummarySnapshotStore.swift; sourceTree = "<group>"; };
+		3D333ED32D639DF100D795BF /* yaControl.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = yaControl.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		3DF000012FDD000100000001 /* yaControlWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = yaControlWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		3DF000012FDD000100000003 /* CloudSummaryWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSummaryWidget.swift; sourceTree = "<group>"; };
+		3DF000012FDD000100000004 /* CloudSummaryWidgetEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSummaryWidgetEntry.swift; sourceTree = "<group>"; };
+		3DF000012FDD000100000005 /* CloudSummaryWidgetProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSummaryWidgetProvider.swift; sourceTree = "<group>"; };
+		3DF000012FDD000100000006 /* CloudSummaryWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSummaryWidgetView.swift; sourceTree = "<group>"; };
+		3DF000012FDD000100000007 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		3DF000012FDD000100000008 /* yaControlWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = yaControlWidget.entitlements; sourceTree = "<group>"; };
+		3DF000012FDD000100000009 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		3DF000012FDD00010000000A /* yaControl/Helpers/Widget/AppGroupConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = yaControl/Helpers/Widget/AppGroupConfig.swift; sourceTree = "<group>"; };
+		3DF000012FDD00010000000B /* yaControl/Helpers/Widget/CloudSummarySnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = yaControl/Helpers/Widget/CloudSummarySnapshot.swift; sourceTree = "<group>"; };
+		3DF000012FDD00010000000C /* yaControl/Helpers/Widget/CloudSummarySnapshotStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = yaControl/Helpers/Widget/CloudSummarySnapshotStore.swift; sourceTree = "<group>"; };
+		3DF000012FDD00010000000F /* yaControl/Helpers/Widget/CloudSummaryWidgetKind.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = yaControl/Helpers/Widget/CloudSummaryWidgetKind.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -68,22 +70,22 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
-	3D333ED02D639DF100D795BF /* Frameworks */ = {
-		isa = PBXFrameworksBuildPhase;
-		buildActionMask = 2147483647;
+		3D333ED02D639DF100D795BF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
 			files = (
 				3DA091FA2FDC1CF700A7CEE1 /* ElegantTabs in Frameworks */,
 				3D023EB72D8B3BFA003FA336 /* LaunchAtLogin in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-	3DF000012FDD000100000203 /* Frameworks */ = {
-		isa = PBXFrameworksBuildPhase;
-		buildActionMask = 2147483647;
-		files = (
-		);
-		runOnlyForDeploymentPostprocessing = 0;
-	};
+		3DF000012FDD000100000203 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -106,38 +108,39 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-	3DF000012FDD000100000002 /* yaControlWidget */ = {
-		isa = PBXGroup;
-		children = (
-			3DF000012FDD000100000003 /* CloudSummaryWidget.swift */,
-			3DF000012FDD000100000004 /* CloudSummaryWidgetEntry.swift */,
-			3DF000012FDD000100000005 /* CloudSummaryWidgetProvider.swift */,
-			3DF000012FDD000100000006 /* CloudSummaryWidgetView.swift */,
-			3DF000012FDD000100000007 /* Info.plist */,
-			3DF000012FDD000100000008 /* yaControlWidget.entitlements */,
-			3DF000012FDD00010000000E /* Resources */,
-		);
-		path = yaControlWidget;
-		sourceTree = "<group>";
-	};
-	3DF000012FDD00010000000D /* Widget Shared Files */ = {
-		isa = PBXGroup;
-		children = (
-			3DF000012FDD00010000000A /* AppGroupConfig.swift */,
-			3DF000012FDD00010000000B /* CloudSummarySnapshot.swift */,
-			3DF000012FDD00010000000C /* CloudSummarySnapshotStore.swift */,
-		);
-		name = "Widget Shared Files";
-		sourceTree = "<group>";
-	};
-	3DF000012FDD00010000000E /* Resources */ = {
-		isa = PBXGroup;
-		children = (
-			3DF000012FDD000100000009 /* Localizable.xcstrings */,
-		);
-		path = Resources;
-		sourceTree = "<group>";
-	};
+		3DF000012FDD000100000002 /* yaControlWidget */ = {
+			isa = PBXGroup;
+			children = (
+				3DF000012FDD000100000003 /* CloudSummaryWidget.swift */,
+				3DF000012FDD000100000004 /* CloudSummaryWidgetEntry.swift */,
+				3DF000012FDD000100000005 /* CloudSummaryWidgetProvider.swift */,
+				3DF000012FDD000100000006 /* CloudSummaryWidgetView.swift */,
+				3DF000012FDD000100000007 /* Info.plist */,
+				3DF000012FDD000100000008 /* yaControlWidget.entitlements */,
+				3DF000012FDD00010000000E /* Resources */,
+			);
+			path = yaControlWidget;
+			sourceTree = "<group>";
+		};
+		3DF000012FDD00010000000D /* Widget Shared Files */ = {
+			isa = PBXGroup;
+			children = (
+				3DF000012FDD00010000000A /* yaControl/Helpers/Widget/AppGroupConfig.swift */,
+				3DF000012FDD00010000000F /* yaControl/Helpers/Widget/CloudSummaryWidgetKind.swift */,
+				3DF000012FDD00010000000B /* yaControl/Helpers/Widget/CloudSummarySnapshot.swift */,
+				3DF000012FDD00010000000C /* yaControl/Helpers/Widget/CloudSummarySnapshotStore.swift */,
+			);
+			name = "Widget Shared Files";
+			sourceTree = "<group>";
+		};
+		3DF000012FDD00010000000E /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				3DF000012FDD000100000009 /* Localizable.xcstrings */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -167,25 +170,25 @@
 			productReference = 3D333ED32D639DF100D795BF /* yaControl.app */;
 			productType = "com.apple.product-type.application";
 		};
-	3DF000012FDD000100000301 /* yaControlWidget */ = {
-		isa = PBXNativeTarget;
-		buildConfigurationList = 3DF000012FDD000100000404 /* Build configuration list for PBXNativeTarget "yaControlWidget" */;
-		buildPhases = (
-			3DF000012FDD000100000205 /* Sources */,
-			3DF000012FDD000100000203 /* Frameworks */,
-			3DF000012FDD000100000206 /* Resources */,
-		);
-		buildRules = (
-		);
-		dependencies = (
-		);
-		name = yaControlWidget;
-		packageProductDependencies = (
-		);
-		productName = yaControlWidget;
-		productReference = 3DF000012FDD000100000001 /* yaControlWidget.appex */;
-		productType = "com.apple.product-type.app-extension";
-	};
+		3DF000012FDD000100000301 /* yaControlWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3DF000012FDD000100000404 /* Build configuration list for PBXNativeTarget "yaControlWidget" */;
+			buildPhases = (
+				3DF000012FDD000100000205 /* Sources */,
+				3DF000012FDD000100000203 /* Frameworks */,
+				3DF000012FDD000100000206 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = yaControlWidget;
+			packageProductDependencies = (
+			);
+			productName = yaControlWidget;
+			productReference = 3DF000012FDD000100000001 /* yaControlWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -231,53 +234,54 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-	3D333ED12D639DF100D795BF /* Resources */ = {
-		isa = PBXResourcesBuildPhase;
-		buildActionMask = 2147483647;
-		files = (
-		);
-		runOnlyForDeploymentPostprocessing = 0;
-	};
-	3DF000012FDD000100000206 /* Resources */ = {
-		isa = PBXResourcesBuildPhase;
-		buildActionMask = 2147483647;
-		files = (
-			3DF000012FDD000100000106 /* Localizable.xcstrings in Resources */,
-		);
-		runOnlyForDeploymentPostprocessing = 0;
-	};
+		3D333ED12D639DF100D795BF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3DF000012FDD000100000206 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3DF000012FDD000100000106 /* Localizable.xcstrings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-	3D333ECF2D639DF100D795BF /* Sources */ = {
-		isa = PBXSourcesBuildPhase;
-		buildActionMask = 2147483647;
-		files = (
-		);
-		runOnlyForDeploymentPostprocessing = 0;
-	};
-	3DF000012FDD000100000205 /* Sources */ = {
-		isa = PBXSourcesBuildPhase;
-		buildActionMask = 2147483647;
-		files = (
-			3DF000012FDD000100000102 /* CloudSummaryWidget.swift in Sources */,
-			3DF000012FDD000100000103 /* CloudSummaryWidgetEntry.swift in Sources */,
-			3DF000012FDD000100000104 /* CloudSummaryWidgetProvider.swift in Sources */,
-			3DF000012FDD000100000105 /* CloudSummaryWidgetView.swift in Sources */,
-			3DF000012FDD000100000107 /* AppGroupConfig.swift in Sources */,
-			3DF000012FDD000100000108 /* CloudSummarySnapshot.swift in Sources */,
-			3DF000012FDD000100000109 /* CloudSummarySnapshotStore.swift in Sources */,
-		);
-		runOnlyForDeploymentPostprocessing = 0;
-	};
+		3D333ECF2D639DF100D795BF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3DF000012FDD000100000205 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3DF000012FDD000100000102 /* CloudSummaryWidget.swift in Sources */,
+				3DF000012FDD000100000103 /* CloudSummaryWidgetEntry.swift in Sources */,
+				3DF000012FDD000100000104 /* CloudSummaryWidgetProvider.swift in Sources */,
+				3DF000012FDD000100000105 /* CloudSummaryWidgetView.swift in Sources */,
+				3DF000012FDD000100000107 /* yaControl/Helpers/Widget/AppGroupConfig.swift in Sources */,
+				3DF000012FDD00010000010A /* yaControl/Helpers/Widget/CloudSummaryWidgetKind.swift in Sources */,
+				3DF000012FDD000100000108 /* yaControl/Helpers/Widget/CloudSummarySnapshot.swift in Sources */,
+				3DF000012FDD000100000109 /* yaControl/Helpers/Widget/CloudSummarySnapshotStore.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-	3DF000012FDD000100000204 /* PBXTargetDependency */ = {
-		isa = PBXTargetDependency;
-		target = 3DF000012FDD000100000301 /* yaControlWidget */;
-		targetProxy = 3DF000012FDD000100000201 /* PBXContainerItemProxy */;
-	};
+		3DF000012FDD000100000204 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3DF000012FDD000100000301 /* yaControlWidget */;
+			targetProxy = 3DF000012FDD000100000201 /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
