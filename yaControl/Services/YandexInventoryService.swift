@@ -195,6 +195,7 @@ final class YandexInventoryService: @unchecked Sendable {
             totalObjectCount: bucketInfo.totalObjectCount,
             createdAt: DateFormattingHelper.convertGMTToLocalTime(utcDateString: bucketInfo.createdAt),
             updatedAt: DateFormattingHelper.convertGMTToLocalTime(utcDateString: bucketInfo.updatedAt),
+            folderId: folder.id,
             folderName: folder.name,
             folderUrl: URL(string: APIConfig.yaFoldersWebUrl + folder.id + "/storage/buckets"),
             bucketUrl: URL(string: APIConfig.yaBucketsWebUrl(folderID: folder.id, bucketName: bucket.name))

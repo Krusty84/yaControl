@@ -15,6 +15,7 @@ struct BucketTableData: Decodable, Identifiable, Equatable {
     let totalObjectCount: Int
     let createdAt: String
     let updatedAt: String
+    let folderId: String
     let folderName: String
     let folderUrl: URL?
     let bucketUrl: URL?

@@ -3066,6 +3066,29 @@
         }
       }
     },
+    "table.action.createBucket" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create bucket"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Бакет жасау"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Создать бакет"
+          }
+        }
+      }
+    },
     "table.action.createFunction" : {
       "extractionState" : "manual",
       "localizations" : {

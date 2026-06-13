@@ -194,6 +194,10 @@ struct CloudComputingTabContent: View {
         }
     }
     
+    private func localized(_ key: String) -> String {
+        LocalizedStringHelper.string(key, locale: locale)
+    }
+    
     private var createVMFolderId: String? {
         if let selectedVM,
            let selected = model.vmTableData.first(where: { $0.id == selectedVM }) {
@@ -211,8 +215,5 @@ struct CloudComputingTabContent: View {
     private func openCreateVMPage() {
         guard let createVMURL else { return }
         openURL(createVMURL)
-    }
-    private func localized(_ key: String) -> String {
-        LocalizedStringHelper.string(key, locale: locale)
     }
 }

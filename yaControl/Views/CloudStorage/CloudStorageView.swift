@@ -9,7 +9,8 @@ import SwiftUI
 
 struct BucketTabContent: View {
     @Environment(\.locale) private var locale
-
+    @Environment(\.openURL) private var openURL
+    
     let isActive: Bool
     let refreshToken: UUID
 
@@ -121,10 +122,40 @@ struct BucketTabContent: View {
             .refreshable {
                 await model.fetchBuckets()
             }
+            .contextMenu {
+                Button {
+                    openCreateBucketPage()
+                } label: {
+                    Label(
+                        LocalizedStringKey(L10n.Table.createBucket),
+                        systemImage: "plus.rectangle.on.rectangle"
+                    )
+                }
+                .disabled(createBucketURL == nil)
+            }
         }
     }
 
     private func localized(_ key: String) -> String {
         LocalizedStringHelper.string(key, locale: locale)
+    }
+    
+    private var createBucketFolderId: String? {
+        if let selectedBucket,
+           let selected = model.bucketTableData.first(where: { $0.id == selectedBucket }) {
+            return selected.folderId
+        }
+
+        return model.filteredBuckets.first?.folderId ?? model.bucketTableData.first?.folderId
+    }
+
+    private var createBucketURL: URL? {
+        guard let folderId = createBucketFolderId else { return nil }
+        return URL(string: APIConfig.yaCreateBucketWebUrl(folderID: folderId))
+    }
+
+    private func openCreateBucketPage() {
+        guard let createBucketURL else { return }
+        openURL(createBucketURL)
     }
 }
