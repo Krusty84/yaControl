@@ -63,23 +63,33 @@ struct SLFInvokeColumn: View {
     let slf: ServerLessFunctionTableData
 
     var body: some View {
-        Text(slf.id)
-            .contextMenu {
-                Button(LocalizedStringKey(L10n.Table.copyInvokeURL)) {
-                    NSPasteboard.general.clearContents()
-                    NSPasteboard.general.setString(slf.httpInvokeUrl,
-                                                   forType: .string)
-                }
-
-                Button(LocalizedStringKey(L10n.Table.copyYCCommand)) {
-                    let cmd = "yc serverless function invoke \(slf.id)"
-                    NSPasteboard.general.clearContents()
-                    NSPasteboard.general.setString(cmd, forType: .string)
-                    //May be it will not be good for App Store review
-                    //TerminalLauncher.openTerminal()
-                }
-                .disabled(!SettingsManager.shared.ycCLIInstalled)
+        Menu {
+            Button(LocalizedStringKey(L10n.Table.copyInvokeURL)) {
+                NSPasteboard.general.clearContents()
+                NSPasteboard.general.setString(
+                    slf.httpInvokeUrl,
+                    forType: .string
+                )
             }
+
+            Button(LocalizedStringKey(L10n.Table.copyYCCommand)) {
+                let cmd = "yc serverless function invoke \(slf.id)"
+                NSPasteboard.general.clearContents()
+                NSPasteboard.general.setString(cmd, forType: .string)
+                // May be it will not be good for App Store review
+                // TerminalLauncher.openTerminal()
+            }
+            .disabled(!SettingsManager.shared.ycCLIInstalled)
+        } label: {
+            Text(slf.id)
+                .lineLimit(1)
+                .truncationMode(.middle)
+                .contentShape(Rectangle())
+        }
+        .menuStyle(.borderlessButton)
+        .buttonStyle(.plain)
+        .pointingHandCursor()
+        .help(slf.id)
     }
 }
 

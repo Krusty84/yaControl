@@ -21,19 +21,36 @@ final class YandexAPIClient: @unchecked Sendable {
     ) async throws -> (Data, HTTPURLResponse) {
         var request = URLRequest(url: url)
         request.httpMethod = method
+
         if let iamToken {
             request.setValue("Bearer \(iamToken)", forHTTPHeaderField: "Authorization")
         }
+
         if let body {
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             request.httpBody = body
         }
 
+        #if DEBUG
+        printAPIRequest(request, endpoint: endpoint)
+        #endif
+
+        let startTime = Date()
         let (data, response) = try await URLSession.shared.data(for: request)
+        let durationMs = Int(Date().timeIntervalSince(startTime) * 1000)
+
+        #if DEBUG
+        printAPIResponse(
+            response,
+            data: data,
+            endpoint: endpoint,
+            durationMs: durationMs
+        )
+        #endif
+
         let httpResponse = try validateHTTPResponse(response, data: data, endpoint: endpoint)
         return (data, httpResponse)
     }
-
     func throwYandexAPIErrorIfPresent(in data: Data) throws {
         do {
             let response = try JSONDecoder().decode(YandexAPIErrorResponse.self, from: data)
@@ -140,4 +157,111 @@ final class YandexAPIClient: @unchecked Sendable {
 
         return String(sanitized.prefix(300))
     }
+    
+    #if DEBUG
+    private func printAPIRequest(_ request: URLRequest, endpoint: String) {
+        let method = request.httpMethod ?? "<unknown>"
+        let url = request.url?.absoluteString ?? "<invalid url>"
+        let headers = sanitizedHeaders(request.allHTTPHeaderFields)
+
+        let requestBody: String
+        if let body = request.httpBody, !body.isEmpty {
+            requestBody = prettyPrintedBody(body)
+        } else {
+            requestBody = "<empty>"
+        }
+
+        print("""
+        
+        ┌────────────────────────────────────────────
+        │ Yandex API Request
+        ├────────────────────────────────────────────
+        │ endpoint: \(endpoint)
+        │ method:   \(method)
+        │ url:      \(url)
+        │ headers:  \(headers)
+        │ body:
+        \(requestBody)
+        └────────────────────────────────────────────
+        
+        """)
+    }
+
+    private func printAPIResponse(
+        _ response: URLResponse,
+        data: Data,
+        endpoint: String,
+        durationMs: Int
+    ) {
+        let httpResponse = response as? HTTPURLResponse
+        let statusCode = httpResponse?.statusCode ?? -1
+        let headers = sanitizedResponseHeaders(httpResponse?.allHeaderFields)
+
+        let responseBody: String
+        if data.isEmpty {
+            responseBody = "<empty>"
+        } else {
+            responseBody = prettyPrintedBody(data)
+        }
+
+        print("""
+        
+        ┌────────────────────────────────────────────
+        │ Yandex API Response
+        ├────────────────────────────────────────────
+        │ endpoint:   \(endpoint)
+        │ statusCode: \(statusCode)
+        │ duration:   \(durationMs) ms
+        │ headers:    \(headers)
+        │ body:
+        \(responseBody)
+        └────────────────────────────────────────────
+        
+        """)
+    }
+
+    private func sanitizedHeaders(_ headers: [String: String]?) -> [String: String] {
+        guard var headers else { return [:] }
+
+        for key in headers.keys {
+            if key.lowercased() == "authorization" {
+                headers[key] = "<redacted>"
+            }
+        }
+
+        return headers
+    }
+
+    private func sanitizedResponseHeaders(_ headers: [AnyHashable: Any]?) -> [String: String] {
+        guard let headers else { return [:] }
+
+        var result: [String: String] = [:]
+
+        for (key, value) in headers {
+            let keyString = String(describing: key)
+            let valueString = String(describing: value)
+
+            if keyString.lowercased() == "authorization" {
+                result[keyString] = "<redacted>"
+            } else {
+                result[keyString] = valueString
+            }
+        }
+
+        return result
+    }
+
+    private func prettyPrintedBody(_ data: Data) -> String {
+        if let jsonObject = try? JSONSerialization.jsonObject(with: data),
+           let prettyData = try? JSONSerialization.data(
+                withJSONObject: jsonObject,
+                options: [.prettyPrinted, .sortedKeys]
+           ),
+           let prettyString = String(data: prettyData, encoding: .utf8) {
+            return prettyString
+        }
+
+        return String(data: data, encoding: .utf8) ?? "<non-utf8 body>"
+    }
+    #endif
 }

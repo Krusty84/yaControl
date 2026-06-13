@@ -100,22 +100,28 @@ struct VMStatusColumn: View {
 struct VMPublicIPColumn: View {
     let vm: VMTableData
 
+    private var ipText: String {
+        vm.addresses.joined(separator: ", ")
+    }
+
     var body: some View {
-        Text(vm.addresses.joined(separator: ", "))
-            .fixedSize(horizontal: false, vertical: true)
-            .contextMenu {
+        if vm.addresses.isEmpty {
+            Text("—")
+                .foregroundStyle(.secondary)
+        } else {
+            Menu {
                 Button(LocalizedStringKey(L10n.Table.copyIPs)) {
-                    let s = vm.addresses.joined(separator: ", ")
                     NSPasteboard.general.clearContents()
-                    NSPasteboard.general.setString(s, forType: .string)
+                    NSPasteboard.general.setString(ipText, forType: .string)
                 }
+
                 if let ipAddress = vm.addresses.first {
-                    Button(action: {
+                    Button {
                         let cmd = "ssh -l \(SettingsManager.shared.generalUsername4VMs) \(ipAddress)"
                         NSPasteboard.general.clearContents()
                         NSPasteboard.general.setString(cmd, forType: .string)
                         TerminalLauncher.openTerminal()
-                    }) {
+                    } label: {
                         Text(
                             LocalizedStringKey(
                                 SettingsManager.shared.generalUsername4VMs.isEmpty
@@ -125,16 +131,24 @@ struct VMPublicIPColumn: View {
                         )
                     }
                     .disabled(SettingsManager.shared.generalUsername4VMs.isEmpty)
-                    
+
                     Button(LocalizedStringKey(L10n.Table.openRDP)) {
                         RDPFileLauncher.openRDPClient(
                             to: ipAddress,
                             username: SettingsManager.shared.generalUsername4VMs
                         )
                     }
-                    //.disabled(SettingsManager.shared.generalUsername4VMs.isEmpty)
                 }
+            } label: {
+                Text(ipText)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .contentShape(Rectangle())
             }
+            .menuStyle(.borderlessButton)
+            .buttonStyle(.plain)
+            .pointingHandCursor()
+            .help(ipText)
+        }
     }
 }
 
