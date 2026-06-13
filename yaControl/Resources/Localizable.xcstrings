@@ -1945,7 +1945,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Default folder"
+            "value" : "Default folder for create a new resources"
           }
         },
         "kk" : {
@@ -1956,8 +1956,8 @@
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Папка по умолчанию"
+            "state" : "translated",
+            "value" : "Папка по умолчанию для новых ресурсов"
           }
         }
       }
@@ -2487,6 +2487,29 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Управление оплатой"
+          }
+        }
+      }
+    },
+    "settings.tab.cloud" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cloud"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Бұлт"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Облако"
           }
         }
       }

@@ -16,6 +16,7 @@ struct SettingsTabContent: View {
 
     private enum SettingsTab: Hashable {
         case general
+        case cloud
         case virtualMachineManagement
         case billingManagement
     }
@@ -55,6 +56,16 @@ struct SettingsTabContent: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .onAppear {
             model.loadSettings()
+
+            if selectedTab == .cloud {
+                Task {
+                    await model.loadFoldersForCreation(locale: locale)
+                }
+            }
+        }
+        .onChange(of: selectedTab) { _, newTab in
+            guard newTab == .cloud else { return }
+
             Task {
                 await model.loadFoldersForCreation(locale: locale)
             }
@@ -66,6 +77,11 @@ struct SettingsTabContent: View {
             settingsTabButton(
                 LocalizedStringKey(L10n.Settings.generalTab),
                 tab: .general
+            )
+            
+            settingsTabButton(
+                LocalizedStringKey(L10n.Settings.cloudTab),
+                tab: .cloud
             )
 
             settingsTabButton(
@@ -113,6 +129,9 @@ struct SettingsTabContent: View {
         case .general:
             generalSettingsTab
 
+        case .cloud:
+            cloudSettingsTab
+
         case .virtualMachineManagement:
             vmManagementTab
 
@@ -134,15 +153,23 @@ struct SettingsTabContent: View {
 
                 Divider()
 
+                yandexCLiSection
+            }
+            .padding(SettingsLayout.outerPadding)
+            .frame(maxWidth: .infinity, alignment: .topLeading)
+        }
+    }
+    
+    // MARK: - Cloud Tab
+
+    private var cloudSettingsTab: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: SettingsLayout.sectionSpacing) {
                 yandexAuthenticationSection
 
                 Divider()
 
                 defaultFolderForCreationSection
-
-                Divider()
-
-                yandexCLiSection
             }
             .padding(SettingsLayout.outerPadding)
             .frame(maxWidth: .infinity, alignment: .topLeading)

@@ -81,6 +81,7 @@ enum L10n {
 
     enum Settings {
         static let generalTab = "settings.tab.general"
+        static let cloudTab = "settings.tab.cloud"
         static let vmManagementTab = "settings.tab.vmManagement"
         static let billingManagementTab = "settings.tab.billingManagement"
         
