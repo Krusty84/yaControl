@@ -161,7 +161,7 @@ enum L10n {
         static let openSSH = "table.action.openSSH"
         static let openRDP = "table.action.openRDP"
         static let copyInvokeURL = "table.action.copyInvokeURL"
-        static let callViaYandexCloudCLI = "table.action.callViaYandexCloudCLI"
+        static let copyYCCommand = "table.action.copyYCCommand"
     }
 
     enum Notifications {

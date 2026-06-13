@@ -18,9 +18,9 @@ struct SLFNameColumn: View {
                 Text(slf.name)
                     .foregroundColor(.blue)
                     .underline()
-                    .lineLimit(nil)                      // allow unlimited lines
-                    .multilineTextAlignment(.leading)    // left-align wrapped text
-                    .help(slf.name)                      // tooltip showing name
+                    .lineLimit(nil)
+                    .multilineTextAlignment(.leading)
+                    .help(slf.name)
             }
             .buttonStyle(.plain)
             .onHover { hovering in
@@ -36,9 +36,9 @@ struct SLFNameColumn: View {
             }
         } else {
             Text(slf.name)
-                .lineLimit(nil)                      // allow wrapping here too
+                .lineLimit(nil)
                 .multilineTextAlignment(.leading)
-                .help(slf.name)                      // tooltip for plain text
+                .help(slf.name)
         }
     }
 }
@@ -70,11 +70,13 @@ struct SLFInvokeColumn: View {
                     NSPasteboard.general.setString(slf.httpInvokeUrl,
                                                    forType: .string)
                 }
-                Button(LocalizedStringKey(L10n.Table.callViaYandexCloudCLI)) {
+
+                Button(LocalizedStringKey(L10n.Table.copyYCCommand)) {
                     let cmd = "yc serverless function invoke \(slf.id)"
                     NSPasteboard.general.clearContents()
                     NSPasteboard.general.setString(cmd, forType: .string)
-                    TerminalLauncher.openTerminal()
+                    //May be it will not be good for App Store review
+                    //TerminalLauncher.openTerminal()
                 }
                 .disabled(!SettingsManager.shared.ycCLIInstalled)
             }

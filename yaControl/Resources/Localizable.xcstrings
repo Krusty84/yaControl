@@ -2971,29 +2971,6 @@
         }
       }
     },
-    "table.action.callViaYandexCloudCLI" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Call via CLI Yandex Cloud"
-          }
-        },
-        "kk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Yandex Cloud CLI арқылы шақыру"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Вызвать через CLI Yandex Cloud"
-          }
-        }
-      }
-    },
     "table.action.copyInvokeURL" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -3059,6 +3036,29 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Копировать имя и ID"
+          }
+        }
+      }
+    },
+    "table.action.copyYCCommand" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy YC Command"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YC командасын көшіру"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Копировать YC команду"
           }
         }
       }
