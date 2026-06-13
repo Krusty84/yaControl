@@ -164,6 +164,7 @@ enum L10n {
         static let copyInvokeURL = "table.action.copyInvokeURL"
         static let copyYCCommand = "table.action.copyYCCommand"
         static let createVM = "table.action.createVM"
+        static let createFunction = "table.action.createFunction"
     }
 
     enum Notifications {

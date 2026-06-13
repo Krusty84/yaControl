@@ -9,7 +9,8 @@ import SwiftUI
 
 struct ServerLessFunctionTabContent: View {
     @Environment(\.locale) private var locale
-
+    @Environment(\.openURL) private var openURL
+    
     let isActive: Bool
     let refreshToken: UUID
 
@@ -128,10 +129,40 @@ struct ServerLessFunctionTabContent: View {
             .refreshable {
                 await model.fetchServerLessFunctions()
             }
+            .contextMenu {
+                Button {
+                    openCreateFunctionPage()
+                } label: {
+                    Label(
+                        LocalizedStringKey(L10n.Table.createFunction),
+                        systemImage: "plus.rectangle.on.rectangle"
+                    )
+                }
+                .disabled(createFunctionURL == nil)
+            }
         }
     }
 
     private func localized(_ key: String) -> String {
         LocalizedStringHelper.string(key, locale: locale)
+    }
+    
+    private var createFunctionFolderId: String? {
+        if let selectedSlf,
+           let selected = model.slfTableData.first(where: { $0.id == selectedSlf }) {
+            return selected.folderId
+        }
+
+        return model.filteredSLFs.first?.folderId ?? model.slfTableData.first?.folderId
+    }
+
+    private var createFunctionURL: URL? {
+        guard let folderId = createFunctionFolderId else { return nil }
+        return URL(string: APIConfig.yaCreateFunctionWebUrl(folderID: folderId))
+    }
+
+    private func openCreateFunctionPage() {
+        guard let createFunctionURL else { return }
+        openURL(createFunctionURL)
     }
 }

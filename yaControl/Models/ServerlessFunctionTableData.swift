@@ -12,6 +12,7 @@ struct ServerLessFunctionTableData: Decodable, Identifiable, Equatable {
     let name: String
     let status: String
     let createdAt: String
+    let folderId: String
     let folderName: String
     let folderUrl: URL?
     let httpInvokeUrl: String

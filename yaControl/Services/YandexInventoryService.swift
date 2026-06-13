@@ -210,6 +210,7 @@ final class YandexInventoryService: @unchecked Sendable {
             name: function.name,
             status: function.status,
             createdAt: DateFormattingHelper.convertGMTToLocalTime(utcDateString: function.createdAt),
+            folderId: folder.id,
             folderName: folder.name,
             folderUrl: URL(string: APIConfig.yaFoldersWebUrl + folder.id + "/functions/functions"),
             httpInvokeUrl: function.httpInvokeUrl,

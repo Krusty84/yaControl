@@ -3066,6 +3066,29 @@
         }
       }
     },
+    "table.action.createFunction" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create function"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Функция жасау"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Создать функцию"
+          }
+        }
+      }
+    },
     "table.action.createVM" : {
       "extractionState" : "manual",
       "localizations" : {

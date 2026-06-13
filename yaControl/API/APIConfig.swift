@@ -22,6 +22,7 @@ struct APIConfig {
     //
     static let yaFoldersWebUrl = "https://console.yandex.cloud/folders/"
     static let yaCreateVMWebPath = "compute/create-instance"
+    static let yaCreateFunctionWebPath = "functions/create-function"
     static func yaVMsWebUrl(folderID: String, instanceID: String) -> String {
           return "\(yaFoldersWebUrl)\(folderID)/compute/instance/\(instanceID)/overview"
     }
@@ -30,6 +31,9 @@ struct APIConfig {
     }
     static func yaSLFsWebUrl(folderID: String, slfID: String) -> String {
           return "\(yaFoldersWebUrl)\(folderID)/functions/functions/\(slfID)/overview"
+    }
+    static func yaCreateFunctionWebUrl(folderID: String) -> String {
+        "\(yaFoldersWebUrl)\(folderID)/\(yaCreateFunctionWebPath)"
     }
     static func yaBucketsWebUrl(folderID: String, bucketName: String) -> String {
           return "\(yaFoldersWebUrl)\(folderID)/storage/buckets/\(bucketName)"
