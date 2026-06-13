@@ -43,17 +43,19 @@ struct YaControlApp: App {
 
 struct MenuBarContentView: View {
     @State private var optionKeyPressed = false
+    @State private var refreshToken = UUID()
 
     var body: some View {
         Group {
             if optionKeyPressed {
                 InfoWindow()
             } else {
-                MainWindow()
+                MainWindow(refreshToken: refreshToken)
             }
         }
         .onAppear {
             optionKeyPressed = NSEvent.modifierFlags.contains(.option)
+            refreshToken = UUID()
         }
     }
 }

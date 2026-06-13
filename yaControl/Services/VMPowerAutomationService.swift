@@ -126,6 +126,9 @@ final class VMPowerAutomationService: @unchecked Sendable {
             }
 
             await startVMs(vmsToStart, iamToken: authResponse.iamToken, source: source)
+            if !vmsToStart.isEmpty {
+                notifyVMInventoryDidChange()
+            }
         } catch {
             LoggerHelper.error("VM auto-start failed source=\(source.rawValue) error=\(error.localizedDescription)")
         }
@@ -180,7 +183,9 @@ final class VMPowerAutomationService: @unchecked Sendable {
             if !failedVMIds.isEmpty {
                 LoggerHelper.error("VM shutdown finished with failures source=\(source.rawValue) failedVMIds=\(failedVMIds)")
             }
-
+            
+            notifyVMInventoryDidChange()
+            
             return failedVMIds.isEmpty
         } catch {
             LoggerHelper.error("VM shutdown failed source=\(source.rawValue) error=\(error.localizedDescription)")
@@ -473,6 +478,10 @@ final class VMPowerAutomationService: @unchecked Sendable {
                 )
             )
         }
+    }
+    
+    private func notifyVMInventoryDidChange() {
+        NotificationCenter.default.post(name: .vmInventoryDidChange, object: nil)
     }
 
 }

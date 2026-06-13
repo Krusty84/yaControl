@@ -9,6 +9,7 @@ import SwiftUI
 import ElegantTabs
 
 struct MainWindow: View {
+    let refreshToken: UUID
     @State private var selectedTab = 0
     
     var body: some View {
@@ -17,21 +18,30 @@ struct MainWindow: View {
                 localizedTitle: LocalizedStringKey(L10n.Tabs.computing),
                 icon: .system(name: "desktopcomputer")
             ) {
-                CloudComputingTabContent()
+                CloudComputingTabContent(
+                    isActive: selectedTab == 0,
+                    refreshToken: refreshToken
+                )
             }
 
             TabItem(
                 localizedTitle: LocalizedStringKey(L10n.Tabs.functions),
                 icon: .system(name: "function")
             ) {
-                ServerLessFunctionTabContent()
+                ServerLessFunctionTabContent(
+                    isActive: selectedTab == 1,
+                    refreshToken: refreshToken
+                )
             }
 
             TabItem(
                 localizedTitle: LocalizedStringKey(L10n.Tabs.storage),
                 icon: .system(name: "archivebox")
             ) {
-                BucketTabContent()
+                BucketTabContent(
+                    isActive: selectedTab == 2,
+                    refreshToken: refreshToken
+                )
             }
 
             TabItem(

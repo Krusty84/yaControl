@@ -39,42 +39,62 @@ final class CloudStorageModel {
     
     // MARK: – Data loading
     func loadIfNeeded() async {
-        guard !hasLoaded else { return }
-        hasLoaded = true
+        await refreshIfStale(maxAge: .greatestFiniteMagnitude)
+    }
+    
+    //120 sec default time for update
+    func refreshIfStale(maxAge: TimeInterval = 120) async {
+        guard !isLoading else { return }
+
+        if !hasLoaded {
+            await fetchBuckets()
+            return
+        }
+
+        let age = Date().timeIntervalSince(lastUpdateTime)
+        guard age >= maxAge else { return }
+
         await fetchBuckets()
     }
 
     func fetchBuckets() async {
+        guard !isLoading else { return }
+
         isLoading = true
         error = nil
-        
+
+        defer {
+            isLoading = false
+        }
+
         do {
             // 1. Authenticate
             let auth = try await api.checkOauthKey(
                 yandexPassportOauthToken: SettingsManager.shared.oAuthKey
             )
             iamToken = auth.iamToken
-            
+
             // 2. Load buckets and billing in parallel
             async let buckets = api.getBuckets(iamToken: iamToken)
-            async let bills   = api.getCosts(iamToken: iamToken)
-            
+            async let bills = api.getCosts(iamToken: iamToken)
+
             let (list, billings) = try await (buckets, bills)
-            
+
             // 3. Publish results
             bucketTableData = list
-            billingData      = billings
+            billingData = billings
+
             if let first = billings.first {
                 currentBalance = first.balance
-                currency       = first.currency
-                billingUrl     = first.billingUrl
+                currency = first.currency
+                billingUrl = first.billingUrl
             }
+
             lastUpdateTime = Date()
-            isLoading = false
-            
+            hasLoaded = true
+
         } catch {
             self.error = error
-            isLoading = false
             LoggerHelper.error("Error fetching buckets: \(error.localizedDescription)")
         }
     }

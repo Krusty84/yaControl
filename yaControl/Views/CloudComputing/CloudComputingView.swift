@@ -10,6 +10,9 @@ import SwiftUI
 struct CloudComputingTabContent: View {
     @Environment(\.locale) private var locale
 
+    let isActive: Bool
+    let refreshToken: UUID
+
     @State private var model = CloudComputingModel()
     @State private var selectedVM: VMTableData.ID? = nil
     @State private var isStopAllConfirmationPresented = false
@@ -17,10 +20,10 @@ struct CloudComputingTabContent: View {
     var body: some View {
         VStack(spacing: 0) {
             headerView
-
+            
             contentArea
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-
+            
             StatusPanel(
                 lastUpdateTime: model.lastUpdateTime,
                 currentBalance: model.currentBalance,
@@ -30,7 +33,35 @@ struct CloudComputingTabContent: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .task {
-            await model.loadIfNeeded()
+            await model.refreshIfStale(maxAge: 30)
+        }
+        .onAppear {
+            guard isActive else { return }
+            
+            Task {
+                await model.refreshIfStale(maxAge: 30)
+            }
+        }
+        .onChange(of: isActive) { _, active in
+            guard active else { return }
+            
+            Task {
+                await model.refreshIfStale(maxAge: 15)
+            }
+        }
+        .onChange(of: refreshToken) { _, _ in
+            guard isActive else { return }
+            
+            Task {
+                await model.refreshIfStale(maxAge: 15)
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .vmInventoryDidChange)) { _ in
+            guard isActive else { return }
+            
+            Task {
+                await model.fetchVMs()
+            }
         }
     }
 

@@ -10,6 +10,9 @@ import SwiftUI
 struct ServerLessFunctionTabContent: View {
     @Environment(\.locale) private var locale
 
+    let isActive: Bool
+    let refreshToken: UUID
+
     @State private var model = ServerlessFunctionModel()
     @State private var selectedSlf: ServerLessFunctionTableData.ID? = nil
 
@@ -29,7 +32,28 @@ struct ServerLessFunctionTabContent: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .task {
-            await model.loadIfNeeded()
+            await model.refreshIfStale(maxAge: 120)
+        }
+        .onAppear {
+            guard isActive else { return }
+
+            Task {
+                await model.refreshIfStale(maxAge: 120)
+            }
+        }
+        .onChange(of: isActive) { _, active in
+            guard active else { return }
+
+            Task {
+                await model.refreshIfStale(maxAge: 120)
+            }
+        }
+        .onChange(of: refreshToken) { _, _ in
+            guard isActive else { return }
+
+            Task {
+                await model.refreshIfStale(maxAge: 120)
+            }
         }
     }
 

@@ -38,14 +38,33 @@ final class ServerlessFunctionModel {
 
     // Public method to load data
     func loadIfNeeded() async {
-        guard !hasLoaded else { return }
-        hasLoaded = true
+        await refreshIfStale(maxAge: .greatestFiniteMagnitude)
+    }
+
+    //120 sec default time for update
+    func refreshIfStale(maxAge: TimeInterval = 120) async {
+        guard !isLoading else { return }
+
+        if !hasLoaded {
+            await fetchServerLessFunctions()
+            return
+        }
+
+        let age = Date().timeIntervalSince(lastUpdateTime)
+        guard age >= maxAge else { return }
+
         await fetchServerLessFunctions()
     }
 
     func fetchServerLessFunctions() async {
+        guard !isLoading else { return }
+
         isLoading = true
         error = nil
+
+        defer {
+            isLoading = false
+        }
 
         do {
             // 1. Get IAM token
@@ -63,17 +82,18 @@ final class ServerlessFunctionModel {
             // 3. Update published properties
             slfTableData = list
             billingData = billings
+
             if let first = billings.first {
                 currentBalance = first.balance
                 currency = first.currency
                 billingUrl = first.billingUrl
             }
+
             lastUpdateTime = Date()
-            isLoading = false
+            hasLoaded = true
 
         } catch {
             self.error = error
-            isLoading = false
             LoggerHelper.error("Fetch SLFs failed: \(error.localizedDescription)")
         }
     }

@@ -42,14 +42,33 @@ final class CloudComputingModel {
 
     // MARK: - Actions
     func loadIfNeeded() async {
-        guard !hasLoaded else { return }
-        hasLoaded = true
+        await refreshIfStale(maxAge: .greatestFiniteMagnitude)
+    }
+
+    //30 sec default time for update
+    func refreshIfStale(maxAge: TimeInterval = 30) async {
+        guard !isLoading else { return }
+
+        if !hasLoaded {
+            await fetchVMs()
+            return
+        }
+
+        let age = Date().timeIntervalSince(lastUpdateTime)
+        guard age >= maxAge else { return }
+
         await fetchVMs()
     }
 
     func fetchVMs() async {
+        guard !isLoading else { return }
+
         isLoading = true
         error = nil
+
+        defer {
+            isLoading = false
+        }
 
         do {
             // Authenticate
@@ -66,21 +85,22 @@ final class CloudComputingModel {
 
             // Publish data
             vmTableData = list
-            billingData  = billings
+            billingData = billings
+
             if let first = billings.first {
                 currentBalance = first.balance
-                currency       = first.currency
-                billingUrl     = first.billingUrl
+                currency = first.currency
+                billingUrl = first.billingUrl
             }
+
             lastUpdateTime = Date()
-            isLoading = false
+            hasLoaded = true
 
             // Update global app state
             AppState.shared.isVirtualMachineRunning = runningVMs > 0
 
         } catch {
             self.error = error
-            isLoading = false
             LoggerHelper.error("Error fetching VMs: \(error.localizedDescription)")
         }
     }
