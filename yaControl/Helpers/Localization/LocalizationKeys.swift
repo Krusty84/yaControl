@@ -48,6 +48,7 @@ enum L10n {
         static let errorTitle = "computing.error.title"
         static let emptyTitle = "computing.empty.title"
         static let emptyDescription = "computing.empty.description"
+
     }
 
     enum Storage {
@@ -162,6 +163,7 @@ enum L10n {
         static let openRDP = "table.action.openRDP"
         static let copyInvokeURL = "table.action.copyInvokeURL"
         static let copyYCCommand = "table.action.copyYCCommand"
+        static let createVM = "table.action.createVM"
     }
 
     enum Notifications {

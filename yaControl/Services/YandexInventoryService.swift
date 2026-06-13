@@ -174,6 +174,7 @@ final class YandexInventoryService: @unchecked Sendable {
             memoryGB: memoryGB,
             preemptible: instance.schedulingPolicy.preemptible,
             addresses: addresses,
+            folderId: folder.id,
             folderName: folder.name,
             folderUrl: URL(string: APIConfig.yaFoldersWebUrl + folder.id + "/compute/instances"),
             vmUrl: URL(string: APIConfig.yaVMsWebUrl(folderID: folder.id, instanceID: instance.id)),

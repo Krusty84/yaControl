@@ -16,6 +16,7 @@ struct VMTableData: Decodable, Identifiable, Equatable {
     let memoryGB: String
     let preemptible: Bool
     let addresses: [String]
+    let folderId: String
     let folderName: String
     let folderUrl: URL?
     let vmUrl: URL?

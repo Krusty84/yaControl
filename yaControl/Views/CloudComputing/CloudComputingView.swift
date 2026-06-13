@@ -9,6 +9,7 @@ import SwiftUI
 
 struct CloudComputingTabContent: View {
     @Environment(\.locale) private var locale
+    @Environment(\.openURL) private var openURL
 
     let isActive: Bool
     let refreshToken: UUID
@@ -179,9 +180,38 @@ struct CloudComputingTabContent: View {
             .padding(.vertical, 6)
             .id(locale.identifier)
             .refreshable { await model.fetchVMs() }
+            .contextMenu {
+                Button {
+                    openCreateVMPage()
+                } label: {
+                    Label(
+                        LocalizedStringKey(L10n.Table.createVM),
+                        systemImage: "plus.rectangle.on.rectangle"
+                    )
+                }
+                .disabled(createVMURL == nil)
+            }
         }
     }
+    
+    private var createVMFolderId: String? {
+        if let selectedVM,
+           let selected = model.vmTableData.first(where: { $0.id == selectedVM }) {
+            return selected.folderId
+        }
 
+        return model.filteredVMs.first?.folderId ?? model.vmTableData.first?.folderId
+    }
+
+    private var createVMURL: URL? {
+        guard let folderId = createVMFolderId else { return nil }
+        return URL(string: APIConfig.yaCreateVMWebUrl(folderID: folderId))
+    }
+
+    private func openCreateVMPage() {
+        guard let createVMURL else { return }
+        openURL(createVMURL)
+    }
     private func localized(_ key: String) -> String {
         LocalizedStringHelper.string(key, locale: locale)
     }
