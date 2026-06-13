@@ -53,7 +53,12 @@ struct SettingsTabContent: View {
                 .controlSize(.small)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .onAppear(perform: model.loadSettings)
+        .onAppear {
+            model.loadSettings()
+            Task {
+                await model.loadFoldersForCreation(locale: locale)
+            }
+        }
     }
 
     private var tabPicker: some View {
@@ -130,6 +135,10 @@ struct SettingsTabContent: View {
                 Divider()
 
                 yandexAuthenticationSection
+
+                Divider()
+
+                defaultFolderForCreationSection
 
                 Divider()
 
@@ -233,6 +242,71 @@ struct SettingsTabContent: View {
                 }
             }
             .padding(.bottom, SettingsLayout.headerBottomPadding)
+        }
+    }
+    
+    private var defaultFolderForCreationSection: some View {
+        Section {
+            VStack(alignment: .leading, spacing: SettingsLayout.compactRowSpacing) {
+                HStack(spacing: SettingsLayout.horizontalRowSpacing) {
+                    Picker(
+                        LocalizedStringKey(L10n.Settings.defaultFolderPlaceholder),
+                        selection: $model.defaultFolderIdForCreation
+                    ) {
+                        Text(LocalizedStringKey(L10n.Settings.defaultFolderPlaceholder))
+                            .tag("")
+
+                        ForEach(model.folderOptions) { folder in
+                            Text(folder.displayName)
+                                .tag(folder.id)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .frame(maxWidth: 420, alignment: .leading)
+                    .disabled(model.isLoadingFolders || model.folderOptions.isEmpty)
+                    .help(localized(L10n.Settings.defaultFolderHelp))
+
+                    Button {
+                        Task {
+                            await model.loadFoldersForCreation(locale: locale)
+                        }
+                    } label: {
+                        if model.isLoadingFolders {
+                            ProgressView()
+                                .controlSize(.small)
+                        } else {
+                            Label(
+                                LocalizedStringKey(L10n.Settings.defaultFolderReload),
+                                systemImage: "arrow.clockwise"
+                            )
+                            .labelStyle(.iconOnly)
+                        }
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(model.isOAuthTokenEmpty || model.isLoadingFolders)
+                    .help(localized(L10n.Settings.defaultFolderReload))
+
+                    Spacer()
+                }
+
+                if model.folderOptions.isEmpty && !model.isLoadingFolders {
+                    Text(LocalizedStringKey(L10n.Settings.defaultFolderEmpty))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+
+                if let folderLoadErrorMessage = model.folderLoadErrorMessage {
+                    Text(folderLoadErrorMessage)
+                        .font(.caption)
+                        .foregroundStyle(.red)
+                }
+            }
+            .padding(.horizontal, SettingsLayout.innerHorizontalPadding)
+        } header: {
+            SectionHeader(
+                title: LocalizedStringKey(L10n.Settings.defaultFolderTitle),
+                systemImage: "folder.fill"
+            )
         }
     }
 

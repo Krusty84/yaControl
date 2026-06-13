@@ -26,6 +26,16 @@ final class SettingsModel {
             settingsManager.ycCLIInstalled = ycCLIInstalled
         }
     }
+    
+    var defaultFolderIdForCreation = "" {
+        didSet {
+            settingsManager.defaultFolderIdForCreation = defaultFolderIdForCreation
+        }
+    }
+
+    var folderOptions: [CloudFolderOption] = []
+    var isLoadingFolders = false
+    var folderLoadErrorMessage: String?
 
     var autoStartVM = false {
         didSet {
@@ -97,6 +107,7 @@ final class SettingsModel {
         autoStartVM = settingsManager.autoStartEnabled
         appLogging = settingsManager.appLoggingEnabled
         ycCLIInstalled = settingsManager.ycCLIInstalled
+        defaultFolderIdForCreation = settingsManager.defaultFolderIdForCreation
         startOptions = settingsManager.startOptions
         shutdownOptions = settingsManager.shutdownOptions
         billingThreshold = settingsManager.billingThreshold
@@ -153,6 +164,71 @@ final class SettingsModel {
             responseCode = nil
             errorMessage = error.localizedDescription
             LoggerHelper.error("OAuth verification failed: \(error.localizedDescription)")
+        }
+    }
+    
+    func loadFoldersForCreation(locale: Locale) async {
+        let token = trimmedOAuthKey
+
+        guard !token.isEmpty else {
+            folderOptions = []
+            folderLoadErrorMessage = LocalizedStringHelper.string(
+                L10n.Settings.oauthRequired,
+                locale: locale
+            )
+            return
+        }
+
+        isLoadingFolders = true
+        folderLoadErrorMessage = nil
+
+        defer {
+            isLoadingFolders = false
+        }
+
+        do {
+            let auth = try await api.checkOauthKey(yandexPassportOauthToken: token)
+            let cloudsResponse = try await api.getClouds(iamToken: auth.iamToken)
+
+            var loadedFolders: [CloudFolderOption] = []
+
+            try await withThrowingTaskGroup(of: [FolderDTO].self) { group in
+                for cloud in cloudsResponse.clouds {
+                    group.addTask {
+                        try await self.api.getFolders(
+                            iamToken: auth.iamToken,
+                            cloudId: cloud.id
+                        )
+                    }
+                }
+
+                for try await folders in group {
+                    loadedFolders.append(
+                        contentsOf: folders.map {
+                            CloudFolderOption(
+                                id: $0.id,
+                                name: $0.name,
+                                cloudId: $0.cloudId,
+                                status: $0.status
+                            )
+                        }
+                    )
+                }
+            }
+
+            folderOptions = loadedFolders.sorted {
+                $0.name.localizedStandardCompare($1.name) == .orderedAscending
+            }
+
+            if !defaultFolderIdForCreation.isEmpty,
+               !folderOptions.contains(where: { $0.id == defaultFolderIdForCreation }) {
+                folderLoadErrorMessage = "Saved default folder is not available for the current OAuth token."
+            }
+
+        } catch {
+            folderOptions = []
+            folderLoadErrorMessage = error.localizedDescription
+            LoggerHelper.error("Failed to load folders for creation: \(error.localizedDescription)")
         }
     }
 }

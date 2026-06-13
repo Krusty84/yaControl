@@ -18,6 +18,7 @@ final class SettingsManager: @unchecked Sendable {
     private let appLoggingEnabledKey = "com.krusty84.yaControl.settings.appLoggingEnabled"
     private let appLanguageKey = "com.krusty84.yaControl.settings.appLanguage"
     private let ycCLIInstalledKey = "com.krusty84.yaControl.settings.ycCLIInstalled"
+    private let defaultFolderIdForCreationKey = "com.krusty84.yaControl.settings.defaultFolderIdForCreation"
     private let startOptionsKey = "com.krusty84.yaControl.settings.startOptions"
     private let shutdownOptionsKey = "com.krusty84.yaControl.settings.shutdownOptions"
     private let autostartVMIdsKey = "com.krusty84.yaControl.settings.autostart_vm_ids"
@@ -47,6 +48,11 @@ final class SettingsManager: @unchecked Sendable {
     var ycCLIInstalled: Bool {
         get { defaults.bool(forKey: ycCLIInstalledKey) }
         set { defaults.set(newValue, forKey: ycCLIInstalledKey) }
+    }
+    
+    var defaultFolderIdForCreation: String {
+        get { defaults.string(forKey: defaultFolderIdForCreationKey) ?? "" }
+        set { defaults.set(newValue, forKey: defaultFolderIdForCreationKey) }
     }
     
     var oAuthKey: String {

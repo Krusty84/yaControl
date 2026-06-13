@@ -153,9 +153,14 @@ struct ServerLessFunctionTabContent: View {
             return selected.folderId
         }
 
-        return model.filteredSLFs.first?.folderId ?? model.slfTableData.first?.folderId
-    }
+        if let folderId = model.filteredSLFs.first?.folderId ?? model.slfTableData.first?.folderId {
+            return folderId
+        }
 
+        let defaultFolderId = SettingsManager.shared.defaultFolderIdForCreation
+        return defaultFolderId.isEmpty ? nil : defaultFolderId
+    }
+    
     private var createFunctionURL: URL? {
         guard let folderId = createFunctionFolderId else { return nil }
         return URL(string: APIConfig.yaCreateFunctionWebUrl(folderID: folderId))

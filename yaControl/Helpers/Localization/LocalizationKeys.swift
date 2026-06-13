@@ -83,21 +83,21 @@ enum L10n {
         static let generalTab = "settings.tab.general"
         static let vmManagementTab = "settings.tab.vmManagement"
         static let billingManagementTab = "settings.tab.billingManagement"
-
+        
         static let applicationPreferencesTitle = "settings.applicationPreferences.title"
         static let launchAtLoginHelp = "settings.launchAtLogin.help"
         static let appLoggingTitle = "settings.appLogging.title"
         static let appLoggingHelp = "settings.appLogging.help"
         static let enableNotifications = "settings.notifications.enable"
         static let notificationsHelp = "settings.notifications.help"
-
+        
         static let languageTitle = "settings.language.title"
         static let languageHelp = "settings.language.help"
         static let languageSystem = "settings.language.system"
         static let languageEnglish = "settings.language.english"
         static let languageRussian = "settings.language.russian"
         static let languageKazakh = "settings.language.kazakh"
-
+        
         static let oauthTitle = "settings.oauth.title"
         static let oauthPlaceholder = "settings.oauth.placeholder"
         static let oauthAccessibilityLabel = "settings.oauth.accessibilityLabel"
@@ -111,12 +111,18 @@ enum L10n {
         static let oauthInvalid = "settings.oauth.invalid"
         static let oauthEmptyError = "settings.oauth.emptyError"
         static let oauthInvalidWithCode = "settings.oauth.invalidWithCode"
-
+        
         static let ycCliTitle = "settings.ycCli.title"
         static let ycCliInstalled = "settings.ycCli.installed"
         static let ycCliInstalledHelp = "settings.ycCli.installed.help"
         static let ycCliGet = "settings.ycCli.get"
-
+        
+        static let defaultFolderTitle = "settings.defaultFolder.title"
+        static let defaultFolderHelp = "settings.defaultFolder.help"
+        static let defaultFolderPlaceholder = "settings.defaultFolder.placeholder"
+        static let defaultFolderReload = "settings.defaultFolder.reload"
+        static let defaultFolderEmpty = "settings.defaultFolder.empty"
+        
         static let vmAutoStartStopTitle = "settings.vm.autoStartStop.title"
         static let vmEnablePowerManagement = "settings.vm.enablePowerManagement"
         static let vmEnablePowerManagementHelp = "settings.vm.enablePowerManagement.help"
@@ -125,7 +131,7 @@ enum L10n {
         static let vmUsernameTitle = "settings.vm.username.title"
         static let vmUsernamePlaceholder = "settings.vm.username.placeholder"
         static let vmUsernameHelp = "settings.vm.username.help"
-
+        
         static let billingThresholdTitle = "settings.billing.threshold.title"
         static let billingThresholdPlaceholder = "settings.billing.threshold.placeholder"
         static let billingThresholdHelp = "settings.billing.threshold.help"

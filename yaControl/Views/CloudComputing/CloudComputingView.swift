@@ -204,7 +204,12 @@ struct CloudComputingTabContent: View {
             return selected.folderId
         }
 
-        return model.filteredVMs.first?.folderId ?? model.vmTableData.first?.folderId
+        if let folderId = model.filteredVMs.first?.folderId ?? model.vmTableData.first?.folderId {
+            return folderId
+        }
+
+        let defaultFolderId = SettingsManager.shared.defaultFolderIdForCreation
+        return defaultFolderId.isEmpty ? nil : defaultFolderId
     }
 
     private var createVMURL: URL? {

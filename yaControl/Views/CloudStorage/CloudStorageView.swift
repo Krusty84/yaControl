@@ -146,7 +146,12 @@ struct BucketTabContent: View {
             return selected.folderId
         }
 
-        return model.filteredBuckets.first?.folderId ?? model.bucketTableData.first?.folderId
+        if let folderId = model.filteredBuckets.first?.folderId ?? model.bucketTableData.first?.folderId {
+            return folderId
+        }
+
+        let defaultFolderId = SettingsManager.shared.defaultFolderIdForCreation
+        return defaultFolderId.isEmpty ? nil : defaultFolderId
     }
 
     private var createBucketURL: URL? {

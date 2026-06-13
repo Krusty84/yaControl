@@ -1870,6 +1870,98 @@
         }
       }
     },
+    "settings.defaultFolder.help" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Used when creating a new virtual machine, function, or bucket, etc."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Жаңа виртуалды машина, функция немесе бакет жасау кезінде жол таңдалмаған немесе кесте бос болса қолданылады."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " Используется при создании новой виртуальной машины, функции, бакета и пр."
+          }
+        }
+      }
+    },
+    "settings.defaultFolder.placeholder" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select folder"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Каталогты таңдаңыз"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выберите папку"
+          }
+        }
+      }
+    },
+    "settings.defaultFolder.reload" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reload folders"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Каталогтар тізімін жаңарту"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Обновить папки"
+          }
+        }
+      }
+    },
+    "settings.defaultFolder.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Default folder"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Жасауға арналған әдепкі каталог"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Папка по умолчанию"
+          }
+        }
+      }
+    },
     "settings.language.english" : {
       "extractionState" : "stale",
       "localizations" : {
