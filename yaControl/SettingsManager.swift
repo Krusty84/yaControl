@@ -16,6 +16,7 @@ final class SettingsManager: @unchecked Sendable {
     private let billingDefaultThreshold = 50.0
     private let autoStartEnabledKey = "com.krusty84.yaControl.settings.autoStartEnabled"
     private let appLoggingEnabledKey = "com.krusty84.yaControl.settings.appLoggingEnabled"
+    private let apiDebugEnabledKey = "com.krusty84.yaControl.settings.apiDebugEnabled"
     private let appLanguageKey = "com.krusty84.yaControl.settings.appLanguage"
     private let ycCLIInstalledKey = "com.krusty84.yaControl.settings.ycCLIInstalled"
     private let defaultFolderIdForCreationKey = "com.krusty84.yaControl.settings.defaultFolderIdForCreation"
@@ -32,6 +33,11 @@ final class SettingsManager: @unchecked Sendable {
     var appLoggingEnabled: Bool {
         get { defaults.bool(forKey: appLoggingEnabledKey) }
         set { defaults.set(newValue, forKey: appLoggingEnabledKey) }
+    }
+    
+    var apiDebugEnabled: Bool {
+        get { defaults.bool(forKey: apiDebugEnabledKey) }
+        set { defaults.set(newValue, forKey: apiDebugEnabledKey) }
     }
 
     var appLanguage: AppLanguage {

@@ -13,12 +13,14 @@ struct SettingsTabContent: View {
 
     @State private var model = SettingsModel()
     @State private var selectedTab: SettingsTab = .general
+    @State private var apiDebugStore = APIDebugStore.shared
 
     private enum SettingsTab: Hashable {
         case general
         case cloud
         case virtualMachineManagement
         case billingManagement
+        case debug
     }
 
     private enum SettingsLayout {
@@ -93,6 +95,11 @@ struct SettingsTabContent: View {
                 LocalizedStringKey(L10n.Settings.billingManagementTab),
                 tab: .billingManagement
             )
+            
+            settingsTabButton(
+                LocalizedStringKey(L10n.Settings.debugTab),
+                tab: .debug
+            )
         }
         .background(.quaternary)
         .clipShape(.rect(cornerRadius: 6))
@@ -137,6 +144,9 @@ struct SettingsTabContent: View {
 
         case .billingManagement:
             billingManagementTab
+                
+        case .debug:
+            debugTab
         }
     }
 
@@ -481,6 +491,59 @@ struct SettingsTabContent: View {
             .padding(SettingsLayout.outerPadding)
             .frame(maxWidth: .infinity, alignment: .topLeading)
         }
+    }
+    
+    // MARK: - Debug Tab
+
+    private var debugTab: some View {
+        VStack(alignment: .leading, spacing: SettingsLayout.sectionSpacing) {
+            Section {
+                Toggle(LocalizedStringKey(L10n.Settings.apiDebugEnabled), isOn: $model.apiDebugEnabled)
+                    .toggleStyle(.switch)
+                    .help(localized(L10n.Settings.apiDebugEnabledHelp))
+                    .padding(.horizontal, SettingsLayout.innerHorizontalPadding)
+            } header: {
+                SectionHeader(
+                    title: LocalizedStringKey(L10n.Settings.debugTitle),
+                    systemImage: "ladybug.fill"
+                )
+            }
+
+            Divider()
+
+            Section {
+                VStack(alignment: .leading, spacing: SettingsLayout.rowSpacing) {
+                    TextEditor(text: $apiDebugStore.messages)
+                        .font(.system(.caption, design: .monospaced))
+                        .frame(minHeight: 280)
+                        .border(.separator)
+
+                    HStack {
+                        Button(LocalizedStringKey(L10n.Settings.debugSaveToFile)) {
+                            apiDebugStore.saveToExternalFile()
+                        }
+                        .disabled(apiDebugStore.messages.isEmpty)
+
+                        Button(LocalizedStringKey(L10n.Settings.debugClear)) {
+                            apiDebugStore.clear()
+                        }
+                        .disabled(apiDebugStore.messages.isEmpty)
+
+                        Spacer()
+                    }
+                }
+                .padding(.horizontal, SettingsLayout.innerHorizontalPadding)
+            } header: {
+                SectionHeader(
+                    title: LocalizedStringKey(L10n.Settings.debugMessagesTitle),
+                    systemImage: "doc.text.magnifyingglass"
+                )
+            }
+
+            Spacer()
+        }
+        .padding(SettingsLayout.outerPadding)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
 
     // MARK: - OAuth Status Indicator

@@ -20,6 +20,15 @@ final class SettingsModel {
             settingsManager.appLoggingEnabled = appLogging
         }
     }
+    
+    var apiDebugEnabled = false {
+        didSet {
+            settingsManager.apiDebugEnabled = apiDebugEnabled
+            Task { @MainActor in
+                APIDebugStore.shared.isEnabled = apiDebugEnabled
+            }
+        }
+    }
 
     var ycCLIInstalled = false {
         didSet {
@@ -106,6 +115,7 @@ final class SettingsModel {
         generalUsername4VMs = settingsManager.generalUsername4VMs
         autoStartVM = settingsManager.autoStartEnabled
         appLogging = settingsManager.appLoggingEnabled
+        apiDebugEnabled = settingsManager.apiDebugEnabled
         ycCLIInstalled = settingsManager.ycCLIInstalled
         defaultFolderIdForCreation = settingsManager.defaultFolderIdForCreation
         startOptions = settingsManager.startOptions

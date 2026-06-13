@@ -136,6 +136,14 @@ enum L10n {
         static let billingThresholdTitle = "settings.billing.threshold.title"
         static let billingThresholdPlaceholder = "settings.billing.threshold.placeholder"
         static let billingThresholdHelp = "settings.billing.threshold.help"
+        
+        static let debugTab = "settings.tab.debug"
+        static let debugTitle = "settings.debug.title"
+        static let apiDebugEnabled = "settings.debug.apiDebugEnabled"
+        static let apiDebugEnabledHelp = "settings.debug.apiDebugEnabled.help"
+        static let debugMessagesTitle = "settings.debug.messages.title"
+        static let debugSaveToFile = "settings.debug.saveToFile"
+        static let debugClear = "settings.debug.clear"
     }
 
     enum Table {

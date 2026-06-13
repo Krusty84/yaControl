@@ -31,22 +31,38 @@ final class YandexAPIClient: @unchecked Sendable {
             request.httpBody = body
         }
 
+        let requestDebugMessage = formattedAPIRequest(request, endpoint: endpoint)
+
         #if DEBUG
-        printAPIRequest(request, endpoint: endpoint)
+        print(requestDebugMessage)
         #endif
+
+        if SettingsManager.shared.apiDebugEnabled {
+            Task { @MainActor in
+                APIDebugStore.shared.append(requestDebugMessage)
+            }
+        }
 
         let startTime = Date()
         let (data, response) = try await URLSession.shared.data(for: request)
         let durationMs = Int(Date().timeIntervalSince(startTime) * 1000)
 
-        #if DEBUG
-        printAPIResponse(
+        let responseDebugMessage = formattedAPIResponse(
             response,
             data: data,
             endpoint: endpoint,
             durationMs: durationMs
         )
+
+        #if DEBUG
+        print(responseDebugMessage)
         #endif
+
+        if SettingsManager.shared.apiDebugEnabled {
+            Task { @MainActor in
+                APIDebugStore.shared.append(responseDebugMessage)
+            }
+        }
 
         let httpResponse = try validateHTTPResponse(response, data: data, endpoint: endpoint)
         return (data, httpResponse)
@@ -159,7 +175,7 @@ final class YandexAPIClient: @unchecked Sendable {
     }
     
     #if DEBUG
-    private func printAPIRequest(_ request: URLRequest, endpoint: String) {
+    private func formattedAPIRequest(_ request: URLRequest, endpoint: String) -> String {
         let method = request.httpMethod ?? "<unknown>"
         let url = request.url?.absoluteString ?? "<invalid url>"
         let headers = sanitizedHeaders(request.allHTTPHeaderFields)
@@ -171,7 +187,7 @@ final class YandexAPIClient: @unchecked Sendable {
             requestBody = "<empty>"
         }
 
-        print("""
+        return """
         
         ┌────────────────────────────────────────────
         │ Yandex API Request
@@ -184,15 +200,15 @@ final class YandexAPIClient: @unchecked Sendable {
         \(requestBody)
         └────────────────────────────────────────────
         
-        """)
+        """
     }
 
-    private func printAPIResponse(
+    private func formattedAPIResponse(
         _ response: URLResponse,
         data: Data,
         endpoint: String,
         durationMs: Int
-    ) {
+    ) -> String {
         let httpResponse = response as? HTTPURLResponse
         let statusCode = httpResponse?.statusCode ?? -1
         let headers = sanitizedResponseHeaders(httpResponse?.allHeaderFields)
@@ -204,7 +220,7 @@ final class YandexAPIClient: @unchecked Sendable {
             responseBody = prettyPrintedBody(data)
         }
 
-        print("""
+        return """
         
         ┌────────────────────────────────────────────
         │ Yandex API Response
@@ -217,7 +233,7 @@ final class YandexAPIClient: @unchecked Sendable {
         \(responseBody)
         └────────────────────────────────────────────
         
-        """)
+        """
     }
 
     private func sanitizedHeaders(_ headers: [String: String]?) -> [String: String] {
@@ -225,7 +241,7 @@ final class YandexAPIClient: @unchecked Sendable {
 
         for key in headers.keys {
             if key.lowercased() == "authorization" {
-                headers[key] = "<redacted>"
+                headers[key] = "<HIDDEN>"
             }
         }
 
