@@ -6,7 +6,7 @@
 	<true/>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>group.com.krusty84.yaControl</string>
+		<string>$(TeamIdentifierPrefix)com.krusty84.yaControl</string>
 	</array>
 </dict>
 </plist>

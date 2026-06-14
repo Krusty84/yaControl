@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3D023EB72D8B3BFA003FA336 /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 3D023EB62D8B3BFA003FA336 /* LaunchAtLogin */; };
-		3DA091FA2FDC1CF700A7CEE1 /* ElegantTabs in Frameworks */ = {isa = PBXBuildFile; productRef = 3DA091F92FDC1CF700A7CEE1 /* ElegantTabs */; };
+		3DA094392FDE11ED00A7CEE1 /* ElegantTabs in Frameworks */ = {isa = PBXBuildFile; productRef = 3DA094382FDE11ED00A7CEE1 /* ElegantTabs */; };
+		3DA0943C2FDE121200A7CEE1 /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 3DA0943B2FDE121200A7CEE1 /* LaunchAtLogin */; };
 		3DF000012FDD000100000101 /* yaControlWidget.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 3DF000012FDD000100000001 /* yaControlWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		3DF000012FDD000100000102 /* CloudSummaryWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF000012FDD000100000003 /* CloudSummaryWidget.swift */; };
 		3DF000012FDD000100000103 /* CloudSummaryWidgetEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF000012FDD000100000004 /* CloudSummaryWidgetEntry.swift */; };
@@ -74,8 +74,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3DA091FA2FDC1CF700A7CEE1 /* ElegantTabs in Frameworks */,
-				3D023EB72D8B3BFA003FA336 /* LaunchAtLogin in Frameworks */,
+				3DA0943C2FDE121200A7CEE1 /* LaunchAtLogin in Frameworks */,
+				3DA094392FDE11ED00A7CEE1 /* ElegantTabs in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -163,8 +163,8 @@
 			);
 			name = yaControl;
 			packageProductDependencies = (
-				3D023EB62D8B3BFA003FA336 /* LaunchAtLogin */,
-				3DA091F92FDC1CF700A7CEE1 /* ElegantTabs */,
+				3DA094382FDE11ED00A7CEE1 /* ElegantTabs */,
+				3DA0943B2FDE121200A7CEE1 /* LaunchAtLogin */,
 			);
 			productName = yaControl;
 			productReference = 3D333ED32D639DF100D795BF /* yaControl.app */;
@@ -219,8 +219,8 @@
 			mainGroup = 3D333ECA2D639DF100D795BF;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				3D023EB52D8B3BFA003FA336 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */,
-				3DA091F82FDC1CF700A7CEE1 /* XCRemoteSwiftPackageReference "ElegantTabs" */,
+				3DA094372FDE11ED00A7CEE1 /* XCRemoteSwiftPackageReference "ElegantTabs" */,
+				3DA0943A2FDE121200A7CEE1 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 3D333ED42D639DF100D795BF /* Products */;
@@ -427,7 +427,6 @@
 				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
 				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
 				ENABLE_RESOURCE_ACCESS_USB = NO;
-				ENABLE_USER_SELECTED_FILES = readwrite;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = yaControl/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = yaControl;
@@ -470,7 +469,6 @@
 				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
 				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
 				ENABLE_RESOURCE_ACCESS_USB = NO;
-				ENABLE_USER_SELECTED_FILES = readwrite;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = yaControl/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = yaControl;
@@ -578,15 +576,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		3D023EB52D8B3BFA003FA336 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/sindresorhus/LaunchAtLogin-Modern";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
-			};
-		};
-		3DA091F82FDC1CF700A7CEE1 /* XCRemoteSwiftPackageReference "ElegantTabs" */ = {
+		3DA094372FDE11ED00A7CEE1 /* XCRemoteSwiftPackageReference "ElegantTabs" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Krusty84/ElegantTabs.git";
 			requirement = {
@@ -594,18 +584,26 @@
 				minimumVersion = 1.1.0;
 			};
 		};
+		3DA0943A2FDE121200A7CEE1 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sindresorhus/LaunchAtLogin-Modern";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		3D023EB62D8B3BFA003FA336 /* LaunchAtLogin */ = {
+		3DA094382FDE11ED00A7CEE1 /* ElegantTabs */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 3D023EB52D8B3BFA003FA336 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */;
-			productName = LaunchAtLogin;
-		};
-		3DA091F92FDC1CF700A7CEE1 /* ElegantTabs */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 3DA091F82FDC1CF700A7CEE1 /* XCRemoteSwiftPackageReference "ElegantTabs" */;
+			package = 3DA094372FDE11ED00A7CEE1 /* XCRemoteSwiftPackageReference "ElegantTabs" */;
 			productName = ElegantTabs;
+		};
+		3DA0943B2FDE121200A7CEE1 /* LaunchAtLogin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3DA0943A2FDE121200A7CEE1 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */;
+			productName = LaunchAtLogin;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
