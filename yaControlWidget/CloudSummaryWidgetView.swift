@@ -73,7 +73,7 @@ struct CloudSummaryWidgetView: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
 
-            Text(balanceText(snapshot))
+            Text(balanceAttributedString(snapshot))
                 .font(.title3.weight(.semibold))
                 .lineLimit(1)
                 .minimumScaleFactor(0.75)
@@ -159,6 +159,13 @@ struct CloudSummaryWidgetView: View {
         [snapshot.currentBalance, snapshot.currency]
             .filter { !$0.isEmpty }
             .joined(separator: " ")
+    }
+    
+    private func balanceAttributedString(_ snapshot: CloudSummarySnapshot) -> AttributedString {
+        BillingFormattingHelper.balanceAttributedString(
+            amount: snapshot.currentBalance,
+            currency: snapshot.currency
+        )
     }
 }
 

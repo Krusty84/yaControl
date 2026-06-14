@@ -45,28 +45,8 @@ struct CloudSummarySnapshotUpdater: Sendable {
             )
 
             try CloudSummarySnapshotStore.shared.save(snapshot)
-            //
-            let loadedSnapshot = try CloudSummarySnapshotStore.shared.load()
-
-            let diagnosticMessage = """
-            Widget snapshot save diagnostic:
-            Saved snapshot: true
-            Loaded after save: \(loadedSnapshot != nil)
-            Balance: \(snapshot.currentBalance) \(snapshot.currency)
-            VMs: \(snapshot.runningVMsCount)/\(snapshot.totalVMsCount)
-            Functions: \(snapshot.activeFunctionsCount)/\(snapshot.totalFunctionsCount)
-            Buckets: \(snapshot.totalBucketsCount)
-            App Group: \(AppGroupConfig.identifier)
-            """
-
-            print(diagnosticMessage)
-
-            Task { @MainActor in
-                APIDebugStore.shared.append(diagnosticMessage)
-            }
-
             WidgetCenter.shared.reloadTimelines(ofKind: CloudSummaryWidgetKind.cloudSummary)
-            WidgetCenter.shared.reloadAllTimelines()
+ 
         } catch {
             LoggerHelper.error("Failed to refresh widget snapshot: \(error.localizedDescription)")
         }

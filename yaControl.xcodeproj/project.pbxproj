@@ -61,9 +61,22 @@
 		3DF000012FDD00010000000F /* yaControl/Helpers/Widget/CloudSummaryWidgetKind.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = yaControl/Helpers/Widget/CloudSummaryWidgetKind.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		3DCD404C2FDEE3200074A9AA /* Exceptions for "yaControl" folder in "yaControlWidget" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Helpers/Formatting/BillingFormattingHelper.swift,
+			);
+			target = 3DF000012FDD000100000301 /* yaControlWidget */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		3D333ED52D639DF100D795BF /* yaControl */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				3DCD404C2FDEE3200074A9AA /* Exceptions for "yaControl" folder in "yaControlWidget" target */,
+			);
 			path = yaControl;
 			sourceTree = "<group>";
 		};

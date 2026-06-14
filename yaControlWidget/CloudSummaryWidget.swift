@@ -18,6 +18,6 @@ struct CloudSummaryWidget: Widget {
         }
         .configurationDisplayName("yaControl")
         .description("widget.description")
-        .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
+        .supportedFamilies([.systemSmall, .systemMedium])
     }
 }
