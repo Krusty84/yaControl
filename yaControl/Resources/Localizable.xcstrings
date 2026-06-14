@@ -2704,19 +2704,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Virtual Machine Management"
+            "value" : "VM Management"
           }
         },
         "kk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Виртуалды машиналарды басқару"
+            "value" : "ВМ басқару"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Управление виртуальными машинами"
+            "value" : "Управление ВМ"
           }
         }
       }
