@@ -49,21 +49,31 @@ struct CloudSummaryWidgetView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .padding()
+        .padding(.vertical)
+        .padding(.horizontal, widgetFamily == .systemSmall ? 0 : 16)
     }
 
     private func header(_ snapshot: CloudSummarySnapshot) -> some View {
-        HStack(alignment: .firstTextBaseline) {
-            Text("widget.title")
-                .font(.headline)
-                .fontWeight(.semibold)
+        HStack(alignment: .top) {
+            VStack(alignment: .leading, spacing: 1) {
+                Text("widget.title")
+                    .font(.headline)
+                    .fontWeight(.semibold)
 
-            Spacer()
-
-            Text(snapshot.lastUpdated, format: .dateTime.hour().minute())
+                HStack(spacing: 0) {
+                    Text("widget.updated")
+                    Text(": ")
+                    Text(
+                        snapshot.lastUpdated,
+                        format: .dateTime.hour().minute()
+                    )
+                }
                 .font(.caption2)
                 .foregroundStyle(.secondary)
-                .accessibilityLabel(Text("widget.updated"))
+                .accessibilityElement(children: .combine)
+            }
+
+            Spacer()
         }
     }
 
@@ -87,7 +97,7 @@ struct CloudSummaryWidgetView: View {
             CompactMetricRow(
                 title: "widget.virtualMachines",
                 systemImage: "desktopcomputer",
-                value: "\(snapshot.runningVMsCount)/\(snapshot.totalVMsCount)"
+                value: "\(snapshot.totalVMsCount)/\(snapshot.runningVMsCount)"
             )
 
             CompactMetricRow(
