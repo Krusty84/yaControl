@@ -226,6 +226,9 @@
         }
       }
     },
+    "widget.stale" : {
+
+    },
     "widget.title" : {
       "localizations" : {
         "en" : {
@@ -358,8 +361,27 @@
         }
       }
     },
-    "yaControl" : {
-
+    "widget.stale": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stale"
+          }
+        },
+        "kk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ескірген"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Устарело"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

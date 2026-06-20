@@ -54,7 +54,7 @@ struct CloudSummaryWidgetView: View {
     }
 
     private func header(_ snapshot: CloudSummarySnapshot) -> some View {
-        HStack(alignment: .top) {
+        HStack(alignment: .top, spacing: 8) {
             VStack(alignment: .leading, spacing: 1) {
                 Text("widget.title")
                     .font(.headline)
@@ -63,6 +63,7 @@ struct CloudSummaryWidgetView: View {
                 HStack(spacing: 0) {
                     Text("widget.updated")
                     Text(": ")
+
                     Text(
                         snapshot.lastUpdated,
                         format: .dateTime.hour().minute()
@@ -73,8 +74,30 @@ struct CloudSummaryWidgetView: View {
                 .accessibilityElement(children: .combine)
             }
 
-            Spacer()
+            Spacer(minLength: 8)
+
+            if CloudSummaryWidgetFreshness.isStale(
+                snapshot,
+                at: entry.date
+            ) {
+                staleIndicator
+            }
         }
+    }
+    
+    private var staleIndicator: some View {
+        VStack(spacing: 1) {
+            Image(systemName: "clock.badge.exclamationmark")
+                .font(.system(size: 16, weight: .semibold))
+
+            Text("widget.stale")
+                .font(.caption2.weight(.semibold))
+                .lineLimit(1)
+        }
+        .foregroundStyle(.orange)
+        .frame(minWidth: 38)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(Text("widget.stale"))
     }
 
     private func balanceView(_ snapshot: CloudSummarySnapshot) -> some View {
