@@ -11,7 +11,6 @@ final class SettingsManager: @unchecked Sendable {
     static let shared = SettingsManager()
     private let defaults = UserDefaults.standard
     // Keys
-    private let legacyOAuthKey = "com.krusty84.yaControl.settings.oAuthKey"
     private let billingThresholdKey = "com.krusty84.yaControl.settings.billingThreshold"
     private let billingDefaultThreshold = 50.0
     private let autoStartEnabledKey = "com.krusty84.yaControl.settings.autoStartEnabled"
@@ -25,12 +24,6 @@ final class SettingsManager: @unchecked Sendable {
     private let autostartVMIdsKey = "com.krusty84.yaControl.settings.autostart_vm_ids"
     private let generalUsername4VMs_ = "com.krusty84.yaControl.settings.generalUsername4VMs"
     private let widgetAutoRefreshEnabledKey = "com.krusty84.yaControl.settings.widgetAutoRefreshEnabled"
-//    private let widgetRefreshIntervalMinutesKey = "com.krusty84.yaControl.settings.widgetRefreshIntervalMinutes"
-//    private let widgetDefaultRefreshIntervalMinutes = 30
-
-    init() {
-        migrateLegacyOAuthToken()
-    }
 
     // General
     var appLoggingEnabled: Bool {
@@ -222,18 +215,5 @@ final class SettingsManager: @unchecked Sendable {
         defaults.set(Array(updated), forKey: autostartVMIdsKey)
 
         toRemove.forEach { defaults.removeObject(forKey: "vm_\($0)_isSelected") }
-    }
-
-    private func migrateLegacyOAuthToken() {
-        if let token = defaults.string(forKey: legacyOAuthKey), !token.isEmpty {
-            do {
-                try KeychainTokenStore.shared.saveOAuthToken(token)
-                defaults.removeObject(forKey: legacyOAuthKey)
-            } catch {
-                LoggerHelper.error("Failed to migrate OAuth token to Keychain: \(error.localizedDescription)")
-            }
-        } else {
-            defaults.removeObject(forKey: legacyOAuthKey)
-        }
     }
 }

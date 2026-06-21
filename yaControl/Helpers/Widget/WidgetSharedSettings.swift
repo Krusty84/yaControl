@@ -43,44 +43,4 @@ enum WidgetSharedSettings {
             )
         }
     }
-
-    /// Moves the value stored by older versions of the application
-    /// from the application-only UserDefaults container to the App Group.
-    static func migrateFromStandardDefaults(
-        _ standardDefaults: UserDefaults = .standard
-    ) {
-        guard let sharedDefaults = defaults else {
-            return
-        }
-
-        // Do not overwrite an existing App Group value.
-        guard sharedDefaults.object(
-            forKey: refreshIntervalMinutesKey
-        ) == nil else {
-            return
-        }
-
-        // There is nothing to migrate for a new installation.
-        guard standardDefaults.object(
-            forKey: refreshIntervalMinutesKey
-        ) != nil else {
-            return
-        }
-
-        let legacyValue = max(
-            standardDefaults.integer(
-                forKey: refreshIntervalMinutesKey
-            ),
-            minimumRefreshIntervalMinutes
-        )
-
-        sharedDefaults.set(
-            legacyValue,
-            forKey: refreshIntervalMinutesKey
-        )
-
-        standardDefaults.removeObject(
-            forKey: refreshIntervalMinutesKey
-        )
-    }
 }
