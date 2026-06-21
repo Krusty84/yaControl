@@ -68,6 +68,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Helpers/Formatting/BillingFormattingHelper.swift,
+				Helpers/Widget/WidgetSharedSettings.swift,
 			);
 			target = 3DF000012FDD000100000301 /* yaControlWidget */;
 		};

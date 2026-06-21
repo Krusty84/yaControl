@@ -7,6 +7,7 @@
 
 import Foundation
 import Observation
+import WidgetKit
 
 @Observable
 @MainActor
@@ -45,14 +46,16 @@ final class SettingsModel {
     var widgetAutoRefreshEnabled = true {
         didSet {
             settingsManager.widgetAutoRefreshEnabled = widgetAutoRefreshEnabled
-            restartWidgetSnapshotScheduler()
+            applyWidgetRefreshSettings()
         }
     }
 
     var widgetRefreshIntervalMinutes = 30 {
         didSet {
-            settingsManager.widgetRefreshIntervalMinutes = widgetRefreshIntervalMinutes
-            restartWidgetSnapshotScheduler()
+            settingsManager.widgetRefreshIntervalMinutes =
+                widgetRefreshIntervalMinutes
+
+            applyWidgetRefreshSettings()
         }
     }
 
@@ -266,8 +269,22 @@ final class SettingsModel {
         }
     }
 
-    private func restartWidgetSnapshotScheduler() {
-        guard !isLoadingSettings else { return }
+//    private func restartWidgetSnapshotScheduler() {
+//        guard !isLoadingSettings else { return }
+//
+//        Task { @MainActor in
+//            CloudSummarySnapshotRefreshScheduler.shared.restart()
+//        }
+//    }
+    
+    private func applyWidgetRefreshSettings() {
+        guard !isLoadingSettings else {
+            return
+        }
+
+        WidgetCenter.shared.reloadTimelines(
+            ofKind: CloudSummaryWidgetKind.cloudSummary
+        )
 
         Task { @MainActor in
             CloudSummarySnapshotRefreshScheduler.shared.restart()

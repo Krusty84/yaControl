@@ -8,7 +8,13 @@
 import Foundation
 
 enum CloudSummaryWidgetFreshness {
-    static let staleInterval: TimeInterval = 60 * 60
+    private static let refreshGracePeriod: TimeInterval = 60
+
+    static var staleInterval: TimeInterval {
+        TimeInterval(
+            WidgetSharedSettings.refreshIntervalMinutes
+        ) * 60 + refreshGracePeriod
+    }
 
     static func staleDate(
         for snapshot: CloudSummarySnapshot
