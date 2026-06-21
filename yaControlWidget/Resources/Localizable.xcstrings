@@ -361,27 +361,8 @@
         }
       }
     },
-    "widget.stale": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Stale"
-          }
-        },
-        "kk": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ескірген"
-          }
-        },
-        "ru": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Устарело"
-          }
-        }
-      }
+    "yaControl" : {
+
     }
   },
   "version" : "1.0"
