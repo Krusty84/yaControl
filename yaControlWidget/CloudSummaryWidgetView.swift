@@ -37,70 +37,82 @@ struct CloudSummaryWidgetView: View {
     }
 
     private func summaryView(_ snapshot: CloudSummarySnapshot) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
-            header(snapshot)
+        let isStale = CloudSummaryWidgetFreshness.isStale(
+            snapshot,
+            at: entry.date
+        )
 
-            balanceView(snapshot)
+        return VStack(alignment: .leading, spacing: 10) {
+            header(snapshot, isStale: isStale)
+
+            balanceView(snapshot, isStale: isStale)
 
             if widgetFamily == .systemSmall {
-                smallMetrics(snapshot)
+                smallMetrics(snapshot, isStale: isStale)
             } else {
-                mediumMetrics(snapshot)
+                mediumMetrics(snapshot, isStale: isStale)
             }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .frame(
+            maxWidth: .infinity,
+            maxHeight: .infinity,
+            alignment: .topLeading
+        )
         .padding(.vertical)
-        .padding(.horizontal, widgetFamily == .systemSmall ? 0 : 16)
+       // .padding(.horizontal, widgetFamily == .systemSmall ? 0 : 16)
+        .padding(.horizontal, 0)
+        .overlay(alignment: .topTrailing) {
+            if isStale {
+                staleIndicator
+                    .padding(.top, 16)
+//                    .padding(
+//                        .trailing,
+//                        widgetFamily == .systemSmall ? 0 : 16
+//                    )
+                    .padding(.horizontal, 0)
+            }
+        }
     }
 
-    private func header(_ snapshot: CloudSummarySnapshot) -> some View {
-        HStack(alignment: .top, spacing: 8) {
-            VStack(alignment: .leading, spacing: 1) {
-                Text("widget.title")
-                    .font(.headline)
-                    .fontWeight(.semibold)
+    private func header(
+        _ snapshot: CloudSummarySnapshot,
+        isStale: Bool
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 1) {
+            Text("widget.title")
+                .font(.headline)
+                .fontWeight(.semibold)
 
-                HStack(spacing: 0) {
-                    Text("widget.updated")
-                    Text(": ")
+            HStack(spacing: 0) {
+                Text("widget.updated")
+                Text(": ")
 
-                    Text(
-                        snapshot.lastUpdated,
-                        format: .dateTime.hour().minute()
-                    )
-                }
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-                .accessibilityElement(children: .combine)
+                Text(
+                    snapshot.lastUpdated,
+                    format: .dateTime.hour().minute()
+                )
+                .strikethrough(isStale)
             }
-
-            Spacer(minLength: 8)
-
-            if CloudSummaryWidgetFreshness.isStale(
-                snapshot,
-                at: entry.date
-            ) {
-                staleIndicator
-            }
+            .font(.caption2)
+            .foregroundStyle(.secondary)
+            .accessibilityElement(children: .combine)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
     
     private var staleIndicator: some View {
-        VStack(spacing: 1) {
-            Image(systemName: "clock.badge.exclamationmark")
-                .font(.system(size: 16, weight: .semibold))
-
-            Text("widget.stale")
-                .font(.caption2.weight(.semibold))
-                .lineLimit(1)
-        }
-        .foregroundStyle(.orange)
-        .frame(minWidth: 38)
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel(Text("widget.stale"))
+        Image(systemName: "clock.badge.exclamationmark")
+            .font(.system(size: 16, weight: .semibold))
+            .foregroundStyle(.orange)
+            .padding(4)
+            .background(Color.clear)
+            .accessibilityLabel(Text("widget.stale"))
     }
 
-    private func balanceView(_ snapshot: CloudSummarySnapshot) -> some View {
+    private func balanceView(
+        _ snapshot: CloudSummarySnapshot,
+        isStale: Bool
+    ) -> some View {
         VStack(alignment: .leading, spacing: 2) {
             Label("widget.balance", systemImage: "creditcard")
                 .font(.caption)
@@ -110,62 +122,84 @@ struct CloudSummaryWidgetView: View {
                 .font(.title3.weight(.semibold))
                 .lineLimit(1)
                 .minimumScaleFactor(0.75)
+                .strikethrough(isStale)
                 .accessibilityLabel(Text("widget.balance"))
                 .accessibilityValue(Text(balanceText(snapshot)))
         }
     }
 
-    private func smallMetrics(_ snapshot: CloudSummarySnapshot) -> some View {
+    private func smallMetrics(
+        _ snapshot: CloudSummarySnapshot,
+        isStale: Bool
+    ) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             CompactMetricRow(
                 title: "widget.virtualMachines",
                 systemImage: "desktopcomputer",
-                value: "\(snapshot.totalVMsCount)/\(snapshot.runningVMsCount)"
+                value: "\(snapshot.totalVMsCount)/\(snapshot.runningVMsCount)",
+                isStale: isStale
             )
 
             CompactMetricRow(
                 title: "widget.functions",
                 systemImage: "function",
-                value: "\(snapshot.activeFunctionsCount)/\(snapshot.totalFunctionsCount)"
+                value: "\(snapshot.activeFunctionsCount)/\(snapshot.totalFunctionsCount)",
+                isStale: isStale
             )
 
             CompactMetricRow(
                 title: "widget.buckets",
                 systemImage: "archivebox",
-                value: "\(snapshot.totalBucketsCount)"
+                value: "\(snapshot.totalBucketsCount)",
+                isStale: isStale
             )
         }
     }
 
-    private func mediumMetrics(_ snapshot: CloudSummarySnapshot) -> some View {
+    private func mediumMetrics(
+        _ snapshot: CloudSummarySnapshot,
+        isStale: Bool
+    ) -> some View {
         VStack(alignment: .leading, spacing: 7) {
             MetricRow(
                 title: "widget.virtualMachines",
                 systemImage: "desktopcomputer",
                 value: String(
-                    format: NSLocalizedString("widget.totalRunningFormat", comment: ""),
+                    format: NSLocalizedString(
+                        "widget.totalRunningFormat",
+                        comment: ""
+                    ),
                     String(snapshot.totalVMsCount),
                     String(snapshot.runningVMsCount)
-                )
+                ),
+                isStale: isStale
             )
 
             MetricRow(
                 title: "widget.functions",
                 systemImage: "function",
                 value: String(
-                    format: NSLocalizedString("widget.totalActiveFormat", comment: ""),
+                    format: NSLocalizedString(
+                        "widget.totalActiveFormat",
+                        comment: ""
+                    ),
                     String(snapshot.totalFunctionsCount),
                     String(snapshot.activeFunctionsCount)
-                )
+                ),
+                isStale: isStale
             )
 
             MetricRow(
                 title: "widget.buckets",
                 systemImage: "archivebox",
                 value: String(
-                    format: NSLocalizedString("widget.totalOnlyFormat", comment: ""),
+                    format: NSLocalizedString(
+                        "widget.totalOnlyFormat",
+                        comment: ""
+                    ),
                     String(snapshot.totalBucketsCount)
-                )
+                ),
+                isStale: isStale
             )
         }
     }
@@ -206,6 +240,7 @@ private struct MetricRow: View {
     let title: LocalizedStringKey
     let systemImage: String
     let value: String
+    let isStale: Bool
 
     var body: some View {
         HStack(alignment: .firstTextBaseline, spacing: 8) {
@@ -220,6 +255,7 @@ private struct MetricRow: View {
                 .multilineTextAlignment(.trailing)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
+                .strikethrough(isStale)
         }
         .accessibilityElement(children: .combine)
     }
@@ -229,6 +265,7 @@ private struct CompactMetricRow: View {
     let title: LocalizedStringKey
     let systemImage: String
     let value: String
+    let isStale: Bool
 
     var body: some View {
         HStack(spacing: 8) {
@@ -246,6 +283,7 @@ private struct CompactMetricRow: View {
 
             Text(value)
                 .font(.caption.weight(.semibold))
+                .strikethrough(isStale)
         }
         .accessibilityElement(children: .combine)
     }
