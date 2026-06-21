@@ -48,9 +48,15 @@ struct CloudSummaryWidgetView: View {
             balanceView(snapshot, isStale: isStale)
 
             if widgetFamily == .systemSmall {
-                smallMetrics(snapshot, isStale: isStale)
+                CloudSummarySmallWidgetView(
+                    snapshot: snapshot,
+                    isStale: isStale
+                )
             } else {
-                mediumMetrics(snapshot, isStale: isStale)
+                CloudSummaryMediumWidgetView(
+                    snapshot: snapshot,
+                    isStale: isStale
+                )
             }
         }
         .frame(
@@ -59,16 +65,11 @@ struct CloudSummaryWidgetView: View {
             alignment: .topLeading
         )
         .padding(.vertical)
-       // .padding(.horizontal, widgetFamily == .systemSmall ? 0 : 16)
         .padding(.horizontal, 0)
         .overlay(alignment: .topTrailing) {
             if isStale {
                 staleIndicator
                     .padding(.top, 16)
-//                    .padding(
-//                        .trailing,
-//                        widgetFamily == .systemSmall ? 0 : 16
-//                    )
                     .padding(.horizontal, 0)
             }
         }
@@ -128,82 +129,6 @@ struct CloudSummaryWidgetView: View {
         }
     }
 
-    private func smallMetrics(
-        _ snapshot: CloudSummarySnapshot,
-        isStale: Bool
-    ) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            CompactMetricRow(
-                title: "widget.virtualMachines",
-                systemImage: "desktopcomputer",
-                value: "\(snapshot.totalVMsCount)/\(snapshot.runningVMsCount)",
-                isStale: isStale
-            )
-
-            CompactMetricRow(
-                title: "widget.functions",
-                systemImage: "function",
-                value: "\(snapshot.activeFunctionsCount)/\(snapshot.totalFunctionsCount)",
-                isStale: isStale
-            )
-
-            CompactMetricRow(
-                title: "widget.buckets",
-                systemImage: "archivebox",
-                value: "\(snapshot.totalBucketsCount)",
-                isStale: isStale
-            )
-        }
-    }
-
-    private func mediumMetrics(
-        _ snapshot: CloudSummarySnapshot,
-        isStale: Bool
-    ) -> some View {
-        VStack(alignment: .leading, spacing: 7) {
-            MetricRow(
-                title: "widget.virtualMachines",
-                systemImage: "desktopcomputer",
-                value: String(
-                    format: NSLocalizedString(
-                        "widget.totalRunningFormat",
-                        comment: ""
-                    ),
-                    String(snapshot.totalVMsCount),
-                    String(snapshot.runningVMsCount)
-                ),
-                isStale: isStale
-            )
-
-            MetricRow(
-                title: "widget.functions",
-                systemImage: "function",
-                value: String(
-                    format: NSLocalizedString(
-                        "widget.totalActiveFormat",
-                        comment: ""
-                    ),
-                    String(snapshot.totalFunctionsCount),
-                    String(snapshot.activeFunctionsCount)
-                ),
-                isStale: isStale
-            )
-
-            MetricRow(
-                title: "widget.buckets",
-                systemImage: "archivebox",
-                value: String(
-                    format: NSLocalizedString(
-                        "widget.totalOnlyFormat",
-                        comment: ""
-                    ),
-                    String(snapshot.totalBucketsCount)
-                ),
-                isStale: isStale
-            )
-        }
-    }
-
     private func unavailableView(
         title: LocalizedStringKey,
         message: LocalizedStringKey,
@@ -233,59 +158,6 @@ struct CloudSummaryWidgetView: View {
             amount: snapshot.currentBalance,
             currency: snapshot.currency
         )
-    }
-}
-
-private struct MetricRow: View {
-    let title: LocalizedStringKey
-    let systemImage: String
-    let value: String
-    let isStale: Bool
-
-    var body: some View {
-        HStack(alignment: .firstTextBaseline, spacing: 8) {
-            Label(title, systemImage: systemImage)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-
-            Spacer(minLength: 8)
-
-            Text(value)
-                .font(.caption.weight(.semibold))
-                .multilineTextAlignment(.trailing)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
-                .strikethrough(isStale)
-        }
-        .accessibilityElement(children: .combine)
-    }
-}
-
-private struct CompactMetricRow: View {
-    let title: LocalizedStringKey
-    let systemImage: String
-    let value: String
-    let isStale: Bool
-
-    var body: some View {
-        HStack(spacing: 8) {
-            Image(systemName: systemImage)
-                .foregroundStyle(.secondary)
-                .frame(width: 14)
-                .accessibilityHidden(true)
-
-            Text(title)
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-                .lineLimit(1)
-
-            Spacer(minLength: 4)
-
-            Text(value)
-                .font(.caption.weight(.semibold))
-                .strikethrough(isStale)
-        }
-        .accessibilityElement(children: .combine)
     }
 }
 
