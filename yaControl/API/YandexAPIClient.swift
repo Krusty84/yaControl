@@ -258,7 +258,7 @@ final class YandexAPIClient: @unchecked Sendable {
             let valueString = String(describing: value)
 
             if keyString.lowercased() == "authorization" {
-                result[keyString] = "<redacted>"
+                result[keyString] = LogRedactionHelper.hiddenValue
             } else {
                 result[keyString] = valueString
             }
@@ -270,14 +270,18 @@ final class YandexAPIClient: @unchecked Sendable {
     private func prettyPrintedBody(_ data: Data) -> String {
         if let jsonObject = try? JSONSerialization.jsonObject(with: data),
            let prettyData = try? JSONSerialization.data(
-                withJSONObject: jsonObject,
+                withJSONObject: LogRedactionHelper.redactedJSONObject(jsonObject),
                 options: [.prettyPrinted, .sortedKeys]
            ),
            let prettyString = String(data: prettyData, encoding: .utf8) {
             return prettyString
         }
 
-        return String(data: data, encoding: .utf8) ?? "<non-utf8 body>"
+        if let body = String(data: data, encoding: .utf8) {
+            return LogRedactionHelper.redact(body)
+        }
+
+        return "<non-utf8 body>"
     }
     #endif
 }

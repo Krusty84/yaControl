@@ -29,7 +29,8 @@ struct LoggerHelper {
                      file: String = #file,
                      line: Int = #line) {
         guard SettingsManager.shared.appLoggingEnabled else { return }
-        logger.info("[\(extractFileName(file)):\(line)] \(function) - \(message, privacy: .public)")
+        let redactedMessage = LogRedactionHelper.redact(message)
+        logger.info("[\(extractFileName(file)):\(line)] \(function) - \(redactedMessage, privacy: .public)")
     }
 
     static func debug(_ message: String,
@@ -37,7 +38,8 @@ struct LoggerHelper {
                       file: String = #file,
                       line: Int = #line) {
         guard SettingsManager.shared.appLoggingEnabled else { return }
-        logger.debug("[\(extractFileName(file)):\(line)] \(function) - \(message, privacy: .public)")
+        let redactedMessage = LogRedactionHelper.redact(message)
+        logger.debug("[\(extractFileName(file)):\(line)] \(function) - \(redactedMessage, privacy: .public)")
     }
 
     static func error(_ message: String,
@@ -45,11 +47,11 @@ struct LoggerHelper {
                       file: String = #file,
                       line: Int = #line) {
         guard SettingsManager.shared.appLoggingEnabled else { return }
-        logger.error("[\(extractFileName(file)):\(line)] \(function) - \(message, privacy: .public)")
+        let redactedMessage = LogRedactionHelper.redact(message)
+        logger.error("[\(extractFileName(file)):\(line)] \(function) - \(redactedMessage, privacy: .public)")
     }
 
     private static func extractFileName(_ path: String) -> String {
         return (path as NSString).lastPathComponent
     }
 }
-
