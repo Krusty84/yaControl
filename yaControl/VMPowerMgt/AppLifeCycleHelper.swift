@@ -86,12 +86,12 @@ final class AppLifecycleObserver {
                 }
             },
 
-            // Screen locked (optional)
+// Screen locked (optional)
 //            DistributedNotificationCenter.default().addObserver(forName: NSNotification.Name("com.apple.screenIsLocked"), object: nil, queue: .main) { _ in
 //                print("Screen locked")
 //            },
 
-            // Screen unlocked (optional)
+// Screen unlocked (optional)
 //            DistributedNotificationCenter.default().addObserver(forName: NSNotification.Name("com.apple.screenIsUnlocked"), object: nil, queue: .main) { _ in
 //                print("Screen unlocked")
 //            }

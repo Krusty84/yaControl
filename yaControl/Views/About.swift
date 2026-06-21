@@ -51,7 +51,7 @@ struct AboutTabContent: View {
                         Text(LocalizedStringHelper.formatted(
                             L10n.About.contact,
                             locale: locale,
-                            "www.linkedin.com/in/sedoykin"
+                            "www.sedoykin.com"
                         ))
                             .onHover { hovering in
                                 if hovering { NSCursor.pointingHand.push() }

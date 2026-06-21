@@ -10,8 +10,6 @@
 		3DA094392FDE11ED00A7CEE1 /* ElegantTabs in Frameworks */ = {isa = PBXBuildFile; productRef = 3DA094382FDE11ED00A7CEE1 /* ElegantTabs */; };
 		3DA0943C2FDE121200A7CEE1 /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 3DA0943B2FDE121200A7CEE1 /* LaunchAtLogin */; };
 		3DE02E9D2FE70072000CDCBD /* CloudSummaryWidgetFreshness.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE02E9C2FE7006D000CDCBD /* CloudSummaryWidgetFreshness.swift */; };
-		3DE02EA12FE8100000CDCBD1 /* CloudSummarySmallWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE02EA02FE8100000CDCBD1 /* CloudSummarySmallWidgetView.swift */; };
-		3DE02EA32FE8100000CDCBD1 /* CloudSummaryMediumWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE02EA22FE8100000CDCBD1 /* CloudSummaryMediumWidgetView.swift */; };
 		3DF000012FDD000100000101 /* yaControlWidget.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 3DF000012FDD000100000001 /* yaControlWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		3DF000012FDD000100000102 /* CloudSummaryWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF000012FDD000100000003 /* CloudSummaryWidget.swift */; };
 		3DF000012FDD000100000103 /* CloudSummaryWidgetEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF000012FDD000100000004 /* CloudSummaryWidgetEntry.swift */; };
@@ -51,8 +49,6 @@
 /* Begin PBXFileReference section */
 		3D333ED32D639DF100D795BF /* yaControl.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = yaControl.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3DE02E9C2FE7006D000CDCBD /* CloudSummaryWidgetFreshness.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSummaryWidgetFreshness.swift; sourceTree = "<group>"; };
-		3DE02EA02FE8100000CDCBD1 /* CloudSummarySmallWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSummarySmallWidgetView.swift; sourceTree = "<group>"; };
-		3DE02EA22FE8100000CDCBD1 /* CloudSummaryMediumWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSummaryMediumWidgetView.swift; sourceTree = "<group>"; };
 		3DF000012FDD000100000001 /* yaControlWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = yaControlWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		3DF000012FDD000100000003 /* CloudSummaryWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSummaryWidget.swift; sourceTree = "<group>"; };
 		3DF000012FDD000100000004 /* CloudSummaryWidgetEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSummaryWidgetEntry.swift; sourceTree = "<group>"; };
@@ -85,6 +81,11 @@
 				3DCD404C2FDEE3200074A9AA /* Exceptions for "yaControl" folder in "yaControlWidget" target */,
 			);
 			path = yaControl;
+			sourceTree = "<group>";
+		};
+		3DE02F7B2FE82618000CDCBD /* SubViews */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = SubViews;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -131,13 +132,12 @@
 		3DF000012FDD000100000002 /* yaControlWidget */ = {
 			isa = PBXGroup;
 			children = (
+				3DE02F7B2FE82618000CDCBD /* SubViews */,
 				3DE02E9C2FE7006D000CDCBD /* CloudSummaryWidgetFreshness.swift */,
 				3DF000012FDD000100000003 /* CloudSummaryWidget.swift */,
 				3DF000012FDD000100000004 /* CloudSummaryWidgetEntry.swift */,
 				3DF000012FDD000100000005 /* CloudSummaryWidgetProvider.swift */,
 				3DF000012FDD000100000006 /* CloudSummaryWidgetView.swift */,
-				3DE02EA02FE8100000CDCBD1 /* CloudSummarySmallWidgetView.swift */,
-				3DE02EA22FE8100000CDCBD1 /* CloudSummaryMediumWidgetView.swift */,
 				3DF000012FDD000100000007 /* Info.plist */,
 				3DF000012FDD000100000008 /* yaControlWidget.entitlements */,
 				3DF000012FDD00010000000E /* Resources */,
@@ -204,6 +204,9 @@
 			buildRules = (
 			);
 			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				3DE02F7B2FE82618000CDCBD /* SubViews */,
 			);
 			name = yaControlWidget;
 			packageProductDependencies = (
@@ -290,8 +293,6 @@
 				3DF000012FDD000100000103 /* CloudSummaryWidgetEntry.swift in Sources */,
 				3DF000012FDD000100000104 /* CloudSummaryWidgetProvider.swift in Sources */,
 				3DF000012FDD000100000105 /* CloudSummaryWidgetView.swift in Sources */,
-				3DE02EA12FE8100000CDCBD1 /* CloudSummarySmallWidgetView.swift in Sources */,
-				3DE02EA32FE8100000CDCBD1 /* CloudSummaryMediumWidgetView.swift in Sources */,
 				3DE02E9D2FE70072000CDCBD /* CloudSummaryWidgetFreshness.swift in Sources */,
 				3DF000012FDD000100000107 /* yaControl/Helpers/Widget/AppGroupConfig.swift in Sources */,
 				3DF000012FDD00010000010A /* yaControl/Helpers/Widget/CloudSummaryWidgetKind.swift in Sources */,
