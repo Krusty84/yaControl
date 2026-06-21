@@ -48,7 +48,7 @@ enum L10n {
         static let errorTitle = "computing.error.title"
         static let emptyTitle = "computing.empty.title"
         static let emptyDescription = "computing.empty.description"
-
+        static let createFirstVM = "computing.empty.createFirstVM"
     }
 
     enum Storage {
@@ -60,6 +60,7 @@ enum L10n {
         static let errorTitle = "storage.error.title"
         static let emptyTitle = "storage.empty.title"
         static let emptyDescription = "storage.empty.description"
+        static let createFirstBucket = "storage.empty.createFirstBucket"
     }
 
     enum Serverless {
@@ -72,6 +73,7 @@ enum L10n {
         static let errorTitle = "serverless.error.title"
         static let emptyTitle = "serverless.empty.title"
         static let emptyDescription = "serverless.empty.description"
+        static let createFirstFunction = "serverless.empty.createFirstFunction"
     }
 
     enum StatusPanel {

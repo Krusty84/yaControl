@@ -96,11 +96,20 @@ struct BucketTabContent: View {
                 }
             }
         } else if model.filteredBuckets.isEmpty {
-            ContentUnavailableView(
-                LocalizedStringKey(L10n.Storage.emptyTitle),
-                systemImage: "archivebox",
-                description: Text(LocalizedStringKey(L10n.Storage.emptyDescription))
-            )
+            ContentUnavailableView {
+                Label(
+                    LocalizedStringKey(L10n.Storage.emptyTitle),
+                    systemImage: "archivebox"
+                )
+            } description: {
+                Text(LocalizedStringKey(L10n.Storage.emptyDescription))
+            } actions: {
+                Button(LocalizedStringKey(L10n.Storage.createFirstBucket)) {
+                    openCreateBucketPage()
+                }
+                .buttonStyle(.link)
+                .disabled(createBucketURL == nil)
+            }
         } else {
             Table(model.filteredBuckets, selection: $selectedBucket) {
                 TableColumn(LocalizedStringKey(L10n.Table.storageName)) { BucketNameColumn(bucket: $0) }

@@ -103,11 +103,20 @@ struct ServerLessFunctionTabContent: View {
                 }
             }
         } else if model.filteredSLFs.isEmpty {
-            ContentUnavailableView(
-                LocalizedStringKey(L10n.Serverless.emptyTitle),
-                systemImage: "function",
-                description: Text(LocalizedStringKey(L10n.Serverless.emptyDescription))
-            )
+            ContentUnavailableView {
+                Label(
+                    LocalizedStringKey(L10n.Serverless.emptyTitle),
+                    systemImage: "function"
+                )
+            } description: {
+                Text(LocalizedStringKey(L10n.Serverless.emptyDescription))
+            } actions: {
+                Button(LocalizedStringKey(L10n.Serverless.createFirstFunction)) {
+                    openCreateFunctionPage()
+                }
+                .buttonStyle(.link)
+                .disabled(createFunctionURL == nil)
+            }
         } else {
             Table(model.filteredSLFs, selection: $selectedSlf) {
                 TableColumn(LocalizedStringKey(L10n.Table.serverlessName)) { slf in

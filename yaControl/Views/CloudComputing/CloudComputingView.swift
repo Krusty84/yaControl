@@ -135,11 +135,20 @@ struct CloudComputingTabContent: View {
                 }
             }
         } else if model.filteredVMs.isEmpty {
-            ContentUnavailableView(
-                LocalizedStringKey(L10n.Computing.emptyTitle),
-                systemImage: "desktopcomputer",
-                description: Text(LocalizedStringKey(L10n.Computing.emptyDescription))
-            )
+            ContentUnavailableView {
+                Label(
+                    LocalizedStringKey(L10n.Computing.emptyTitle),
+                    systemImage: "desktopcomputer"
+                )
+            } description: {
+                Text(LocalizedStringKey(L10n.Computing.emptyDescription))
+            } actions: {
+                Button(LocalizedStringKey(L10n.Computing.createFirstVM)) {
+                    openCreateVMPage()
+                }
+                .buttonStyle(.link)
+                .disabled(createVMURL == nil)
+            }
         } else {
             Table(model.filteredVMs, selection: $selectedVM) {
                 TableColumn(LocalizedStringKey(L10n.Table.vmAutoStart)) { item in

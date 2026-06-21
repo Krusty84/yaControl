@@ -490,6 +490,29 @@
         }
       }
     },
+    "computing.empty.createFirstVM" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create your first VM"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Алғашқы виртуалды машинаны жасау"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Создать первую виртуальную машину"
+          }
+        }
+      }
+    },
     "computing.empty.description" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1544,6 +1567,29 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Активно: %lld"
+          }
+        }
+      }
+    },
+    "serverless.empty.createFirstFunction" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create your first function"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Алғашқы функцияны жасау"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Создать первую функцию"
           }
         }
       }
@@ -3292,6 +3338,29 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Обновлено: %@"
+          }
+        }
+      }
+    },
+    "storage.empty.createFirstBucket" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create your first bucket"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Алғашқы бакетті жасау"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Создать первый бакет"
           }
         }
       }
