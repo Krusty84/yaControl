@@ -36,10 +36,11 @@ struct SettingsGeneralTabView: View {
                 LaunchAtLogin.Toggle()
                     .toggleStyle(.switch)
                     .help(localized(L10n.Settings.launchAtLoginHelp))
-
-                Toggle(LocalizedStringKey(L10n.Settings.appLoggingTitle), isOn: $model.appLogging)
-                    .toggleStyle(.switch)
-                    .help(localized(L10n.Settings.appLoggingHelp))
+                
+// TODO: Maybe for future release, I am not sure about real reasons...
+//                Toggle(LocalizedStringKey(L10n.Settings.appLoggingTitle), isOn: $model.appLogging)
+//                    .toggleStyle(.switch)
+//                    .help(localized(L10n.Settings.appLoggingHelp))
 
                 NotificationToggleView()
                     .help(localized(L10n.Settings.notificationsHelp))
