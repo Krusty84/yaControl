@@ -15,20 +15,26 @@ final class VMPowerAutomationService: @unchecked Sendable {
     private let powerService: VMPowerService
     private let pollingService: VMPollingService
     private let operationRegistry: VMPowerOperationRegistry
+    private let wakeAutoStartCoordinator: WakeAutoStartCoordinator
     private let internetWaitTimeout: Duration = .seconds(30)
+    private let wakeRetryPolicy: VMPowerAutomationRetryPolicy
 
     init(
         authAPI: YandexAuthAPI = YandexAuthAPI(),
         inventoryService: YandexInventoryService = .shared,
         powerService: VMPowerService = .shared,
         pollingService: VMPollingService = .shared,
-        operationRegistry: VMPowerOperationRegistry = .shared
+        operationRegistry: VMPowerOperationRegistry = .shared,
+        wakeAutoStartCoordinator: WakeAutoStartCoordinator = .shared,
+        wakeRetryPolicy: VMPowerAutomationRetryPolicy = .wake
     ) {
         self.authAPI = authAPI
         self.inventoryService = inventoryService
         self.powerService = powerService
         self.pollingService = pollingService
         self.operationRegistry = operationRegistry
+        self.wakeAutoStartCoordinator = wakeAutoStartCoordinator
+        self.wakeRetryPolicy = wakeRetryPolicy
     }
 
     func handleAppLaunch() async {
@@ -44,7 +50,12 @@ final class VMPowerAutomationService: @unchecked Sendable {
     }
 
     func handleMacWake() async {
-        await handleAutoStart(option: .afterWakeup, source: .macOSWake)
+        LoggerHelper.info("Wake auto-start notification received")
+        await wakeAutoStartCoordinator.start { [self] in
+            let result = await makeWakeAutoStartWorkflow().run()
+            LoggerHelper.info("Wake auto-start workflow finished result=\(result)")
+            await AppState.shared.checkNumRunningVMs()
+        }
     }
 
     private func handleAutoStart(option: StartOption, source: VMPowerOperationSource) async {
@@ -114,6 +125,16 @@ final class VMPowerAutomationService: @unchecked Sendable {
                 )
             }
 
+            for vm in autoStartPlan.deferredVMs {
+                VMPowerOperationLogger.log(
+                    vmId: vm.id,
+                    operation: .start,
+                    source: source,
+                    outcome: .skipped,
+                    message: "Status is deferred for auto-start: \(vm.status.rawValue)"
+                )
+            }
+
             for vm in autoStartPlan.skippedVMs {
                 VMPowerOperationLogger.log(
                     vmId: vm.id,
@@ -144,6 +165,12 @@ final class VMPowerAutomationService: @unchecked Sendable {
             return true
         }
 
+        let vmIds = SettingsManager.shared.getAllAutostartVMs()
+        guard !vmIds.isEmpty else {
+            LoggerHelper.info("Automatic shutdown has no selected running VMs source=\(source.rawValue)")
+            return true
+        }
+
         let token = SettingsManager.shared.oAuthKey
         guard !token.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             LoggerHelper.error("VM shutdown failed source=\(source.rawValue) error=\(YandexRequestError.emptyOAuthToken.localizedDescription)")
@@ -155,11 +182,36 @@ final class VMPowerAutomationService: @unchecked Sendable {
             LoggerHelper.info("IAM token acquired successfully source=\(source.rawValue)")
 
             let allVMs = try await inventoryService.loadVMTableData(iamToken: authResponse.iamToken)
-            let runningVMs = VMPowerAutomationPlanner.shutdownVMs(in: allVMs)
-            LoggerHelper.info("Running VM IDs source=\(source.rawValue) ids=\(runningVMs.map(\.id))")
+            let shutdownPlan = VMPowerAutomationPlanner.shutdownPlan(
+                selectedVMIds: vmIds,
+                inventory: allVMs
+            )
+            let selectedVMIdSet = Set(vmIds)
+            let unselectedRunningVMs = allVMs.filter { vm in
+                vm.status.isRunning && !selectedVMIdSet.contains(vm.id)
+            }
+
+            for vm in unselectedRunningVMs {
+                LoggerHelper.info("Automatic shutdown skipped VM vmId=\(vm.id) reason=not_selected")
+            }
+
+            for vmId in shutdownPlan.missingVMIds {
+                LoggerHelper.info("Automatic shutdown skipped VM vmId=\(vmId) reason=missing")
+            }
+
+            for vm in shutdownPlan.skippedVMs {
+                LoggerHelper.info(
+                    "Automatic shutdown skipped VM vmId=\(vm.id) reason=status_\(vm.status.rawValue)"
+                )
+            }
+
+            let runningVMs = shutdownPlan.vmsToStop
+            LoggerHelper.info(
+                "Automatic shutdown source=\(source.rawValue) selectedRunningVMIds=\(runningVMs.map(\.id))"
+            )
 
             guard !runningVMs.isEmpty else {
-                LoggerHelper.info("No running VMs found source=\(source.rawValue)")
+                LoggerHelper.info("Automatic shutdown has no selected running VMs source=\(source.rawValue)")
                 return true
             }
 
@@ -192,19 +244,25 @@ final class VMPowerAutomationService: @unchecked Sendable {
         }
     }
 
+    @discardableResult
     private func startVMs(
         _ vms: [VMTableData],
         iamToken: String,
         source: VMPowerOperationSource
-    ) async {
+    ) async -> Bool {
         let lockedVMs = await lockVMs(vms, source: source)
-        guard !lockedVMs.isEmpty else { return }
+        guard !lockedVMs.isEmpty else { return false }
 
         let lockedVMIds = Set(lockedVMs.map(\.id))
         defer {
             Task {
                 await releaseLocks(lockedVMIds)
             }
+        }
+
+        guard !Task.isCancelled else {
+            await releaseLocks(lockedVMIds)
+            return false
         }
 
         let results = await powerService.startVMs(
@@ -235,6 +293,11 @@ final class VMPowerAutomationService: @unchecked Sendable {
             await operationRegistry.finish(vmId: result.vmId)
         }
 
+        guard !Task.isCancelled else {
+            await releaseLocks(lockedVMIds.subtracting(Set(failedResults.map(\.vmId))))
+            return false
+        }
+
         let initialStatuses = Dictionary(
             uniqueKeysWithValues: lockedVMs
                 .filter { successfulVMIds.contains($0.id) }
@@ -245,11 +308,16 @@ final class VMPowerAutomationService: @unchecked Sendable {
             initialStatuses: initialStatuses
         )
 
+        var didCompletePolls = true
         for (_, result) in pollResults {
-            _ = await handlePollingResult(result, operation: .start, source: source)
+            let didComplete = await handlePollingResult(result, operation: .start, source: source)
+            if !didComplete {
+                didCompletePolls = false
+            }
         }
 
         await releaseLocks(lockedVMIds.subtracting(Set(failedResults.map(\.vmId))))
+        return failedResults.isEmpty && didCompletePolls
     }
 
     private func stopVMs(
@@ -481,6 +549,38 @@ final class VMPowerAutomationService: @unchecked Sendable {
     
     private func notifyVMInventoryDidChange() {
         NotificationCenter.default.post(name: .vmInventoryDidChange, object: nil)
+    }
+
+    private func makeWakeAutoStartWorkflow() -> VMPowerWakeAutoStartWorkflow {
+        VMPowerWakeAutoStartWorkflow(
+            retryPolicy: wakeRetryPolicy,
+            sleeper: TaskAutomationSleeper(),
+            loadSettings: {
+                VMAutoStartSettingsSnapshot(
+                    autoStartEnabled: SettingsManager.shared.autoStartEnabled,
+                    startOptions: SettingsManager.shared.startOptions,
+                    selectedVMIds: SettingsManager.shared.getAllAutostartVMs(),
+                    oAuthToken: SettingsManager.shared.oAuthKey
+                )
+            },
+            waitUntilConnected: { timeout in
+                await InternetConnectionMonitor.waitUntilConnected(timeout: timeout)
+            },
+            authenticate: { token in
+                try await self.authAPI.checkOAuthToken(token)
+            },
+            loadInventory: { iamToken in
+                try await self.inventoryService.loadVMTableData(iamToken: iamToken)
+            },
+            startVMs: { vms, iamToken in
+                let didComplete = await self.startVMs(vms, iamToken: iamToken, source: .macOSWake)
+                if !vms.isEmpty {
+                    self.notifyVMInventoryDidChange()
+                }
+                return didComplete
+            },
+            internetWaitTimeout: internetWaitTimeout
+        )
     }
 
 }

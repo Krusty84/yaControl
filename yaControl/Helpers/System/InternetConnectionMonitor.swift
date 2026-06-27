@@ -37,37 +37,64 @@ enum InternetConnectionMonitor {
     }
 
     static func waitUntilConnected(timeout: Duration) async -> Bool {
-        await withCheckedContinuation { continuation in
-            let monitor = NWPathMonitor()
-            let queue = DispatchQueue(label: "InternetConnectionMonitor")
-            let state = InternetConnectionWaitState(
-                monitor: monitor,
-                continuation: continuation
-            )
+        let stateBox = InternetConnectionWaitStateBox()
 
-            let timeoutTask = Task {
-                do {
-                    try await Task.sleep(for: timeout)
-                    LoggerHelper.error("Internet connection wait timed out")
-                    state.finish(false)
-                } catch {
-                    state.finish(false)
+        return await withTaskCancellationHandler {
+            await withCheckedContinuation { continuation in
+                let monitor = NWPathMonitor()
+                let queue = DispatchQueue(label: "InternetConnectionMonitor")
+                let state = InternetConnectionWaitState(
+                    monitor: monitor,
+                    continuation: continuation
+                )
+
+                stateBox.setState(state)
+
+                let timeoutTask = Task {
+                    do {
+                        try await Task.sleep(for: timeout)
+                        LoggerHelper.error("Internet connection wait timed out")
+                        state.finish(false)
+                    } catch {
+                        state.finish(false)
+                    }
                 }
-            }
 
-            state.setTimeoutTask(timeoutTask)
+                state.setTimeoutTask(timeoutTask)
 
-            monitor.pathUpdateHandler = { path in
-                if path.status == .satisfied {
-                    LoggerHelper.info("Internet access is available")
-                    state.finish(true)
-                } else {
-                    LoggerHelper.error("The Internet access does not work")
+                monitor.pathUpdateHandler = { path in
+                    if path.status == .satisfied {
+                        LoggerHelper.info("Internet access is available")
+                        state.finish(true)
+                    } else {
+                        LoggerHelper.error("The Internet access does not work")
+                    }
                 }
-            }
 
-            monitor.start(queue: queue)
+                monitor.start(queue: queue)
+            }
+        } onCancel: {
+            stateBox.cancel()
         }
+    }
+}
+
+private final class InternetConnectionWaitStateBox: @unchecked Sendable {
+    private let lock = NSLock()
+    private var state: InternetConnectionWaitState?
+
+    func setState(_ state: InternetConnectionWaitState) {
+        lock.lock()
+        self.state = state
+        lock.unlock()
+    }
+
+    func cancel() {
+        lock.lock()
+        let state = state
+        lock.unlock()
+
+        state?.finish(false)
     }
 }
 

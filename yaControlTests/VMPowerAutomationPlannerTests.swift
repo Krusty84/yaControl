@@ -20,18 +20,6 @@ final class VMPowerAutomationPlannerTests: XCTestCase {
         XCTAssertEqual(plan.vmsToStart.map(\.id), ["vm-1"])
     }
 
-    func testAutoStartDoesNotSelectRunningSelectedVM() {
-        let vm = makeVM(id: "vm-1", status: .running)
-
-        let plan = VMPowerAutomationPlanner.autoStartPlan(
-            selectedVMIds: ["vm-1"],
-            inventory: [vm]
-        )
-
-        XCTAssertTrue(plan.vmsToStart.isEmpty)
-        XCTAssertEqual(plan.alreadyRunningVMs.map(\.id), ["vm-1"])
-    }
-
     func testAutoStartDoesNotSelectUnselectedStoppedVM() {
         let vm = makeVM(id: "vm-1", status: .stopped)
 
@@ -43,8 +31,44 @@ final class VMPowerAutomationPlannerTests: XCTestCase {
         XCTAssertTrue(plan.vmsToStart.isEmpty)
     }
 
-    func testAutoStartDoesNotSelectSelectedTransitioningVMs() {
-        let statuses: [VMStatus] = [.starting, .stopping, .provisioning, .restarting, .updating]
+    func testAutoStartTreatsRunningSelectedVMAsAlreadyRunning() {
+        let vm = makeVM(id: "vm-1", status: .running)
+
+        let plan = VMPowerAutomationPlanner.autoStartPlan(
+            selectedVMIds: ["vm-1"],
+            inventory: [vm]
+        )
+
+        XCTAssertTrue(plan.vmsToStart.isEmpty)
+        XCTAssertEqual(plan.alreadyRunningVMs.map(\.id), ["vm-1"])
+    }
+
+    func testAutoStartDefersStoppingSelectedVM() {
+        let vm = makeVM(id: "vm-1", status: .stopping)
+
+        let plan = VMPowerAutomationPlanner.autoStartPlan(
+            selectedVMIds: ["vm-1"],
+            inventory: [vm]
+        )
+
+        XCTAssertTrue(plan.vmsToStart.isEmpty)
+        XCTAssertEqual(plan.deferredVMs.map(\.id), ["vm-1"])
+    }
+
+    func testAutoStartDefersStartingSelectedVM() {
+        let vm = makeVM(id: "vm-1", status: .starting)
+
+        let plan = VMPowerAutomationPlanner.autoStartPlan(
+            selectedVMIds: ["vm-1"],
+            inventory: [vm]
+        )
+
+        XCTAssertTrue(plan.vmsToStart.isEmpty)
+        XCTAssertEqual(plan.deferredVMs.map(\.id), ["vm-1"])
+    }
+
+    func testAutoStartDefersOtherTemporaryTransitionStates() {
+        let statuses: [VMStatus] = [.provisioning, .restarting, .updating]
         let inventory = statuses.enumerated().map { index, status in
             makeVM(id: "vm-\(index)", status: status)
         }
@@ -55,10 +79,11 @@ final class VMPowerAutomationPlannerTests: XCTestCase {
         )
 
         XCTAssertTrue(plan.vmsToStart.isEmpty)
-        XCTAssertEqual(plan.skippedVMs.map(\.id), inventory.map(\.id))
+        XCTAssertEqual(plan.deferredVMs.map(\.id), inventory.map(\.id))
+        XCTAssertTrue(plan.skippedVMs.isEmpty)
     }
 
-    func testAutoStartDoesNotSelectFailureDeletingOrUnknownVMs() {
+    func testAutoStartPermanentlySkipsFailureDeletingAndUnknownStates() {
         let statuses: [VMStatus] = [.error, .crashed, .deleting, .unknown]
         let inventory = statuses.enumerated().map { index, status in
             makeVM(id: "vm-\(index)", status: status)
@@ -70,10 +95,11 @@ final class VMPowerAutomationPlannerTests: XCTestCase {
         )
 
         XCTAssertTrue(plan.vmsToStart.isEmpty)
+        XCTAssertTrue(plan.deferredVMs.isEmpty)
         XCTAssertEqual(plan.skippedVMs.map(\.id), inventory.map(\.id))
     }
 
-    func testAutoStartMissingSelectedIDDoesNotProduceOperation() {
+    func testAutoStartIgnoresMissingSelectedID() {
         let plan = VMPowerAutomationPlanner.autoStartPlan(
             selectedVMIds: ["missing-vm"],
             inventory: []
@@ -83,62 +109,103 @@ final class VMPowerAutomationPlannerTests: XCTestCase {
         XCTAssertEqual(plan.missingVMIds, ["missing-vm"])
     }
 
-    func testAutoStartDuplicateSelectedIDsDoNotProduceDuplicateOperations() {
-        let vm = makeVM(id: "vm-1", status: .stopped)
+    func testAutoStartDoesNotProduceDuplicateOperations() {
+        let firstVM = makeVM(id: "vm-1", status: .stopped)
+        let duplicateVM = makeVM(id: "vm-1", status: .stopped)
 
         let plan = VMPowerAutomationPlanner.autoStartPlan(
             selectedVMIds: ["vm-1", "vm-1"],
-            inventory: [vm]
+            inventory: [firstVM, duplicateVM]
         )
 
         XCTAssertEqual(plan.vmsToStart.map(\.id), ["vm-1"])
     }
 
-    func testShutdownSelectsRunningVM() {
+    func testShutdownSelectsSelectedRunningVM() {
+        let selectedVM = makeVM(id: "selected-vm", status: .running)
+        let unselectedVM = makeVM(id: "unselected-vm", status: .running)
+
+        let plan = VMPowerAutomationPlanner.shutdownPlan(
+            selectedVMIds: ["selected-vm"],
+            inventory: [selectedVM, unselectedVM]
+        )
+
+        XCTAssertEqual(plan.vmsToStop.map(\.id), ["selected-vm"])
+    }
+
+    func testShutdownDoesNotSelectUnselectedRunningVM() {
         let vm = makeVM(id: "vm-1", status: .running)
 
-        let selectedVMs = VMPowerAutomationPlanner.shutdownVMs(in: [vm])
+        let plan = VMPowerAutomationPlanner.shutdownPlan(
+            selectedVMIds: [],
+            inventory: [vm]
+        )
 
-        XCTAssertEqual(selectedVMs.map(\.id), ["vm-1"])
+        XCTAssertTrue(plan.vmsToStop.isEmpty)
     }
 
-    func testShutdownDoesNotSelectStoppedVM() {
+    func testShutdownDoesNotSelectSelectedStoppedVM() {
         let vm = makeVM(id: "vm-1", status: .stopped)
 
-        let selectedVMs = VMPowerAutomationPlanner.shutdownVMs(in: [vm])
+        let plan = VMPowerAutomationPlanner.shutdownPlan(
+            selectedVMIds: ["vm-1"],
+            inventory: [vm]
+        )
 
-        XCTAssertTrue(selectedVMs.isEmpty)
+        XCTAssertTrue(plan.vmsToStop.isEmpty)
+        XCTAssertEqual(plan.skippedVMs.map(\.id), ["vm-1"])
     }
 
-    func testShutdownDoesNotSelectTransitioningVMs() {
+    func testShutdownDoesNotSelectSelectedTransitioningVM() {
         let statuses: [VMStatus] = [.starting, .stopping, .provisioning, .restarting, .updating]
         let inventory = statuses.enumerated().map { index, status in
             makeVM(id: "vm-\(index)", status: status)
         }
 
-        let selectedVMs = VMPowerAutomationPlanner.shutdownVMs(in: inventory)
+        let plan = VMPowerAutomationPlanner.shutdownPlan(
+            selectedVMIds: inventory.map(\.id),
+            inventory: inventory
+        )
 
-        XCTAssertTrue(selectedVMs.isEmpty)
+        XCTAssertTrue(plan.vmsToStop.isEmpty)
+        XCTAssertEqual(plan.skippedVMs.map(\.id), inventory.map(\.id))
     }
 
-    func testShutdownDoesNotSelectFailureDeletingOrUnknownVMs() {
+    func testShutdownDoesNotSelectFailureDeletingOrUnknownVM() {
         let statuses: [VMStatus] = [.error, .crashed, .deleting, .unknown]
         let inventory = statuses.enumerated().map { index, status in
             makeVM(id: "vm-\(index)", status: status)
         }
 
-        let selectedVMs = VMPowerAutomationPlanner.shutdownVMs(in: inventory)
+        let plan = VMPowerAutomationPlanner.shutdownPlan(
+            selectedVMIds: inventory.map(\.id),
+            inventory: inventory
+        )
 
-        XCTAssertTrue(selectedVMs.isEmpty)
+        XCTAssertTrue(plan.vmsToStop.isEmpty)
+        XCTAssertEqual(plan.skippedVMs.map(\.id), inventory.map(\.id))
     }
 
-    func testShutdownOutputDoesNotContainDuplicateVMIDs() {
+    func testShutdownIgnoresMissingSelectedVMID() {
+        let plan = VMPowerAutomationPlanner.shutdownPlan(
+            selectedVMIds: ["missing-vm"],
+            inventory: []
+        )
+
+        XCTAssertTrue(plan.vmsToStop.isEmpty)
+        XCTAssertEqual(plan.missingVMIds, ["missing-vm"])
+    }
+
+    func testShutdownDoesNotProduceDuplicateOperations() {
         let firstVM = makeVM(id: "vm-1", status: .running)
         let duplicateVM = makeVM(id: "vm-1", status: .running)
 
-        let selectedVMs = VMPowerAutomationPlanner.shutdownVMs(in: [firstVM, duplicateVM])
+        let plan = VMPowerAutomationPlanner.shutdownPlan(
+            selectedVMIds: ["vm-1", "vm-1"],
+            inventory: [firstVM, duplicateVM]
+        )
 
-        XCTAssertEqual(selectedVMs.map(\.id), ["vm-1"])
+        XCTAssertEqual(plan.vmsToStop.map(\.id), ["vm-1"])
     }
 
     private func makeVM(id: String, status: VMStatus) -> VMTableData {

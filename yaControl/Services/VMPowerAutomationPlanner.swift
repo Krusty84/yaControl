@@ -10,6 +10,13 @@ import Foundation
 struct VMPowerAutoStartPlan: Equatable {
     let vmsToStart: [VMTableData]
     let alreadyRunningVMs: [VMTableData]
+    let deferredVMs: [VMTableData]
+    let skippedVMs: [VMTableData]
+    let missingVMIds: [String]
+}
+
+struct VMPowerShutdownPlan: Equatable {
+    let vmsToStop: [VMTableData]
     let skippedVMs: [VMTableData]
     let missingVMIds: [String]
 }
@@ -19,10 +26,11 @@ enum VMPowerAutomationPlanner {
         selectedVMIds: [String],
         inventory: [VMTableData]
     ) -> VMPowerAutoStartPlan {
-        let vmsById = Dictionary(uniqueKeysWithValues: inventory.map { ($0.id, $0) })
+        let vmsById = uniqueVMsById(inventory)
         var seenVMIds = Set<String>()
         var vmsToStart: [VMTableData] = []
         var alreadyRunningVMs: [VMTableData] = []
+        var deferredVMs: [VMTableData] = []
         var skippedVMs: [VMTableData] = []
         var missingVMIds: [String] = []
 
@@ -36,6 +44,8 @@ enum VMPowerAutomationPlanner {
                 alreadyRunningVMs.append(vm)
             } else if vm.status.isStopped {
                 vmsToStart.append(vm)
+            } else if vm.status.isTransitioning {
+                deferredVMs.append(vm)
             } else {
                 skippedVMs.append(vm)
             }
@@ -44,16 +54,47 @@ enum VMPowerAutomationPlanner {
         return VMPowerAutoStartPlan(
             vmsToStart: vmsToStart,
             alreadyRunningVMs: alreadyRunningVMs,
+            deferredVMs: deferredVMs,
             skippedVMs: skippedVMs,
             missingVMIds: missingVMIds
         )
     }
 
-    static func shutdownVMs(in inventory: [VMTableData]) -> [VMTableData] {
+    static func shutdownPlan(
+        selectedVMIds: [String],
+        inventory: [VMTableData]
+    ) -> VMPowerShutdownPlan {
+        let vmsById = uniqueVMsById(inventory)
         var seenVMIds = Set<String>()
+        var vmsToStop: [VMTableData] = []
+        var skippedVMs: [VMTableData] = []
+        var missingVMIds: [String] = []
 
-        return inventory.filter { vm in
-            vm.status.isRunning && seenVMIds.insert(vm.id).inserted
+        for vmId in selectedVMIds where seenVMIds.insert(vmId).inserted {
+            guard let vm = vmsById[vmId] else {
+                missingVMIds.append(vmId)
+                continue
+            }
+
+            if vm.status.isRunning {
+                vmsToStop.append(vm)
+            } else {
+                skippedVMs.append(vm)
+            }
+        }
+
+        return VMPowerShutdownPlan(
+            vmsToStop: vmsToStop,
+            skippedVMs: skippedVMs,
+            missingVMIds: missingVMIds
+        )
+    }
+
+    private static func uniqueVMsById(_ inventory: [VMTableData]) -> [String: VMTableData] {
+        inventory.reduce(into: [String: VMTableData]()) { result, vm in
+            if result[vm.id] == nil {
+                result[vm.id] = vm
+            }
         }
     }
 }
