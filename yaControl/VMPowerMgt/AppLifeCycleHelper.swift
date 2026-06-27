@@ -12,6 +12,10 @@ import Observation
 //handle termination and ensure async code executes before the app quits, the nuance of shutdown
 final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        guard ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil else {
+            return .terminateNow
+        }
+
         Task {
             let success = await VMPowerAutomationService.shared.handleAppExit()
             LoggerHelper.info(success ? "Shutdown tasks completed successfully." : "Shutdown tasks finished with errors.")

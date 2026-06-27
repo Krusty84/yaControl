@@ -214,6 +214,7 @@ enum L10n {
         static let license = "about.license"
         static let author = "about.author"
         static let contact = "about.contact"
+        static let privacyPolicy = "about.privacyPolicy"
         static let exit = "about.exit"
     }
 

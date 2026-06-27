@@ -21,6 +21,8 @@ struct YaControlApp: App {
     }
 
     init() {
+        guard ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil else { return }
+
         // Initialize the app lifecycle observer
         _ = AppLifecycleObserver.shared
 

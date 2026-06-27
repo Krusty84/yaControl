@@ -89,44 +89,43 @@ final class VMPowerAutomationService: @unchecked Sendable {
             let allVMs = try await inventoryService.loadVMTableData(iamToken: authResponse.iamToken)
             SettingsManager.shared.cleanupAutostartSettings(validVMIds: Set(allVMs.map(\.id)))
 
-            let vmsById = Dictionary(uniqueKeysWithValues: allVMs.map { ($0.id, $0) })
-            var vmsToStart: [VMTableData] = []
+            let autoStartPlan = VMPowerAutomationPlanner.autoStartPlan(
+                selectedVMIds: vmIds,
+                inventory: allVMs
+            )
 
-            for vmId in vmIds {
-                guard let vm = vmsById[vmId] else {
-                    VMPowerOperationLogger.log(
-                        vmId: vmId,
-                        operation: .start,
-                        source: source,
-                        outcome: .skipped,
-                        message: "VM is no longer present in inventory"
-                    )
-                    continue
-                }
-
-                if vm.status.isRunning {
-                    VMPowerOperationLogger.log(
-                        vmId: vm.id,
-                        operation: .start,
-                        source: source,
-                        outcome: .completed,
-                        message: "VM already running"
-                    )
-                } else if vm.status.isStopped {
-                    vmsToStart.append(vm)
-                } else {
-                    VMPowerOperationLogger.log(
-                        vmId: vm.id,
-                        operation: .start,
-                        source: source,
-                        outcome: .skipped,
-                        message: "Status is not actionable for auto-start: \(vm.status.rawValue)"
-                    )
-                }
+            for vmId in autoStartPlan.missingVMIds {
+                VMPowerOperationLogger.log(
+                    vmId: vmId,
+                    operation: .start,
+                    source: source,
+                    outcome: .skipped,
+                    message: "VM is no longer present in inventory"
+                )
             }
 
-            await startVMs(vmsToStart, iamToken: authResponse.iamToken, source: source)
-            if !vmsToStart.isEmpty {
+            for vm in autoStartPlan.alreadyRunningVMs {
+                VMPowerOperationLogger.log(
+                    vmId: vm.id,
+                    operation: .start,
+                    source: source,
+                    outcome: .completed,
+                    message: "VM already running"
+                )
+            }
+
+            for vm in autoStartPlan.skippedVMs {
+                VMPowerOperationLogger.log(
+                    vmId: vm.id,
+                    operation: .start,
+                    source: source,
+                    outcome: .skipped,
+                    message: "Status is not actionable for auto-start: \(vm.status.rawValue)"
+                )
+            }
+
+            await startVMs(autoStartPlan.vmsToStart, iamToken: authResponse.iamToken, source: source)
+            if !autoStartPlan.vmsToStart.isEmpty {
                 notifyVMInventoryDidChange()
             }
         } catch {
@@ -156,7 +155,7 @@ final class VMPowerAutomationService: @unchecked Sendable {
             LoggerHelper.info("IAM token acquired successfully source=\(source.rawValue)")
 
             let allVMs = try await inventoryService.loadVMTableData(iamToken: authResponse.iamToken)
-            let runningVMs = allVMs.filter { $0.status.isRunning }
+            let runningVMs = VMPowerAutomationPlanner.shutdownVMs(in: allVMs)
             LoggerHelper.info("Running VM IDs source=\(source.rawValue) ids=\(runningVMs.map(\.id))")
 
             guard !runningVMs.isEmpty else {

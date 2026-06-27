@@ -174,10 +174,9 @@ final class YandexAPIClient: @unchecked Sendable {
         return String(sanitized.prefix(300))
     }
     
-    #if DEBUG
     private func formattedAPIRequest(_ request: URLRequest, endpoint: String) -> String {
         let method = request.httpMethod ?? "<unknown>"
-        let url = request.url?.absoluteString ?? "<invalid url>"
+        let url = request.url.map { LogRedactionHelper.redact($0.absoluteString) } ?? "<invalid url>"
         let headers = sanitizedHeaders(request.allHTTPHeaderFields)
 
         let requestBody: String
@@ -197,9 +196,10 @@ final class YandexAPIClient: @unchecked Sendable {
         │ url:      \(url)
         │ headers:  \(headers)
         │ body:
-        \(requestBody)
-        └────────────────────────────────────────────
+
+          \(requestBody)
         
+        ─────────────────────────────────────────────
         """
     }
 
@@ -225,14 +225,15 @@ final class YandexAPIClient: @unchecked Sendable {
         ┌────────────────────────────────────────────
         │ Yandex API Response
         ├────────────────────────────────────────────
-        │ endpoint:   \(endpoint)
+        | endpoint:   \(endpoint)
         │ statusCode: \(statusCode)
         │ duration:   \(durationMs) ms
         │ headers:    \(headers)
         │ body:
-        \(responseBody)
-        └────────────────────────────────────────────
         
+          \(responseBody)
+        
+        ─────────────────────────────────────────────
         """
     }
 
@@ -283,5 +284,4 @@ final class YandexAPIClient: @unchecked Sendable {
 
         return "<non-utf8 body>"
     }
-    #endif
 }

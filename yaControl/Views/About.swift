@@ -11,6 +11,8 @@ import AppKit
 struct AboutTabContent: View {
     @Environment(\.locale) private var locale
 
+    private static let privacyPolicyURLString = "https://www.sedoykin.com/published_app/yaControl/legal/Privacy_Policy.html"
+
     var body: some View {
         VStack(spacing: 12) {
             // App Icon
@@ -57,6 +59,13 @@ struct AboutTabContent: View {
                                 if hovering { NSCursor.pointingHand.push() }
                                 else       { NSCursor.pop() }
                             }
+                        if let privacyPolicyURL = URL(string: Self.privacyPolicyURLString) {
+                            Link(
+                                LocalizedStringKey(L10n.About.privacyPolicy),
+                                destination: privacyPolicyURL
+                            )
+                            .accessibilityLabel(LocalizedStringKey(L10n.About.privacyPolicy))
+                        }
                     }
                     .font(.body)
                     .frame(maxWidth: .infinity, alignment: .leading)
