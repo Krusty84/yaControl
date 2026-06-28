@@ -11,7 +11,11 @@ import AppKit
 struct AboutTabContent: View {
     @Environment(\.locale) private var locale
 
-    private static let privacyPolicyURLString = "https://www.sedoykin.com/published_app/yaControl/legal/Privacy_Policy.html"
+    //private static let privacyPolicyURLString = "https://www.sedoykin.com/published_app/yaControl/legal/Privacy_Policy.html"
+    
+    private static let homeURL = URL(string: "https://www.sedoykin.com")!
+    private static let gitHubURL = URL(string: "https://github.com/Krusty84/yaControl")!
+    private static let privacyPolicyURL = URL(string: "https://www.sedoykin.com/published_app/yaControl/legal/Privacy_Policy.html")!
 
     var body: some View {
         VStack(spacing: 12) {
@@ -40,32 +44,23 @@ struct AboutTabContent: View {
                 // License & Author
                 VStack(alignment: .leading, spacing: 4) {
                     Group {
-                        Text(LocalizedStringHelper.formatted(
-                            L10n.About.license,
-                            locale: locale,
-                            "MIT"
-                        ))
-                        Text(LocalizedStringHelper.formatted(
-                            L10n.About.author,
-                            locale: locale,
-                            "Alexey Sedoykin"
-                        ))
-                        Text(LocalizedStringHelper.formatted(
-                            L10n.About.contact,
-                            locale: locale,
-                            "www.sedoykin.com"
-                        ))
-                            .onHover { hovering in
-                                if hovering { NSCursor.pointingHand.push() }
-                                else       { NSCursor.pop() }
-                            }
-                        if let privacyPolicyURL = URL(string: Self.privacyPolicyURLString) {
-                            Link(
-                                LocalizedStringKey(L10n.About.privacyPolicy),
-                                destination: privacyPolicyURL
-                            )
-                            .accessibilityLabel(LocalizedStringKey(L10n.About.privacyPolicy))
-                        }
+                        linkRow(
+                            title: LocalizedStringKey(L10n.About.linkHome),
+                            icon: "house",
+                            url: Self.homeURL
+                        )
+
+                        linkRow(
+                            title: LocalizedStringKey(L10n.About.linkGitHub),
+                            icon: "chevron.left.forwardslash.chevron.right",
+                            url: Self.gitHubURL
+                        )
+
+                        linkRow(
+                            title: LocalizedStringKey(L10n.About.linkPrivacy),
+                            icon: "hand.raised",
+                            url: Self.privacyPolicyURL
+                        )
                     }
                     .font(.body)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -101,4 +96,35 @@ struct AboutTabContent: View {
             // Any additional setup when the view appears
         }
     }
+    
+    private func linkRow(
+         title: LocalizedStringKey,
+         icon: String,
+         url: URL
+     ) -> some View {
+         Link(destination: url) {
+             HStack(spacing: 12) {
+                 Image(systemName: icon)
+                     .frame(width: 28, alignment: .leading)
+                     .foregroundStyle(.primary)
+
+                 Text(title)
+                     .foregroundStyle(.primary)
+
+                 Spacer()
+             }
+             .contentShape(Rectangle())
+         }
+         .font(.body)
+         .buttonStyle(.plain)
+         .pointingHandCursor()
+     }
+
+     private var version: String {
+         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
+
+         return LocalizedStringHelper.formatted(L10n.About.version, locale: locale, version)
+     }
 }
+
+

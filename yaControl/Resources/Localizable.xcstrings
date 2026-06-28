@@ -59,19 +59,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "This tool helps you manage your Yandex Cloud services from one place.\nYou can start or stop virtual machines, view storage buckets or serverless functions all from one place.\nIt also supports automatic VM start/stop based on macOS conditions, like when your Mac goes to sleep or wakes up."
+            "value" : "Quick manipulations with Yandex Cloud resources.\nTurning virtual machines on/off, creating new ones, viewing and creating buckets, viewing and creating serverless functions.\nA desktop widget with real-time information about your balance and active virtual machines.\nThe most important feature, you can turn your virtual machines on/off according to macOS events: startup, sleep, and so on."
           }
         },
         "kk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Бұл құрал Yandex Cloud қызметтерін бір жерден басқаруға көмектеседі.\nВиртуалды машиналарды іске қосып немесе тоқтатып, сақтау бакеттерін және серверсіз функцияларды бір жерден көре аласыз.\nСондай-ақ Mac ұйқы режиміне өткенде немесе оянғанда macOS жағдайларына негізделген ВМ автоматты іске қосу/тоқтатуды қолдайды."
+            "value" : "Yandex Cloud ресурстарымен жылдам басқару.\nВиртуалды машиналарды қосу/өшіру, жаңаларын құру, бакеттерді көру және құру, serverless-функцияларды көру және құру.\nЖұмыс үстелі үшін виджет — сіздің балансыңыз және белсенді виртуалды машиналар туралы жедел ақпарат.\nЕң бастысы, сіз виртуалды машиналарыңызды macOS оқиғаларына сәйкес қоса/өшіре аласыз: іске қосу, ұйқы режимі және т.б."
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Этот инструмент помогает управлять сервисами Yandex Cloud из одного места.\nВы можете запускать и останавливать виртуальные машины, просматривать бакеты хранилища и serverless-функции из одного места.\nТакже поддерживается автоматический запуск и остановка ВМ по событиям macOS, например при переходе Mac в сон или пробуждении."
+            "state" : "needs_review",
+            "value" : "Быстрые манипуляции с ресурсами Yandex Cloud.\nВключение/выключение виртуальных машин, создание новых, просмотр и создание бакетов, просмотр и создание serverless-функций.\nВиджет для рабочего стола с оперативной информацией о вашем балансе и активных виртуальных машинах.\nСамое главное,  вы можете включать/выключать ваши виртуальные машины в соответствии с событиями в macOS: запуск, уход в сон и т. д."
           }
         }
       }
@@ -122,6 +122,75 @@
         }
       }
     },
+    "about.link.github" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHub"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHub"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHub"
+          }
+        }
+      }
+    },
+    "about.link.home" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Author Website"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Басты бет"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Сайт автора"
+          }
+        }
+      }
+    },
+    "about.link.privacy" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy Policy"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Құпиялық саясаты"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Политика конфиденциальности"
+          }
+        }
+      }
+    },
     "about.privacyPolicy" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -164,6 +233,29 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "yaControl"
+          }
+        }
+      }
+    },
+    "about.version" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version %@"
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нұсқа %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Версия %@"
           }
         }
       }

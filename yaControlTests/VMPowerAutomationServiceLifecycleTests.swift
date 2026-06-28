@@ -38,7 +38,7 @@ final class VMPowerAutomationServiceLifecycleTests: XCTestCase {
     func testWakeStartsSelectedStoppedVMWhenOptionEnabled() async {
         let coordinator = WakeAutoStartCoordinator()
         let harness = makeHarness(
-            startOptions: [.afterWakeup],
+            startOptions: [.afterMacOSWakeup],
             selectedVMIds: ["vm-1"],
             inventory: [Self.makeVM(id: "vm-1", status: .stopped)],
             wakeAutoStartCoordinator: coordinator,
@@ -108,7 +108,7 @@ final class VMPowerAutomationServiceLifecycleTests: XCTestCase {
 
     func testMacOSShutdownStopsSelectedVMsWhenOptionEnabled() async {
         let harness = makeHarness(
-            shutdownOptions: [.beforeMacOSShutdown],
+            shutdownOptions: [.beforeMacOSLogout],
             selectedVMIds: ["vm-1"]
         )
 
@@ -134,7 +134,7 @@ final class VMPowerAutomationServiceLifecycleTests: XCTestCase {
 
     func testSelectionSafetyForFastShutdown() async {
         let harness = makeHarness(
-            shutdownOptions: [.beforeMacOSShutdown],
+            shutdownOptions: [.beforeMacOSLogout],
             selectedVMIds: ["vm-1", "vm-1", "vm-2"]
         )
 
@@ -147,7 +147,7 @@ final class VMPowerAutomationServiceLifecycleTests: XCTestCase {
 
     func testEmptySelectionPerformsNoStopRequests() async {
         let harness = makeHarness(
-            shutdownOptions: [.beforeMacOSShutdown],
+            shutdownOptions: [.beforeMacOSLogout],
             selectedVMIds: []
         )
 

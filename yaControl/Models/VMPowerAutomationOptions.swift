@@ -9,7 +9,7 @@ import Foundation
 
 enum StartOption: String, CaseIterable, Sendable {
     case afterAppLaunched = "after_app_launched"
-    case afterWakeup = "after_wakeup"
+    case afterMacOSWakeup = "after_macos_wakeup"
 }
 
 enum ShutdownOption: String, CaseIterable, Sendable {
@@ -23,8 +23,8 @@ extension StartOption {
         switch value {
         case "after_app_launched", "After app launched":
             .afterAppLaunched
-        case "after_wakeup", "After wakeup":
-            .afterWakeup
+        case "after_macos_wakeup", "After macOS wakeup":
+            .afterMacOSWakeup
         default:
             nil
         }
@@ -34,7 +34,7 @@ extension StartOption {
         switch self {
         case .afterAppLaunched:
             LocalizedStringHelper.string(L10n.VMAutomation.startAfterAppLaunched, locale: locale)
-        case .afterWakeup:
+        case .afterMacOSWakeup:
             LocalizedStringHelper.string(L10n.VMAutomation.startAfterWakeup, locale: locale)
         }
     }

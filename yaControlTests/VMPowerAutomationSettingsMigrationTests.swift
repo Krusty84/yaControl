@@ -14,17 +14,17 @@ final class VMPowerAutomationSettingsMigrationTests: XCTestCase {
 
     func testStartMigrationRemovesAfterMacOSStartedAndPreservesSupportedOptions() throws {
         let harness = try makeHarness()
-        try harness.store(["after_macos_started", "after_app_launched", "after_wakeup"], forKey: startOptionsKey)
+        try harness.store(["after_macos_started", "after_app_launched", "after_macos_wakeup"], forKey: startOptionsKey)
 
-        XCTAssertEqual(harness.settings.startOptions, [.afterAppLaunched, .afterWakeup])
-        XCTAssertEqual(try harness.rawValues(forKey: startOptionsKey), ["after_app_launched", "after_wakeup"])
+        XCTAssertEqual(harness.settings.startOptions, [.afterAppLaunched, .afterMacOSWakeup])
+        XCTAssertEqual(try harness.rawValues(forKey: startOptionsKey), ["after_app_launched", "after_macos_wakeup"])
     }
 
     func testOldSleepAndShutdownValuesAreMigrated() throws {
         let harness = try makeHarness()
         try harness.store(["after_macos_sleep", "after_macos_shutdown"], forKey: shutdownOptionsKey)
 
-        XCTAssertEqual(harness.settings.shutdownOptions, [.beforeMacOSSleep, .beforeMacOSShutdown])
+        XCTAssertEqual(harness.settings.shutdownOptions, [.beforeMacOSSleep, .beforeMacOSLogout])
         XCTAssertEqual(try harness.rawValues(forKey: shutdownOptionsKey), ["before_macos_sleep", "before_macos_shutdown"])
     }
 
@@ -49,8 +49,8 @@ final class VMPowerAutomationSettingsMigrationTests: XCTestCase {
         let harness = try makeHarness()
         try harness.store(["after_macos_shutdown", "after_macos_shutdown"], forKey: shutdownOptionsKey)
 
-        XCTAssertEqual(harness.settings.shutdownOptions, [.beforeMacOSShutdown])
-        XCTAssertEqual(harness.settings.shutdownOptions, [.beforeMacOSShutdown])
+        XCTAssertEqual(harness.settings.shutdownOptions, [.beforeMacOSLogout])
+        XCTAssertEqual(harness.settings.shutdownOptions, [.beforeMacOSLogout])
         XCTAssertEqual(try harness.rawValues(forKey: shutdownOptionsKey), ["before_macos_shutdown"])
     }
 

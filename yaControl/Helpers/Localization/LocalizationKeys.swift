@@ -212,6 +212,10 @@ enum L10n {
     enum About {
         static let title = "about.title"
         static let description = "about.description"
+        static let version = "about.version"
+        static let linkHome = "about.link.home"
+        static let linkGitHub = "about.link.github"
+        static let linkPrivacy = "about.link.privacy"
         static let license = "about.license"
         static let author = "about.author"
         static let contact = "about.contact"

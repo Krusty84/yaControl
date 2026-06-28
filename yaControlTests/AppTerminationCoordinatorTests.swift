@@ -14,7 +14,7 @@ final class AppTerminationCoordinatorTests: XCTestCase {
         let recorder = TerminationRecorder()
         let coordinator = AppTerminationCoordinator(
             terminationTimeout: .seconds(1),
-            isShutdownConfigured: { $0 == .beforeMacOSShutdown },
+            isShutdownConfigured: { $0 == .beforeMacOSLogout },
             runShutdown: { reason in
                 await recorder.record(reason: reason)
                 return true

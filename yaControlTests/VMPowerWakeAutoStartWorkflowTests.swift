@@ -276,7 +276,7 @@ private actor WakeWorkflowHarness {
 
     init(
         autoStartEnabled: Bool = true,
-        startOptions: [StartOption] = [.afterWakeup],
+        startOptions: [StartOption] = [.afterMacOSWakeup],
         selectedVMIds: [String],
         oAuthToken: String = "fake-oauth-token",
         networkResults: [Bool] = [true, true, true, true],

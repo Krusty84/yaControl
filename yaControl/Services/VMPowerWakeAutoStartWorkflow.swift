@@ -105,8 +105,8 @@ struct VMPowerWakeAutoStartWorkflow: Sendable {
             return .disabled
         }
 
-        guard settings.startOptions.contains(.afterWakeup) else {
-            LoggerHelper.info("Wake auto-start disabled reason=after_wakeup_disabled")
+        guard settings.startOptions.contains(.afterMacOSWakeup) else {
+            LoggerHelper.info("Wake auto-start disabled reason=after_macos_wakeup_disabled")
             return .disabled
         }
 
