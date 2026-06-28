@@ -2882,6 +2882,29 @@
         }
       }
     },
+    "settings.vm.startMode.launchAtLoginHelp" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enable “Launch at Login” to start selected VMs automatically after signing in to macOS."
+          }
+        },
+        "kk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS жүйесіне кіргеннен кейін таңдалған ВМ-дерді автоматты іске қосу үшін “Launch at Login” параметрін қосыңыз."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Включите «Launch at Login», чтобы автоматически запускать выбранные ВМ после входа в macOS."
+          }
+        }
+      }
+    },
     "settings.vm.startMode.title" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -4423,48 +4446,48 @@
         }
       }
     },
-    "vmAutomation.shutdown.afterMacOSShutdown" : {
+    "vmAutomation.shutdown.beforeMacOSLogout" : {
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "After macOS shutdown"
+            "value" : "Before macOS logout"
           }
         },
         "kk" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "macOS өшірілген кезде"
+            "state" : "needs_review",
+            "value" : "macOS жүйесінен шығу немесе өшіру алдында"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "При завершении работы macOS"
+            "state" : "needs_review",
+            "value" : "Перед выходом из macOS"
           }
         }
       }
     },
-    "vmAutomation.shutdown.afterMacOSSleep" : {
+    "vmAutomation.shutdown.beforeMacOSSleep" : {
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "After macOS sleep"
+            "value" : "Before macOS sleep"
           }
         },
         "kk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "macOS ұйқы режиміне өткенде"
+            "value" : "macOS ұйқы режиміне өту алдында"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "При переходе macOS в сон"
+            "value" : "Перед переходом macOS в сон"
           }
         }
       }
@@ -4488,29 +4511,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "После запуска приложения"
-          }
-        }
-      }
-    },
-    "vmAutomation.start.afterMacOSStarted" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "After macOS started"
-          }
-        },
-        "kk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "macOS іске қосылғаннан кейін"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "После запуска macOS"
           }
         }
       }

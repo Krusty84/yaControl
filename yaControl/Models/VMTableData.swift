@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct VMTableData: Decodable, Identifiable, Equatable {
+struct VMTableData: Decodable, Identifiable, Equatable, Sendable {
     let id: String
     let name: String
     var status: VMStatus

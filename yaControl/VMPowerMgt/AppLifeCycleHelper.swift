@@ -9,19 +9,9 @@ import AppKit
 import Foundation
 import Observation
 
-//handle termination and ensure async code executes before the app quits, the nuance of shutdown
 final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
-        guard ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil else {
-            return .terminateNow
-        }
-
-        Task {
-            let success = await VMPowerAutomationService.shared.handleAppExit()
-            LoggerHelper.info(success ? "Shutdown tasks completed successfully." : "Shutdown tasks finished with errors.")
-            NSApplication.shared.reply(toApplicationShouldTerminate: true)
-        }
-        return .terminateLater
+        AppTerminationCoordinator.shared.applicationShouldTerminate(sender)
     }
 }
 
@@ -87,6 +77,14 @@ final class AppLifecycleObserver {
             workspaceNC.addObserver(forName: NSWorkspace.didWakeNotification, object: nil, queue: .main) { [weak self] _ in
                 Task { @MainActor [weak self] in
                     self?.handleWake()
+                }
+            },
+
+            // Will power off
+            workspaceNC.addObserver(forName: NSWorkspace.willPowerOffNotification, object: nil, queue: .main) { _ in
+                Task { @MainActor in
+                    LoggerHelper.info("System will power off")
+                    AppTerminationCoordinator.shared.handleMacOSPowerOffNotification()
                 }
             },
 

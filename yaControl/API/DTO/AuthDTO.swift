@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct AuthResponse {
+struct AuthResponse: Sendable {
     let code: Int
     let iamToken: String
     let expiresAt: String

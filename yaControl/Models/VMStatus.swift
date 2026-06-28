@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum VMStatus: String, Decodable, Equatable {
+enum VMStatus: String, Decodable, Equatable, Sendable {
     case provisioning = "PROVISIONING"
     case running = "RUNNING"
     case stopping = "STOPPING"

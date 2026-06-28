@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum VMOperation: String {
+enum VMOperation: String, Sendable {
     case start
     case stop
 
@@ -38,12 +38,17 @@ enum VMOperation: String {
     }
 }
 
-struct VMOperationResult: Identifiable, Equatable {
+struct VMOperationResult: Identifiable, Equatable, Sendable {
     let id: String
     let vmId: String
     let operation: VMOperation
     let success: Bool
     let errorMessage: String?
+}
+
+protocol VMPowerControlling: Sendable {
+    func startVMs(iamToken: String, vmIds: [String]) async -> [VMOperationResult]
+    func stopVMs(iamToken: String, vmIds: [String]) async -> [VMOperationResult]
 }
 
 final class VMPowerService: @unchecked Sendable {
@@ -122,3 +127,5 @@ final class VMPowerService: @unchecked Sendable {
         }
     }
 }
+
+extension VMPowerService: VMPowerControlling {}

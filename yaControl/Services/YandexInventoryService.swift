@@ -7,6 +7,10 @@
 
 import Foundation
 
+protocol VMInventoryLoading: Sendable {
+    func loadVMTableData(iamToken: String) async throws -> [VMTableData]
+}
+
 final class YandexInventoryService: @unchecked Sendable {
     static let shared = YandexInventoryService()
 
@@ -219,3 +223,5 @@ final class YandexInventoryService: @unchecked Sendable {
         )
     }
 }
+
+extension YandexInventoryService: VMInventoryLoading {}

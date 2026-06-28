@@ -7,6 +7,10 @@
 
 import Foundation
 
+protocol YandexAuthenticating: Sendable {
+    func checkOAuthToken(_ token: String) async throws -> AuthResponse
+}
+
 final class YandexAuthAPI: @unchecked Sendable {
     private let client: YandexAPIClient
 
@@ -43,3 +47,5 @@ final class YandexAuthAPI: @unchecked Sendable {
         return AuthResponse(code: httpResponse.statusCode, iamToken: iamToken, expiresAt: expiresAt)
     }
 }
+
+extension YandexAuthAPI: YandexAuthenticating {}

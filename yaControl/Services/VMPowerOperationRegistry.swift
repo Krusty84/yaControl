@@ -7,16 +7,17 @@
 
 import Foundation
 
-enum VMPowerOperationSource: String {
+enum VMPowerOperationSource: String, Sendable {
     case manualUI = "manual_ui"
     case stopAll = "stop_all"
     case appLaunch = "app_launch"
     case appExit = "app_exit"
     case macOSSleep = "macos_sleep"
     case macOSWake = "macos_wake"
+    case macOSPowerOff = "macos_power_off"
 }
 
-enum VMPowerOperationOutcome: String {
+enum VMPowerOperationOutcome: String, Sendable {
     case accepted
     case completed
     case timeout

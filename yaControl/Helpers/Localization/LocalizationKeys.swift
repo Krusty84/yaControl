@@ -142,6 +142,7 @@ enum L10n {
         static let vmEnablePowerManagement = "settings.vm.enablePowerManagement"
         static let vmEnablePowerManagementHelp = "settings.vm.enablePowerManagement.help"
         static let vmStartModeTitle = "settings.vm.startMode.title"
+        static let vmStartLaunchAtLoginHelp = "settings.vm.startMode.launchAtLoginHelp"
         static let vmShutdownModeTitle = "settings.vm.shutdownMode.title"
         static let vmUsernameTitle = "settings.vm.username.title"
         static let vmUsernamePlaceholder = "settings.vm.username.placeholder"
@@ -250,10 +251,9 @@ enum L10n {
 
     enum VMAutomation {
         static let startAfterAppLaunched = "vmAutomation.start.afterAppLaunched"
-        static let startAfterMacOSStarted = "vmAutomation.start.afterMacOSStarted"
         static let startAfterWakeup = "vmAutomation.start.afterWakeup"
         static let shutdownAfterAppExit = "vmAutomation.shutdown.afterAppExit"
-        static let shutdownAfterMacOSShutdown = "vmAutomation.shutdown.afterMacOSShutdown"
-        static let shutdownAfterMacOSSleep = "vmAutomation.shutdown.afterMacOSSleep"
+        static let shutdownBeforeMacOSLogout = "vmAutomation.shutdown.beforeMacOSLogout"
+        static let shutdownBeforeMacOSSleep = "vmAutomation.shutdown.beforeMacOSSleep"
     }
 }

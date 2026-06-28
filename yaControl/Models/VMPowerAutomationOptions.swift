@@ -7,16 +7,15 @@
 
 import Foundation
 
-enum StartOption: String, CaseIterable {
+enum StartOption: String, CaseIterable, Sendable {
     case afterAppLaunched = "after_app_launched"
-    case afterMacOSStarted = "after_macos_started"
     case afterWakeup = "after_wakeup"
 }
 
-enum ShutdownOption: String, CaseIterable {
+enum ShutdownOption: String, CaseIterable, Sendable {
     case afterAppExit = "after_app_exit"
-    case afterMacOSShutdown = "after_macos_shutdown"
-    case afterMacOSSleep = "after_macos_sleep"
+    case beforeMacOSSleep = "before_macos_sleep"
+    case beforeMacOSLogout = "before_macos_logout"
 }
 
 extension StartOption {
@@ -24,8 +23,6 @@ extension StartOption {
         switch value {
         case "after_app_launched", "After app launched":
             .afterAppLaunched
-        case "after_macos_started", "After macOS started":
-            .afterMacOSStarted
         case "after_wakeup", "After wakeup":
             .afterWakeup
         default:
@@ -37,8 +34,6 @@ extension StartOption {
         switch self {
         case .afterAppLaunched:
             LocalizedStringHelper.string(L10n.VMAutomation.startAfterAppLaunched, locale: locale)
-        case .afterMacOSStarted:
-            LocalizedStringHelper.string(L10n.VMAutomation.startAfterMacOSStarted, locale: locale)
         case .afterWakeup:
             LocalizedStringHelper.string(L10n.VMAutomation.startAfterWakeup, locale: locale)
         }
@@ -50,10 +45,10 @@ extension ShutdownOption {
         switch value {
         case "after_app_exit", "After app exit":
             .afterAppExit
-        case "after_macos_shutdown", "After macOS shutdown":
-            .afterMacOSShutdown
-        case "after_macos_sleep", "After macOS sleep":
-            .afterMacOSSleep
+        case "before_macos_sleep", "after_macos_sleep", "After macOS sleep", "Before macOS sleep":
+            .beforeMacOSSleep
+        case "before_macos_shutdown", "after_macos_shutdown", "After macOS shutdown", "Before macOS logout or shutdown":
+            .beforeMacOSLogout
         default:
             nil
         }
@@ -63,10 +58,10 @@ extension ShutdownOption {
         switch self {
         case .afterAppExit:
             LocalizedStringHelper.string(L10n.VMAutomation.shutdownAfterAppExit, locale: locale)
-        case .afterMacOSShutdown:
-            LocalizedStringHelper.string(L10n.VMAutomation.shutdownAfterMacOSShutdown, locale: locale)
-        case .afterMacOSSleep:
-            LocalizedStringHelper.string(L10n.VMAutomation.shutdownAfterMacOSSleep, locale: locale)
+        case .beforeMacOSSleep:
+            LocalizedStringHelper.string(L10n.VMAutomation.shutdownBeforeMacOSSleep, locale: locale)
+        case .beforeMacOSLogout:
+            LocalizedStringHelper.string(L10n.VMAutomation.shutdownBeforeMacOSLogout, locale: locale)
         }
     }
 }

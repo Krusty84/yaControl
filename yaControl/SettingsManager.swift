@@ -7,9 +7,20 @@
 
 import Foundation
 
+protocol VMPowerAutomationSettingsProviding: Sendable {
+    var autoStartEnabled: Bool { get }
+    var startOptions: [StartOption] { get }
+    var shutdownOptions: [ShutdownOption] { get }
+    var oAuthKey: String { get }
+    var appLanguage: AppLanguage { get }
+
+    func getAllAutostartVMs() -> [String]
+    func cleanupAutostartSettings(validVMIds: Set<String>)
+}
+
 final class SettingsManager: @unchecked Sendable {
     static let shared = SettingsManager()
-    private let defaults = UserDefaults.standard
+    private let defaults: UserDefaults
     // Keys
     private let billingThresholdKey = "com.krusty84.yaControl.settings.billingThreshold"
     private let billingDefaultThreshold = 50.0
@@ -24,6 +35,10 @@ final class SettingsManager: @unchecked Sendable {
     private let autostartVMIdsKey = "com.krusty84.yaControl.settings.autostart_vm_ids"
     private let generalUsername4VMs_ = "com.krusty84.yaControl.settings.generalUsername4VMs"
     private let widgetAutoRefreshEnabledKey = "com.krusty84.yaControl.settings.widgetAutoRefreshEnabled"
+
+    init(defaults: UserDefaults = .standard) {
+        self.defaults = defaults
+    }
 
     // General
     var appLoggingEnabled: Bool {
@@ -138,19 +153,25 @@ final class SettingsManager: @unchecked Sendable {
     var startOptions: [StartOption] {
         get {
             guard let data = defaults.data(forKey: startOptionsKey) else {
-                return [.afterAppLaunched, .afterMacOSStarted]
+                return [.afterAppLaunched]
             }
 
             do {
                 let strings = try JSONDecoder().decode([String].self, from: data)
-                return strings.compactMap(StartOption.fromStoredValue)
+                let options = canonicalStartOptions(strings.compactMap(StartOption.fromStoredValue))
+                persistMigratedOptionsIfNeeded(
+                    originalStrings: strings,
+                    migratedStrings: options.map(\.rawValue),
+                    key: startOptionsKey
+                )
+                return options
             } catch {
                 LoggerHelper.error("Failed to decode start options: \(error.localizedDescription)")
-                return [.afterAppLaunched, .afterMacOSStarted]
+                return [.afterAppLaunched]
             }
         }
         set {
-            let strings = newValue.map(\.rawValue)
+            let strings = canonicalStartOptions(newValue).map(\.rawValue)
             do {
                 let data = try JSONEncoder().encode(strings)
                 defaults.set(data, forKey: startOptionsKey)
@@ -163,19 +184,25 @@ final class SettingsManager: @unchecked Sendable {
     var shutdownOptions: [ShutdownOption] {
         get {
             guard let data = defaults.data(forKey: shutdownOptionsKey) else {
-                return [.afterAppExit, .afterMacOSShutdown]
+                return []
             }
 
             do {
                 let strings = try JSONDecoder().decode([String].self, from: data)
-                return strings.compactMap(ShutdownOption.fromStoredValue)
+                let options = canonicalShutdownOptions(strings.compactMap(ShutdownOption.fromStoredValue))
+                persistMigratedOptionsIfNeeded(
+                    originalStrings: strings,
+                    migratedStrings: options.map(\.rawValue),
+                    key: shutdownOptionsKey
+                )
+                return options
             } catch {
                 LoggerHelper.error("Failed to decode shutdown options: \(error.localizedDescription)")
-                return [.afterAppExit, .afterMacOSShutdown]
+                return []
             }
         }
         set {
-            let strings = newValue.map(\.rawValue)
+            let strings = canonicalShutdownOptions(newValue).map(\.rawValue)
             do {
                 let data = try JSONEncoder().encode(strings)
                 defaults.set(data, forKey: shutdownOptionsKey)
@@ -216,4 +243,31 @@ final class SettingsManager: @unchecked Sendable {
 
         toRemove.forEach { defaults.removeObject(forKey: "vm_\($0)_isSelected") }
     }
+
+    private func canonicalStartOptions(_ options: [StartOption]) -> [StartOption] {
+        let selected = Set(options)
+        return StartOption.allCases.filter { selected.contains($0) }
+    }
+
+    private func canonicalShutdownOptions(_ options: [ShutdownOption]) -> [ShutdownOption] {
+        let selected = Set(options)
+        return ShutdownOption.allCases.filter { selected.contains($0) }
+    }
+
+    private func persistMigratedOptionsIfNeeded(
+        originalStrings: [String],
+        migratedStrings: [String],
+        key: String
+    ) {
+        guard originalStrings != migratedStrings else { return }
+
+        do {
+            let data = try JSONEncoder().encode(migratedStrings)
+            defaults.set(data, forKey: key)
+        } catch {
+            LoggerHelper.error("Failed to persist migrated VM automation options: \(error.localizedDescription)")
+        }
+    }
 }
+
+extension SettingsManager: VMPowerAutomationSettingsProviding {}

@@ -13,6 +13,16 @@ enum VMPollingResult {
     case failed(vmId: String, message: String)
 }
 
+protocol VMTransitionPolling: Sendable {
+    func waitForVMTransitions(
+        iamToken: String,
+        initialStatuses: [String: VMStatus],
+        timeout: Duration?,
+        interval: Duration?,
+        maxConsecutiveFailures: Int?
+    ) async -> [String: VMPollingResult]
+}
+
 final class VMPollingService: @unchecked Sendable {
     static let shared = VMPollingService()
 
@@ -150,3 +160,5 @@ final class VMPollingService: @unchecked Sendable {
         }
     }
 }
+
+extension VMPollingService: VMTransitionPolling {}

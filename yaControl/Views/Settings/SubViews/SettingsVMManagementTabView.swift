@@ -57,8 +57,13 @@ struct SettingsVMManagementTabView: View {
                             isOn: startOptionBinding(for: option)
                         )
                         .toggleStyle(.checkbox)
-                        .disabled(!model.autoStartVM || option == .afterMacOSStarted)
+                        .disabled(!model.autoStartVM)
                     }
+
+                    Text(LocalizedStringKey(L10n.Settings.vmStartLaunchAtLoginHelp))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
                 .padding(.horizontal, SettingsLayout.innerHorizontalPadding)
             }
@@ -76,7 +81,7 @@ struct SettingsVMManagementTabView: View {
                             isOn: shutdownOptionBinding(for: option)
                         )
                         .toggleStyle(.checkbox)
-                        .disabled(option == .afterMacOSShutdown)
+                        .disabled(!model.autoStartVM)
                     }
                 }
                 .padding(.horizontal, SettingsLayout.innerHorizontalPadding)
