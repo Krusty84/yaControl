@@ -11,11 +11,9 @@ import AppKit
 struct AboutTabContent: View {
     @Environment(\.locale) private var locale
 
-    //private static let privacyPolicyURLString = "https://www.sedoykin.com/published_app/yaControl/legal/Privacy_Policy.html"
-    
-    private static let homeURL = URL(string: "https://www.sedoykin.com")!
-    private static let gitHubURL = URL(string: "https://github.com/Krusty84/yaControl")!
-    private static let privacyPolicyURL = URL(string: "https://www.sedoykin.com/published_app/yaControl/legal/Privacy_Policy.html")!
+    private static let homeURLString = "https://www.sedoykin.com"
+    private static let gitHubURLString = "https://github.com/Krusty84/yaControl"
+    private static let privacyPolicyURLString = "https://www.sedoykin.com/published_app/yaControl/legal/Privacy_Policy.html"
 
     var body: some View {
         VStack(spacing: 12) {
@@ -23,7 +21,7 @@ struct AboutTabContent: View {
             Image(nsImage: NSApp.applicationIconImage)
                 .resizable()
                 .frame(width: 40, height: 40)
-                .cornerRadius(10)
+                .clipShape(.rect(cornerRadius: 10))
 
             // Description
             Text(LocalizedStringKey(L10n.About.title))
@@ -44,23 +42,29 @@ struct AboutTabContent: View {
                 // License & Author
                 VStack(alignment: .leading, spacing: 4) {
                     Group {
-                        linkRow(
-                            title: LocalizedStringKey(L10n.About.linkHome),
-                            icon: "house",
-                            url: Self.homeURL
-                        )
+                        if let homeURL = URL(string: Self.homeURLString) {
+                            linkRow(
+                                title: LocalizedStringKey(L10n.About.linkHome),
+                                icon: "house",
+                                url: homeURL
+                            )
+                        }
 
-                        linkRow(
-                            title: LocalizedStringKey(L10n.About.linkGitHub),
-                            icon: "chevron.left.forwardslash.chevron.right",
-                            url: Self.gitHubURL
-                        )
+                        if let gitHubURL = URL(string: Self.gitHubURLString) {
+                            linkRow(
+                                title: LocalizedStringKey(L10n.About.linkGitHub),
+                                icon: "chevron.left.forwardslash.chevron.right",
+                                url: gitHubURL
+                            )
+                        }
 
-                        linkRow(
-                            title: LocalizedStringKey(L10n.About.linkPrivacy),
-                            icon: "hand.raised",
-                            url: Self.privacyPolicyURL
-                        )
+                        if let privacyPolicyURL = URL(string: Self.privacyPolicyURLString) {
+                            linkRow(
+                                title: LocalizedStringKey(L10n.About.linkPrivacy),
+                                icon: "hand.raised",
+                                url: privacyPolicyURL
+                            )
+                        }
                     }
                     .font(.body)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -81,7 +85,7 @@ struct AboutTabContent: View {
                             .padding(.horizontal, 16)
                             .padding(.vertical, 8)
                             //.background(Color.red)
-                            .cornerRadius(6)
+                            .clipShape(.rect(cornerRadius: 6))
                     }
                     .padding(.trailing, 16)
                     .padding(.bottom, 8)
@@ -126,5 +130,3 @@ struct AboutTabContent: View {
          return LocalizedStringHelper.formatted(L10n.About.version, locale: locale, version)
      }
 }
-
-

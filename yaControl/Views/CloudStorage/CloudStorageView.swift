@@ -28,7 +28,8 @@ struct BucketTabContent: View {
                 lastUpdateTime: model.lastUpdateTime,
                 currentBalance: model.currentBalance,
                 currency: model.currency,
-                billingUrl: model.billingUrl
+                billingUrl: model.billingUrl,
+                billingWarningThreshold: SettingsManager.shared.billingThreshold
             )
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)

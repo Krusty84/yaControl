@@ -101,7 +101,7 @@ struct InfoWindow: View {
                 model.lastUpdated.formatted(date: .omitted, time: .shortened)
             ))
                 .font(.caption)
-                .foregroundColor(.secondary)
+                .foregroundStyle(.secondary)
                 .padding(.bottom, 8)
         }
         .frame(width: 340, height: 460)

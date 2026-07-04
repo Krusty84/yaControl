@@ -5,21 +5,8 @@
 //  Created by Sedoykin Alexey on 20/03/2025.
 //
 
-import OSLog
 import Foundation
-
-/*
- Open Console app to get system events and events from this application, use: com.krusty84.yaControl as filter (subsystem)
- */
-
-/*
- LoggerHelper.debug("Sending network request...", category: "Network")
- LoggerHelper.error("DB write failed", category: "Database")
- LoggerHelper.info("Main screen loaded", category: "UI")
-
- */
 import OSLog
-import Foundation
 
 struct LoggerHelper {
     private static let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "com.example.app", category: "General")

@@ -32,7 +32,7 @@ struct VMNameColumn: View {
         if let url = vm.vmUrl {
             Link(destination: url) {
                 Text(vm.name)
-                    .foregroundColor(.blue)
+                    .foregroundStyle(.blue)
                     .underline()
                     .lineLimit(nil)
                     .multilineTextAlignment(.leading)
@@ -69,7 +69,7 @@ struct VMStatusColumn: View {
     var body: some View {
         Button(action: onAction) {
             Image(systemName: isProcessing ? "arrow.triangle.2.circlepath" : statusIcon)
-                .foregroundColor(statusColor)
+                .foregroundStyle(statusColor)
         }
         .buttonStyle(.plain)
         .disabled(isProcessing || !vm.status.isActionable)
@@ -159,7 +159,7 @@ struct VMFolderColumn: View {
         if let url = vm.folderUrl {
             Link(destination: url) {
                 Text(vm.folderName)
-                    .foregroundColor(.blue)
+                    .foregroundStyle(.blue)
                     .underline()
                     .fixedSize(horizontal: false, vertical: true)
             }

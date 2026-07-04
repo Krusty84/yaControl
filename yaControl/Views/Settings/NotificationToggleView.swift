@@ -5,7 +5,6 @@
 //  Created by Sedoykin Alexey on 02/05/2025.
 //
 
-
 import SwiftUI
 
 struct NotificationToggleView: View {
@@ -17,7 +16,7 @@ struct NotificationToggleView: View {
     var body: some View {
         Toggle(
             LocalizedStringKey(L10n.Settings.enableNotifications),
-            isOn: $isOn.animation(.easeInOut(duration: animationDuration))
+            isOn: $isOn
         )
             .toggleStyle(.switch)
             .onChange(of: isOn) { _, newValue in

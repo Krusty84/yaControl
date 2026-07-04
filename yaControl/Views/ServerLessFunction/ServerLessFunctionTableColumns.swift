@@ -16,7 +16,7 @@ struct SLFNameColumn: View {
         if let url = slf.slfUrl {
             Link(destination: url) {
                 Text(slf.name)
-                    .foregroundColor(.blue)
+                    .foregroundStyle(.blue)
                     .underline()
                     .lineLimit(nil)
                     .multilineTextAlignment(.leading)
@@ -53,7 +53,7 @@ struct SLFStatusColumn: View {
         Image(systemName: slf.status == "ACTIVE"
               ? "arrow.up.square.fill"
               : "arrow.down.square.fill")
-        .foregroundColor(slf.status == "ACTIVE" ? .green : .red)
+            .foregroundStyle(slf.status == "ACTIVE" ? .green : .red)
     }
 }
 
@@ -103,7 +103,7 @@ struct SLFFolderColumn: View {
         if let url = slf.folderUrl {
             Link(destination: url) {
                 Text(slf.folderName)
-                    .foregroundColor(.blue)
+                    .foregroundStyle(.blue)
                     .underline()
                     .fixedSize(horizontal: false, vertical: true)
             }

@@ -55,6 +55,9 @@ struct VMPowerWakeAutoStartWorkflow: Sendable {
         guard !retryPolicy.delays.isEmpty else {
             return await performAttempt(attempt: 1)
         }
+        guard let lastAttemptIndex = retryPolicy.delays.indices.last else {
+            return await performAttempt(attempt: 1)
+        }
 
         for attemptIndex in retryPolicy.delays.indices {
             guard !Task.isCancelled else {
@@ -74,7 +77,7 @@ struct VMPowerWakeAutoStartWorkflow: Sendable {
 
             switch result {
             case .retryRequired(let reason):
-                guard attemptIndex < retryPolicy.delays.indices.last! else {
+                guard attemptIndex < lastAttemptIndex else {
                     LoggerHelper.error("Wake auto-start exhausted retries reason=\(reason)")
                     return result
                 }

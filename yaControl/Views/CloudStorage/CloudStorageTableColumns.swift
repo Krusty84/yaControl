@@ -16,7 +16,7 @@ struct BucketNameColumn: View {
         if let url = bucket.bucketUrl {
             Link(destination: url) {
                 Text(bucket.name)
-                    .foregroundColor(.blue)
+                    .foregroundStyle(.blue)
                     .underline()
                     .lineLimit(nil)                  // allow unlimited lines
                     .multilineTextAlignment(.leading)
@@ -52,7 +52,7 @@ struct BucketFolderColumn: View {
         if let url = bucket.folderUrl {
             Link(destination: url) {
                 Text(bucket.folderName)
-                    .foregroundColor(.blue)
+                    .foregroundStyle(.blue)
                     .underline()
                     .fixedSize(horizontal: false, vertical: true)
             }

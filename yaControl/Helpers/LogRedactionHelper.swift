@@ -24,6 +24,14 @@ enum LogRedactionHelper {
         + #"refreshToken|token|authorization)["']?\s*[:=]\s*)"#
         + #"(?:"[^"]*"|'[^']*'|Bearer\s+[^\s,;&}\]]+|[^\s,;&}\]]+)"#
 
+    private static let sensitiveKeyRegex: NSRegularExpression = {
+        do {
+            return try NSRegularExpression(pattern: sensitiveKeyPattern)
+        } catch {
+            fatalError("Invalid sensitive key redaction regex: \(error)")
+        }
+    }()
+
     static func redact(_ message: String) -> String {
         replaceSensitiveMatches(in: message)
     }
@@ -51,12 +59,8 @@ enum LogRedactionHelper {
     }
 
     private static func replaceSensitiveMatches(in message: String) -> String {
-        guard let regex = try? NSRegularExpression(pattern: sensitiveKeyPattern) else {
-            return message
-        }
-
         let range = NSRange(message.startIndex..<message.endIndex, in: message)
-        return regex.stringByReplacingMatches(
+        return sensitiveKeyRegex.stringByReplacingMatches(
             in: message,
             options: [],
             range: range,

@@ -14,9 +14,8 @@ struct StatusPanel: View {
     let currentBalance: String
     let currency: String
     let billingUrl: URL?
-    
-    @State private var isHovering = false
-    
+    let billingWarningThreshold: Double
+
     var body: some View {
         HStack {
             Text(LocalizedStringHelper.formatted(
@@ -25,50 +24,43 @@ struct StatusPanel: View {
                 lastUpdateTime.formatted(date: .omitted, time: .shortened)
             ))
                 .font(.subheadline)
-                .foregroundColor(.gray)
+                .foregroundStyle(.gray)
             
             Spacer()
             
             if let url = billingUrl {
                 Link(destination: url) {
-                    HStack(spacing: 0) {
-                        Text(LocalizedStringHelper.string(L10n.StatusPanel.currentBalance, locale: locale) + " ")
-                            .font(.subheadline)
-                            .foregroundColor(.gray)
-                        Text(BillingFormattingHelper.balanceAttributedString(
-                            amount: currentBalance,
-                            currency: currency,
-                            warningThreshold: SettingsManager.shared.billingThreshold
-                        ))
-                        .font(.subheadline)
-                        .foregroundColor(.red)
-                    }
-                    .onHover { hovering in
-                        isHovering = hovering
-                        if hovering {
-                            NSCursor.pointingHand.push()
-                        } else {
-                            NSCursor.pop()
+                    balanceView
+                        .onHover { hovering in
+                            if hovering {
+                                NSCursor.pointingHand.push()
+                            } else {
+                                NSCursor.pop()
+                            }
                         }
-                    }
                 }
                 .buttonStyle(.plain)
             } else {
-                HStack(spacing: 0) {
-                    Text(LocalizedStringHelper.string(L10n.StatusPanel.currentBalance, locale: locale) + " ")
-                        .font(.subheadline)
-                        .foregroundColor(.gray)
-                    Text(BillingFormattingHelper.balanceAttributedString(
-                        amount: currentBalance,
-                        currency: currency,
-                        warningThreshold: SettingsManager.shared.billingThreshold
-                    ))
-                    .font(.subheadline)
-                    .foregroundColor(.red)
-                }
+                balanceView
             }
         }
         .padding(.horizontal)
         .padding(.vertical, 8)
+    }
+
+    private var balanceView: some View {
+        HStack(spacing: 4) {
+            Text(LocalizedStringHelper.string(L10n.StatusPanel.currentBalance, locale: locale))
+                .font(.subheadline)
+                .foregroundStyle(.gray)
+
+            Text(BillingFormattingHelper.balanceAttributedString(
+                amount: currentBalance,
+                currency: currency,
+                warningThreshold: billingWarningThreshold
+            ))
+                .font(.subheadline)
+                .foregroundStyle(.red)
+        }
     }
 }

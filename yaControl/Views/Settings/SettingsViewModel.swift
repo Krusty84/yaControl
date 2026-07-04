@@ -14,7 +14,7 @@ import WidgetKit
 final class SettingsModel {
     var oAuthKey = ""
     var responseCode: Int?
-    var errorMessage: String?
+    var error: Error?
 
     var appLogging = false {
         didSet {
@@ -61,7 +61,7 @@ final class SettingsModel {
 
     var folderOptions: [CloudFolderOption] = []
     var isLoadingFolders = false
-    var folderLoadErrorMessage: String?
+    var folderLoadError: Error?
 
     var autoStartVM = false {
         didSet {
@@ -130,6 +130,22 @@ final class SettingsModel {
         trimmedOAuthKey.isEmpty
     }
 
+    var showError: Bool {
+        error != nil
+    }
+
+    var errorMessage: String? {
+        error?.localizedDescription
+    }
+
+    var showFolderLoadError: Bool {
+        folderLoadError != nil
+    }
+
+    var folderLoadErrorMessage: String? {
+        folderLoadError?.localizedDescription
+    }
+
     func loadSettings() {
         isLoadingSettings = true
         defer {
@@ -174,7 +190,9 @@ final class SettingsModel {
 
         guard !token.isEmpty else {
             responseCode = nil
-            errorMessage = LocalizedStringHelper.string(L10n.Settings.oauthEmptyError, locale: locale)
+            error = SettingsModelMessageError(
+                LocalizedStringHelper.string(L10n.Settings.oauthEmptyError, locale: locale)
+            )
             return
         }
 
@@ -189,17 +207,19 @@ final class SettingsModel {
 
             if response.code == 200 {
                 oAuthKey = token
-                errorMessage = nil
+                error = nil
             } else {
-                errorMessage = LocalizedStringHelper.formatted(
-                    L10n.Settings.oauthInvalidWithCode,
-                    locale: locale,
-                    Int64(response.code)
+                error = SettingsModelMessageError(
+                    LocalizedStringHelper.formatted(
+                        L10n.Settings.oauthInvalidWithCode,
+                        locale: locale,
+                        Int64(response.code)
+                    )
                 )
             }
         } catch {
             responseCode = nil
-            errorMessage = error.localizedDescription
+            self.error = error
             LoggerHelper.error("OAuth verification failed: \(error.localizedDescription)")
         }
     }
@@ -209,15 +229,17 @@ final class SettingsModel {
 
         guard !token.isEmpty else {
             folderOptions = []
-            folderLoadErrorMessage = LocalizedStringHelper.string(
-                L10n.Settings.oauthRequired,
-                locale: locale
+            folderLoadError = SettingsModelMessageError(
+                LocalizedStringHelper.string(
+                    L10n.Settings.oauthRequired,
+                    locale: locale
+                )
             )
             return
         }
 
         isLoadingFolders = true
-        folderLoadErrorMessage = nil
+        folderLoadError = nil
 
         defer {
             isLoadingFolders = false
@@ -226,14 +248,16 @@ final class SettingsModel {
         do {
             let auth = try await api.checkOauthKey(yandexPassportOauthToken: token)
             let cloudsResponse = try await api.getClouds(iamToken: auth.iamToken)
+            let api = api
+            let iamToken = auth.iamToken
 
             var loadedFolders: [CloudFolderOption] = []
 
             try await withThrowingTaskGroup(of: [FolderDTO].self) { group in
                 for cloud in cloudsResponse.clouds {
                     group.addTask {
-                        try await self.api.getFolders(
-                            iamToken: auth.iamToken,
+                        try await api.getFolders(
+                            iamToken: iamToken,
                             cloudId: cloud.id
                         )
                     }
@@ -259,24 +283,18 @@ final class SettingsModel {
 
             if !defaultFolderIdForCreation.isEmpty,
                !folderOptions.contains(where: { $0.id == defaultFolderIdForCreation }) {
-                folderLoadErrorMessage = "Saved default folder is not available for the current OAuth token."
+                folderLoadError = SettingsModelMessageError(
+                    "Saved default folder is not available for the current OAuth token."
+                )
             }
 
         } catch {
             folderOptions = []
-            folderLoadErrorMessage = error.localizedDescription
+            folderLoadError = error
             LoggerHelper.error("Failed to load folders for creation: \(error.localizedDescription)")
         }
     }
 
-//    private func restartWidgetSnapshotScheduler() {
-//        guard !isLoadingSettings else { return }
-//
-//        Task { @MainActor in
-//            CloudSummarySnapshotRefreshScheduler.shared.restart()
-//        }
-//    }
-    
     private func applyWidgetRefreshSettings() {
         guard !isLoadingSettings else {
             return
@@ -289,5 +307,17 @@ final class SettingsModel {
         Task { @MainActor in
             CloudSummarySnapshotRefreshScheduler.shared.restart()
         }
+    }
+}
+
+private struct SettingsModelMessageError: LocalizedError {
+    let message: String
+
+    init(_ message: String) {
+        self.message = message
+    }
+
+    var errorDescription: String? {
+        message
     }
 }

@@ -62,7 +62,7 @@ struct StatRow: View {
         HStack {
             Text(label)
                 .font(.subheadline)
-                .foregroundColor(.secondary)
+                .foregroundStyle(.secondary)
             Spacer()
             Text(value)
                 .font(.subheadline.bold())
@@ -80,7 +80,7 @@ struct StatBillingRow: View {
         HStack {
             Text(label)
                 .font(.subheadline)
-                .foregroundColor(.secondary)
+                .foregroundStyle(.secondary)
             Spacer()
             Text(value)
                 .font(.subheadline.bold())

@@ -19,7 +19,7 @@ struct ErrorView: View {
                 locale: locale,
                 error
             ))
-                .foregroundColor(.red)
+                .foregroundStyle(.red)
             Text(LocalizedStringKey(L10n.Errors.checkConnection))
             Text(LocalizedStringKey(L10n.Errors.checkOAuth))
             Text(LocalizedStringKey(L10n.Errors.cloudPending))
