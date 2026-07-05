@@ -2,6 +2,8 @@ for process in \
     WidgetKitExtension \
     WidgetKitSimulator \
     NotificationCenter \
+	pkd \
+	Dock \
     chronod \
     cfprefsd
 do

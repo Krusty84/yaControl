@@ -7,10 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3D2E3CA32FFA8E2200AA2B7D /* yaControlWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 3DF000012FDD000100000001 /* yaControlWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		3DA094392FDE11ED00A7CEE1 /* ElegantTabs in Frameworks */ = {isa = PBXBuildFile; productRef = 3DA094382FDE11ED00A7CEE1 /* ElegantTabs */; };
 		3DA0943C2FDE121200A7CEE1 /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 3DA0943B2FDE121200A7CEE1 /* LaunchAtLogin */; };
 		3DE02E9D2FE70072000CDCBD /* CloudSummaryWidgetFreshness.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE02E9C2FE7006D000CDCBD /* CloudSummaryWidgetFreshness.swift */; };
-		3DF000012FDD000100000101 /* yaControlWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 3DF000012FDD000100000001 /* yaControlWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		3DF000012FDD000100000102 /* CloudSummaryWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF000012FDD000100000003 /* CloudSummaryWidget.swift */; };
 		3DF000012FDD000100000103 /* CloudSummaryWidgetEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF000012FDD000100000004 /* CloudSummaryWidgetEntry.swift */; };
 		3DF000012FDD000100000104 /* CloudSummaryWidgetProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF000012FDD000100000005 /* CloudSummaryWidgetProvider.swift */; };
@@ -23,7 +23,28 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		3DF000012FDD000100000201 /* PBXContainerItemProxy */ = {
+		3D2E3CA12FFA849800AA2B7D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3D333ECB2D639DF100D795BF /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3DF000012FDD000100000301;
+			remoteInfo = yaControlWidget;
+		};
+		3D2E3CA42FFA8E2200AA2B7D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3D333ECB2D639DF100D795BF /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3DF000012FDD000100000301;
+			remoteInfo = yaControlWidget;
+		};
+		3D2E3CA72FFA8E2D00AA2B7D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3D333ECB2D639DF100D795BF /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3DF000012FDD000100000301;
+			remoteInfo = yaControlWidget;
+		};
+		3D2E3CA92FFA8E3F00AA2B7D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 3D333ECB2D639DF100D795BF /* Project object */;
 			proxyType = 1;
@@ -40,13 +61,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		3DF000012FDD000100000202 /* Embed Foundation Extensions */ = {
+		3D2E3CA62FFA8E2200AA2B7D /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				3DF000012FDD000100000101 /* yaControlWidget.appex in Embed Foundation Extensions */,
+				3D2E3CA32FFA8E2200AA2B7D /* yaControlWidget.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -138,6 +159,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		3D2E3CA02FFA849800AA2B7D /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		3D333ECA2D639DF100D795BF = {
 			isa = PBXGroup;
 			children = (
@@ -145,6 +173,7 @@
 				3DF000012FDD000100000002 /* yaControlWidget */,
 				3DF100012FE9000000000002 /* yaControlTests */,
 				3DF000012FDD00010000000D /* Widget Shared Files */,
+				3D2E3CA02FFA849800AA2B7D /* Frameworks */,
 				3D333ED42D639DF100D795BF /* Products */,
 			);
 			sourceTree = "<group>";
@@ -204,12 +233,15 @@
 				3D333ECF2D639DF100D795BF /* Sources */,
 				3D333ED02D639DF100D795BF /* Frameworks */,
 				3D333ED12D639DF100D795BF /* Resources */,
-				3DF000012FDD000100000202 /* Embed Foundation Extensions */,
+				3D2E3CA62FFA8E2200AA2B7D /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				3DF000012FDD000100000204 /* PBXTargetDependency */,
+				3D2E3CA22FFA849800AA2B7D /* PBXTargetDependency */,
+				3D2E3CA52FFA8E2200AA2B7D /* PBXTargetDependency */,
+				3D2E3CA82FFA8E2D00AA2B7D /* PBXTargetDependency */,
+				3D2E3CAA2FFA8E3F00AA2B7D /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				3D333ED52D639DF100D795BF /* yaControl */,
@@ -376,10 +408,25 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		3DF000012FDD000100000204 /* PBXTargetDependency */ = {
+		3D2E3CA22FFA849800AA2B7D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 3DF000012FDD000100000301 /* yaControlWidget */;
-			targetProxy = 3DF000012FDD000100000201 /* PBXContainerItemProxy */;
+			targetProxy = 3D2E3CA12FFA849800AA2B7D /* PBXContainerItemProxy */;
+		};
+		3D2E3CA52FFA8E2200AA2B7D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3DF000012FDD000100000301 /* yaControlWidget */;
+			targetProxy = 3D2E3CA42FFA8E2200AA2B7D /* PBXContainerItemProxy */;
+		};
+		3D2E3CA82FFA8E2D00AA2B7D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3DF000012FDD000100000301 /* yaControlWidget */;
+			targetProxy = 3D2E3CA72FFA8E2D00AA2B7D /* PBXContainerItemProxy */;
+		};
+		3D2E3CAA2FFA8E3F00AA2B7D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3DF000012FDD000100000301 /* yaControlWidget */;
+			targetProxy = 3D2E3CA92FFA8E3F00AA2B7D /* PBXContainerItemProxy */;
 		};
 		3DF100012FE9000000000202 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -523,9 +570,10 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				AUTOMATION_APPLE_EVENTS = NO;
 				CODE_SIGN_ENTITLEMENTS = yaControl/yaControl.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"yaControl/Preview Content\"";
 				DEVELOPMENT_TEAM = 7M7T9VZ52G;
@@ -576,9 +624,10 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				AUTOMATION_APPLE_EVENTS = NO;
 				CODE_SIGN_ENTITLEMENTS = yaControl/yaControl.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"yaControl/Preview Content\"";
 				DEVELOPMENT_TEAM = 7M7T9VZ52G;
@@ -627,9 +676,10 @@
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				AUTOMATION_APPLE_EVENTS = NO;
 				CODE_SIGN_ENTITLEMENTS = yaControlWidget/yaControlWidget.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 7M7T9VZ52G;
 				ENABLE_APP_SANDBOX = YES;
@@ -671,9 +721,10 @@
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				AUTOMATION_APPLE_EVENTS = NO;
 				CODE_SIGN_ENTITLEMENTS = yaControlWidget/yaControlWidget.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 7M7T9VZ52G;
 				ENABLE_APP_SANDBOX = YES;
