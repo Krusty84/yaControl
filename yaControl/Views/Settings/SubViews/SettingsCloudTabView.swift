@@ -80,14 +80,11 @@ struct SettingsCloudTabView: View {
     private var defaultFolderForCreationSection: some View {
         Section {
             VStack(alignment: .leading, spacing: SettingsLayout.compactRowSpacing) {
-                HStack(spacing: SettingsLayout.horizontalRowSpacing) {
+                HStack(spacing: SettingsLayout.compactRowSpacing) {
                     Picker(
                         LocalizedStringKey(L10n.Settings.defaultFolderPlaceholder),
                         selection: $model.defaultFolderIdForCreation
                     ) {
-                        Text(LocalizedStringKey(L10n.Settings.defaultFolderPlaceholder))
-                            .tag("")
-
                         ForEach(model.folderOptions) { folder in
                             Text(folder.displayName)
                                 .tag(folder.id)
@@ -95,28 +92,13 @@ struct SettingsCloudTabView: View {
                     }
                     .pickerStyle(.menu)
                     .frame(maxWidth: 420, alignment: .leading)
-                    .disabled(model.isLoadingFolders || model.folderOptions.isEmpty)
-                    .help(localized(L10n.Settings.defaultFolderHelp))
-
-                    Button {
-                        Task {
-                            await model.loadFoldersForCreation(locale: locale)
+                    .simultaneousGesture(
+                        TapGesture().onEnded {
+                            loadFoldersForCreationIfAvailable()
                         }
-                    } label: {
-                        if model.isLoadingFolders {
-                            ProgressView()
-                                .controlSize(.small)
-                        } else {
-                            Label(
-                                LocalizedStringKey(L10n.Settings.defaultFolderReload),
-                                systemImage: "arrow.clockwise"
-                            )
-                            .labelStyle(.iconOnly)
-                        }
-                    }
-                    .buttonStyle(.plain)
+                    )
                     .disabled(model.isOAuthTokenEmpty || model.isLoadingFolders)
-                    .help(localized(L10n.Settings.defaultFolderReload))
+                    .help(localized(L10n.Settings.defaultFolderHelp))
 
                     Spacer()
                 }
@@ -210,6 +192,16 @@ struct SettingsCloudTabView: View {
                         .foregroundStyle(.red)
                 }
             }
+        }
+    }
+
+    private func loadFoldersForCreationIfAvailable() {
+        guard !model.isOAuthTokenEmpty, !model.isLoadingFolders else {
+            return
+        }
+
+        Task {
+            await model.loadFoldersForCreation(locale: locale)
         }
     }
 
