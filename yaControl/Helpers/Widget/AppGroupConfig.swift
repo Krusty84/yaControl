@@ -8,5 +8,5 @@
 import Foundation
 
 enum AppGroupConfig {
-    static let identifier = "7M7T9VZ52G.com.krusty84.yaControl"
+    static let identifier = "group.com.krusty84.yaControl"
 }
