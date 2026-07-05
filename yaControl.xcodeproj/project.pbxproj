@@ -10,7 +10,7 @@
 		3DA094392FDE11ED00A7CEE1 /* ElegantTabs in Frameworks */ = {isa = PBXBuildFile; productRef = 3DA094382FDE11ED00A7CEE1 /* ElegantTabs */; };
 		3DA0943C2FDE121200A7CEE1 /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 3DA0943B2FDE121200A7CEE1 /* LaunchAtLogin */; };
 		3DE02E9D2FE70072000CDCBD /* CloudSummaryWidgetFreshness.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE02E9C2FE7006D000CDCBD /* CloudSummaryWidgetFreshness.swift */; };
-		3DF000012FDD000100000101 /* yaControlWidget.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 3DF000012FDD000100000001 /* yaControlWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		3DF000012FDD000100000101 /* yaControlWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 3DF000012FDD000100000001 /* yaControlWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		3DF000012FDD000100000102 /* CloudSummaryWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF000012FDD000100000003 /* CloudSummaryWidget.swift */; };
 		3DF000012FDD000100000103 /* CloudSummaryWidgetEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF000012FDD000100000004 /* CloudSummaryWidgetEntry.swift */; };
 		3DF000012FDD000100000104 /* CloudSummaryWidgetProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF000012FDD000100000005 /* CloudSummaryWidgetProvider.swift */; };
@@ -40,15 +40,15 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		3DF000012FDD000100000202 /* Embed App Extensions */ = {
+		3DF000012FDD000100000202 /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				3DF000012FDD000100000101 /* yaControlWidget.appex in Embed App Extensions */,
+				3DF000012FDD000100000101 /* yaControlWidget.appex in Embed Foundation Extensions */,
 			);
-			name = "Embed App Extensions";
+			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -72,6 +72,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		3D8E05D82FF9A7BA00F73456 /* Exceptions for "yaControl" folder in "yaControl" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 3D333ED22D639DF100D795BF /* yaControl */;
+		};
 		3DCD404C2FDEE3200074A9AA /* Exceptions for "yaControl" folder in "yaControlWidget" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -86,6 +93,7 @@
 		3D333ED52D639DF100D795BF /* yaControl */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
+				3D8E05D82FF9A7BA00F73456 /* Exceptions for "yaControl" folder in "yaControl" target */,
 				3DCD404C2FDEE3200074A9AA /* Exceptions for "yaControl" folder in "yaControlWidget" target */,
 			);
 			path = yaControl;
@@ -196,7 +204,7 @@
 				3D333ECF2D639DF100D795BF /* Sources */,
 				3D333ED02D639DF100D795BF /* Frameworks */,
 				3D333ED12D639DF100D795BF /* Resources */,
-				3DF000012FDD000100000202 /* Embed App Extensions */,
+				3DF000012FDD000100000202 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
@@ -268,7 +276,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1620;
-				LastUpgradeCheck = 1620;
+				LastUpgradeCheck = 2650;
 				TargetAttributes = {
 					3D333ED22D639DF100D795BF = {
 						CreatedOnToolsVersion = 16.2;
@@ -386,6 +394,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -415,7 +424,9 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 7M7T9VZ52G;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -439,6 +450,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -449,6 +461,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -478,7 +491,9 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 7M7T9VZ52G;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -495,6 +510,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 			};
 			name = Release;
@@ -510,6 +526,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"yaControl/Preview Content\"";
 				DEVELOPMENT_TEAM = 7M7T9VZ52G;
 				ENABLE_APP_SANDBOX = YES;
@@ -539,6 +556,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.krusty84.yaControl;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
 				RUNTIME_EXCEPTION_ALLOW_DYLD_ENVIRONMENT_VARIABLES = NO;
 				RUNTIME_EXCEPTION_ALLOW_JIT = NO;
 				RUNTIME_EXCEPTION_ALLOW_UNSIGNED_EXECUTABLE_MEMORY = NO;
@@ -561,6 +579,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"yaControl/Preview Content\"";
 				DEVELOPMENT_TEAM = 7M7T9VZ52G;
 				ENABLE_APP_SANDBOX = YES;
@@ -590,6 +609,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.krusty84.yaControl;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
 				RUNTIME_EXCEPTION_ALLOW_DYLD_ENVIRONMENT_VARIABLES = NO;
 				RUNTIME_EXCEPTION_ALLOW_JIT = NO;
 				RUNTIME_EXCEPTION_ALLOW_UNSIGNED_EXECUTABLE_MEMORY = NO;
@@ -610,6 +630,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 7M7T9VZ52G;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -631,6 +652,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.krusty84.yaControl.CloudSummaryWidget;
 				PRODUCT_BUNDLE_PACKAGE_TYPE = "XPC!";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
 				RUNTIME_EXCEPTION_ALLOW_DYLD_ENVIRONMENT_VARIABLES = NO;
 				RUNTIME_EXCEPTION_ALLOW_JIT = NO;
 				RUNTIME_EXCEPTION_ALLOW_UNSIGNED_EXECUTABLE_MEMORY = NO;
@@ -652,6 +674,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 7M7T9VZ52G;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -673,6 +696,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.krusty84.yaControl.CloudSummaryWidget;
 				PRODUCT_BUNDLE_PACKAGE_TYPE = "XPC!";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
 				RUNTIME_EXCEPTION_ALLOW_DYLD_ENVIRONMENT_VARIABLES = NO;
 				RUNTIME_EXCEPTION_ALLOW_JIT = NO;
 				RUNTIME_EXCEPTION_ALLOW_UNSIGNED_EXECUTABLE_MEMORY = NO;
@@ -692,7 +716,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 7M7T9VZ52G;
+				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -715,7 +739,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 7M7T9VZ52G;
+				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
